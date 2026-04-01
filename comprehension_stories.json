@@ -1,0 +1,322 @@
+{
+    "comprehension_stories": [
+        {
+            "id": "story_01",
+            "title_nl": "De Verkeerde Halte",
+            "title_en": "The Wrong Stop",
+            "theme": "Urban Isolation",
+            "full_nl_text": "Ik was erg moe en zat in de laatste trein naar de stad. Het regende hard tegen het raam. Ik deed mijn ogen dicht om even te rusten. Toen ik wakker werd, was de trein helemaal leeg. Ik was bij de verkeerde halte. Het perron was koud, nat en erg donker.",
+            "sentences": [
+                {
+                    "nl": "Ik was erg moe en zat in de laatste trein naar de stad.",
+                    "en": "I was very tired and sat in the last train to the city.",
+                    "redacted_words": [
+                        "trein",
+                        "stad"
+                    ]
+                },
+                {
+                    "nl": "Het regende hard tegen het raam.",
+                    "en": "It rained hard against the window.",
+                    "redacted_words": [
+                        "raam"
+                    ]
+                },
+                {
+                    "nl": "Ik deed mijn ogen dicht om even te rusten.",
+                    "en": "I closed my eyes to rest for a moment.",
+                    "redacted_words": [
+                        "ogen"
+                    ]
+                },
+                {
+                    "nl": "Toen ik wakker werd, was de trein helemaal leeg.",
+                    "en": "When I woke up, the train was completely empty.",
+                    "redacted_words": [
+                        "leeg"
+                    ]
+                },
+                {
+                    "nl": "Ik was bij de verkeerde halte.",
+                    "en": "I was at the wrong stop.",
+                    "redacted_words": [
+                        "halte"
+                    ]
+                },
+                {
+                    "nl": "Het perron was koud, nat en erg donker.",
+                    "en": "The platform was cold, wet and very dark.",
+                    "redacted_words": [
+                        "koud",
+                        "donker"
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "story_02",
+            "title_nl": "De Rode Taart",
+            "title_en": "The Red Cake (Edible)",
+            "theme": "Altered Reality",
+            "full_nl_text": "Ik kocht een klein rood cakeje in de coffeeshop. Ik at de helft op mijn balkon in de regen. Na een uur leek het gebouw plotseling heel groot. De schaduwen op de muur begonnen te bewegen. Ik voelde me heel vreemd en een beetje bang. Ik ging naar binnen en dronk snel veel water.",
+            "sentences": [
+                {
+                    "nl": "Ik kocht een klein rood cakeje in de coffeeshop.",
+                    "en": "I bought a small red cake in the coffeeshop.",
+                    "redacted_words": [
+                        "cakeje"
+                    ]
+                },
+                {
+                    "nl": "Ik at de helft op mijn balkon in de regen.",
+                    "en": "I ate half on my balcony in the rain.",
+                    "redacted_words": [
+                        "balkon",
+                        "regen"
+                    ]
+                },
+                {
+                    "nl": "Na een uur leek het gebouw plotseling heel groot.",
+                    "en": "After an hour the building suddenly seemed very big.",
+                    "redacted_words": [
+                        "gebouw"
+                    ]
+                },
+                {
+                    "nl": "De schaduwen op de muur begonnen te bewegen.",
+                    "en": "The shadows on the wall began to move.",
+                    "redacted_words": [
+                        "schaduwen",
+                        "muur"
+                    ]
+                },
+                {
+                    "nl": "Ik voelde me heel vreemd en een beetje bang.",
+                    "en": "I felt very strange and a little scared.",
+                    "redacted_words": [
+                        "vreemd",
+                        "bang"
+                    ]
+                },
+                {
+                    "nl": "Ik ging naar binnen en dronk snel veel water.",
+                    "en": "I went inside and quickly drank a lot of water.",
+                    "redacted_words": [
+                        "binnen",
+                        "water"
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "story_03",
+            "title_nl": "Buitengesloten",
+            "title_en": "Locked Out",
+            "theme": "Frustration",
+            "full_nl_text": "Ik stond voor de zware deur van mijn flat. Ik zocht overal in mijn zwarte jas. Mijn sleutels waren weg. Het was laat in de nacht en ik was helemaal nat. Ik keek naar de lege straat. Er was niemand buiten om mij te helpen.",
+            "sentences": [
+                {
+                    "nl": "Ik stond voor de zware deur van mijn flat.",
+                    "en": "I stood in front of the heavy door of my flat.",
+                    "redacted_words": [
+                        "deur"
+                    ]
+                },
+                {
+                    "nl": "Ik zocht overal in mijn zwarte jas.",
+                    "en": "I searched everywhere in my black coat.",
+                    "redacted_words": [
+                        "jas"
+                    ]
+                },
+                {
+                    "nl": "Mijn sleutels waren weg.",
+                    "en": "My keys were gone.",
+                    "redacted_words": [
+                        "sleutels"
+                    ]
+                },
+                {
+                    "nl": "Het was laat in de nacht en ik was helemaal nat.",
+                    "en": "It was late at night and I was completely wet.",
+                    "redacted_words": [
+                        "nacht",
+                        "nat"
+                    ]
+                },
+                {
+                    "nl": "Ik keek naar de lege straat.",
+                    "en": "I looked at the empty street.",
+                    "redacted_words": [
+                        "straat"
+                    ]
+                },
+                {
+                    "nl": "Er was niemand buiten om mij te helpen.",
+                    "en": "There was no one outside to help me.",
+                    "redacted_words": [
+                        "buiten"
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "story_04",
+            "title_nl": "De Vreemde Buurman",
+            "title_en": "The Strange Neighbour",
+            "theme": "Mystery",
+            "full_nl_text": "Elke nacht hoor ik langzame voetstappen. De buurman loopt urenlang heen en weer. Zijn kamer is precies boven mijn bed. Gisteren zag ik hem in de donkere gang. Hij zei niets en keek alleen naar de vloer. Hij had een oude, natte regenjas aan.",
+            "sentences": [
+                {
+                    "nl": "Elke nacht hoor ik langzame voetstappen.",
+                    "en": "Every night I hear slow footsteps.",
+                    "redacted_words": [
+                        "voetstappen"
+                    ]
+                },
+                {
+                    "nl": "De buurman loopt urenlang heen en weer.",
+                    "en": "The neighbour walks back and forth for hours.",
+                    "redacted_words": [
+                        "buurman"
+                    ]
+                },
+                {
+                    "nl": "Zijn kamer is precies boven mijn bed.",
+                    "en": "His room is exactly above my bed.",
+                    "redacted_words": [
+                        "kamer",
+                        "bed"
+                    ]
+                },
+                {
+                    "nl": "Gisteren zag ik hem in de donkere gang.",
+                    "en": "Yesterday I saw him in the dark hallway.",
+                    "redacted_words": [
+                        "gang"
+                    ]
+                },
+                {
+                    "nl": "Hij zei niets en keek alleen naar de vloer.",
+                    "en": "He said nothing and only looked at the floor.",
+                    "redacted_words": [
+                        "vloer"
+                    ]
+                },
+                {
+                    "nl": "Hij had een oude, natte regenjas aan.",
+                    "en": "He had an old, wet raincoat on.",
+                    "redacted_words": [
+                        "regenjas"
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "story_05",
+            "title_nl": "De Stroomstoring",
+            "title_en": "The Power Cut",
+            "theme": "Noir Atmosphere",
+            "full_nl_text": "Ik zat rustig achter mijn computer te werken. Plotseling ging het licht uit. Het hele gebouw was in één seconde donker. Mijn scherm was de enige lamp in de kamer. Buiten op straat was het ook helemaal stil. Ik hoorde alleen de harde wind.",
+            "sentences": [
+                {
+                    "nl": "Ik zat rustig achter mijn computer te werken.",
+                    "en": "I sat quietly behind my computer working.",
+                    "redacted_words": [
+                        "computer"
+                    ]
+                },
+                {
+                    "nl": "Plotseling ging het licht uit.",
+                    "en": "Suddenly the light went out.",
+                    "redacted_words": [
+                        "licht"
+                    ]
+                },
+                {
+                    "nl": "Het hele gebouw was in één seconde donker.",
+                    "en": "The whole building was dark in one second.",
+                    "redacted_words": [
+                        "gebouw",
+                        "donker"
+                    ]
+                },
+                {
+                    "nl": "Mijn scherm was de enige lamp in de kamer.",
+                    "en": "My screen was the only lamp in the room.",
+                    "redacted_words": [
+                        "scherm"
+                    ]
+                },
+                {
+                    "nl": "Buiten op straat was het ook helemaal stil.",
+                    "en": "Outside on the street it was also completely quiet.",
+                    "redacted_words": [
+                        "straat",
+                        "stil"
+                    ]
+                },
+                {
+                    "nl": "Ik hoorde alleen de harde wind.",
+                    "en": "I only heard the hard wind.",
+                    "redacted_words": [
+                        "wind"
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "story_06",
+            "title_nl": "Het Bericht",
+            "title_en": "The Message",
+            "theme": "Intrigue",
+            "full_nl_text": "Ik vond een klein briefje in mijn jaszak. Ik weet niet wie het heeft geschreven. Er stond maar één zin op het papier. Wacht op mij bij de oude brug. Het handschrift was slordig en gehaast. Ik ging niet, want het voelde te gevaarlijk.",
+            "sentences": [
+                {
+                    "nl": "Ik vond een klein briefje in mijn jaszak.",
+                    "en": "I found a small note in my coat pocket.",
+                    "redacted_words": [
+                        "briefje",
+                        "jaszak"
+                    ]
+                },
+                {
+                    "nl": "Ik weet niet wie het heeft geschreven.",
+                    "en": "I do not know who wrote it.",
+                    "redacted_words": [
+                        "wie"
+                    ]
+                },
+                {
+                    "nl": "Er stond maar één zin op het papier.",
+                    "en": "There was only one sentence on the paper.",
+                    "redacted_words": [
+                        "zin",
+                        "papier"
+                    ]
+                },
+                {
+                    "nl": "Wacht op mij bij de oude brug.",
+                    "en": "Wait for me by the old bridge.",
+                    "redacted_words": [
+                        "brug"
+                    ]
+                },
+                {
+                    "nl": "Het handschrift was slordig en gehaast.",
+                    "en": "The handwriting was messy and rushed.",
+                    "redacted_words": [
+                        "handschrift"
+                    ]
+                },
+                {
+                    "nl": "Ik ging niet, want het voelde te gevaarlijk.",
+                    "en": "I did not go, because it felt too dangerous.",
+                    "redacted_words": [
+                        "gevaarlijk"
+                    ]
+                }
+            ]
+        }
+    ]
+}

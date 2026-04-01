@@ -1,0 +1,58 @@
+# ── Dependencies ──────────────────────────────────────
+node_modules/
+
+# ── Build Output ──────────────────────────────────────
+dist/
+dist-ssr/
+
+# ── Environment & Secrets ─────────────────────────────
+.env
+.env.local
+.env.*
+*.local
+
+# ── Python ────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+env/
+backend/.venv/
+backend/env_win/
+backend/libs/
+backend/.cache/
+backend/lessons/.ipynb_checkpoints/
+backend/active_intercepts.json
+
+# ── Scratch & Notes ───────────────────────────────────
+creases/
+
+# ── Agent Skills (non-project-specific) ──────────────
+.agents/skills/clean-code/
+.agents/skills/code-comments/
+.agents/skills/find-skills/
+
+# ── Editor & IDE ──────────────────────────────────────
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ── OS ────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Logs ──────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+build_error.txt

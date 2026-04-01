@@ -1,0 +1,3860 @@
+[
+    {
+        "lesson_id": "nl_ch1_1",
+        "metadata": {
+            "title": "Chapter 1: The Foundations",
+            "subtitle": "1.1 The Alphabet",
+            "template": "Grid_Interactive",
+            "content_type": "phonics",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "These are the sounds that make the Dutch alphabet unique to English ears. Listen carefully to the vowels.",
+            "groups": null,
+            "next_lesson": "nl_ch1_2"
+        },
+        "content": "The Dutch alphabet consists of 26 letters. Click each letter to hear its standard pronunciation.",
+        "assets": [
+            {
+                "dutch": "A",
+                "english": "A",
+                "type": "letter",
+                "tts": "a",
+                "pronunciation": "ah",
+                "audio": "nl_ch1_1_a.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "B",
+                "english": "B",
+                "type": "letter",
+                "tts": "be",
+                "pronunciation": "bay",
+                "audio": "nl_ch1_1_b.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "C",
+                "english": "C",
+                "type": "letter",
+                "tts": "ce",
+                "pronunciation": "say",
+                "audio": "nl_ch1_1_c.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "D",
+                "english": "D",
+                "type": "letter",
+                "tts": "de",
+                "pronunciation": "day",
+                "audio": "nl_ch1_1_d.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "E",
+                "english": "E",
+                "type": "letter",
+                "tts": "e",
+                "pronunciation": "ay",
+                "audio": "nl_ch1_1_e.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "F",
+                "english": "F",
+                "type": "letter",
+                "tts": "ef",
+                "pronunciation": "ef",
+                "audio": "nl_ch1_1_f.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "G",
+                "english": "G",
+                "type": "letter",
+                "tts": "ge",
+                "pronunciation": "khay (guttural)",
+                "audio": "nl_ch1_1_g.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "H",
+                "english": "H",
+                "type": "letter",
+                "tts": "ha",
+                "pronunciation": "hah",
+                "audio": "nl_ch1_1_h.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "I",
+                "english": "I",
+                "type": "letter",
+                "tts": "i",
+                "pronunciation": "ee",
+                "audio": "nl_ch1_1_i.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "J",
+                "english": "J",
+                "type": "letter",
+                "tts": "je",
+                "pronunciation": "yay",
+                "audio": "nl_ch1_1_j.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "K",
+                "english": "K",
+                "type": "letter",
+                "tts": "ka",
+                "pronunciation": "kah",
+                "audio": "nl_ch1_1_k.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "L",
+                "english": "L",
+                "type": "letter",
+                "tts": "el",
+                "pronunciation": "el",
+                "audio": "nl_ch1_1_l.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "M",
+                "english": "M",
+                "type": "letter",
+                "tts": "em",
+                "pronunciation": "em",
+                "audio": "nl_ch1_1_m.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "N",
+                "english": "N",
+                "type": "letter",
+                "tts": "en",
+                "pronunciation": "en",
+                "audio": "nl_ch1_1_n.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "O",
+                "english": "O",
+                "type": "letter",
+                "tts": "o",
+                "pronunciation": "oh",
+                "audio": "nl_ch1_1_o.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "P",
+                "english": "P",
+                "type": "letter",
+                "tts": "pe",
+                "pronunciation": "pay",
+                "audio": "nl_ch1_1_p.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Q",
+                "english": "Q",
+                "type": "letter",
+                "tts": "ku",
+                "pronunciation": "kuu",
+                "audio": "nl_ch1_1_q.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "R",
+                "english": "R",
+                "type": "letter",
+                "tts": "er",
+                "pronunciation": "er (rolled)",
+                "audio": "nl_ch1_1_r.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "S",
+                "english": "S",
+                "type": "letter",
+                "tts": "es",
+                "pronunciation": "es",
+                "audio": "nl_ch1_1_s.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "T",
+                "english": "T",
+                "type": "letter",
+                "tts": "te",
+                "pronunciation": "tay",
+                "audio": "nl_ch1_1_t.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "U",
+                "english": "U",
+                "type": "letter",
+                "tts": "u",
+                "pronunciation": "uu (like 'ew' with rounded lips)",
+                "audio": "nl_ch1_1_u.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "V",
+                "english": "V",
+                "type": "letter",
+                "tts": "ve",
+                "pronunciation": "fay",
+                "audio": "nl_ch1_1_v.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "W",
+                "english": "W",
+                "type": "letter",
+                "tts": "we",
+                "pronunciation": "vay",
+                "audio": "nl_ch1_1_w.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "X",
+                "english": "X",
+                "type": "letter",
+                "tts": "iks",
+                "pronunciation": "iks",
+                "audio": "nl_ch1_1_x.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Y",
+                "english": "Y",
+                "type": "letter",
+                "tts": "ij",
+                "pronunciation": "ay",
+                "audio": "nl_ch1_1_y.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Z",
+                "english": "Z",
+                "type": "letter",
+                "tts": "zet",
+                "pronunciation": "zet",
+                "audio": "nl_ch1_1_z.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch1_2",
+        "metadata": {
+            "title": "Chapter 1: The Foundations",
+            "subtitle": "1.2 Distinct Consonants",
+            "template": "Grid_Interactive",
+            "content_type": "phonics",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "These are the consonant sounds that Dutch uses differently from English. Some have no direct equivalent at all.",
+            "groups": null,
+            "next_lesson": "nl_ch1_3"
+        },
+        "content": "Most consonants sound similar to English. However, a few have very distinct pronunciations. Note that P, T, and K are spoken without a puff of air.",
+        "assets": [
+            {
+                "dutch": "P",
+                "english": "Cap",
+                "type": "phoneme",
+                "tts": "pet",
+                "pronunciation": "pet (no puff of air)",
+                "audio": "nl_ch1_2_p.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "T",
+                "english": "Without a puff of air",
+                "type": "phoneme",
+                "tts": "tent",
+                "pronunciation": "tent (no puff of air)",
+                "audio": "nl_ch1_2_t.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "K",
+                "english": "Without a puff of air",
+                "type": "phoneme",
+                "tts": "kat",
+                "pronunciation": "kaht (no puff of air)",
+                "audio": "nl_ch1_2_k.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "CH",
+                "english": "Light",
+                "type": "phoneme",
+                "tts": "licht",
+                "pronunciation": "likht (guttural kh)",
+                "audio": "nl_ch1_2_ch.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "SCH",
+                "english": "Ship",
+                "type": "phoneme",
+                "tts": "schip",
+                "pronunciation": "skhip (s + guttural kh together)",
+                "audio": "nl_ch1_2_sch.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "G",
+                "english": "Insane",
+                "type": "phoneme",
+                "tts": "gek",
+                "pronunciation": "khekh (guttural)",
+                "audio": "nl_ch1_2_g.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "W",
+                "english": "White",
+                "type": "phoneme",
+                "tts": "wit",
+                "pronunciation": "vit",
+                "audio": "nl_ch1_2_w.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "V",
+                "english": "Fat",
+                "type": "phoneme",
+                "tts": "vet",
+                "pronunciation": "fet",
+                "audio": "nl_ch1_2_v.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "R",
+                "english": "Fun",
+                "type": "phoneme",
+                "tts": "pret",
+                "pronunciation": "pret (rolled r)",
+                "audio": "nl_ch1_2_r.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "J",
+                "english": "Sounds like Y",
+                "type": "phoneme",
+                "tts": "ja",
+                "pronunciation": "yah",
+                "audio": "nl_ch1_2_j.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "SJ",
+                "english": "Sounds like SH",
+                "type": "phoneme",
+                "tts": "sjaal",
+                "pronunciation": "shahl",
+                "audio": "nl_ch1_2_sj.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "TJ",
+                "english": "Sounds like CH",
+                "type": "phoneme",
+                "tts": "tja",
+                "pronunciation": "chah",
+                "audio": "nl_ch1_2_tj.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch1_3",
+        "metadata": {
+            "title": "Chapter 1: The Foundations",
+            "subtitle": "1.3 Short and Long Vowels",
+            "template": "Grid_Interactive",
+            "content_type": "phonics",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "The length of a vowel completely changes the meaning of a word in Dutch. Listen to the difference between short and long sounds.",
+            "groups": null,
+            "next_lesson": "nl_ch1_4"
+        },
+        "content": "Dutch vowels can be short or long. The spelling changes to indicate the length of the sound.",
+        "assets": [
+            {
+                "dutch": "A (kort)",
+                "english": "A (Short)",
+                "type": "phoneme",
+                "tts": "man",
+                "pronunciation": "mahn",
+                "audio": "nl_ch1_3_a_short.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "AA (lang)",
+                "english": "AA (Long)",
+                "type": "phoneme",
+                "tts": "straat",
+                "pronunciation": "straht",
+                "audio": "nl_ch1_3_aa_long.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "E (kort)",
+                "english": "E (Short)",
+                "type": "phoneme",
+                "tts": "vet",
+                "pronunciation": "fet",
+                "audio": "nl_ch1_3_e_short.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "EE (lang)",
+                "english": "EE (Long)",
+                "type": "phoneme",
+                "tts": "heel",
+                "pronunciation": "hayl",
+                "audio": "nl_ch1_3_ee_long.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "I (kort)",
+                "english": "I (Short)",
+                "type": "phoneme",
+                "tts": "wit",
+                "pronunciation": "vit",
+                "audio": "nl_ch1_3_i_short.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "IE (lang)",
+                "english": "IE (Long)",
+                "type": "phoneme",
+                "tts": "niet",
+                "pronunciation": "neet",
+                "audio": "nl_ch1_3_ie_long.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "O (kort)",
+                "english": "O (Short)",
+                "type": "phoneme",
+                "tts": "pot",
+                "pronunciation": "pot",
+                "audio": "nl_ch1_3_o_short.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "OO (lang)",
+                "english": "OO (Long)",
+                "type": "phoneme",
+                "tts": "boot",
+                "pronunciation": "boat",
+                "audio": "nl_ch1_3_oo_long.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "U (kort)",
+                "english": "U (Short)",
+                "type": "phoneme",
+                "tts": "bus",
+                "pronunciation": "bus",
+                "audio": "nl_ch1_3_u_short.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "UU (lang)",
+                "english": "UU (Long)",
+                "type": "phoneme",
+                "tts": "muziek",
+                "pronunciation": "muu-zeek",
+                "audio": "nl_ch1_3_uu_long.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "OE",
+                "english": "OE sound",
+                "type": "phoneme",
+                "tts": "poel",
+                "pronunciation": "pool",
+                "audio": "nl_ch1_3_oe.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "EU",
+                "english": "EU sound",
+                "type": "phoneme",
+                "tts": "neus",
+                "pronunciation": "nurs (ur as in 'fur', with rounded lips)",
+                "audio": "nl_ch1_3_eu.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch1_4",
+        "metadata": {
+            "title": "Chapter 1: The Foundations",
+            "subtitle": "1.4 Diphthongs",
+            "template": "Grid_Interactive",
+            "content_type": "phonics",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "Diphthongs are tricky combinations where your mouth shifts shape halfway through the sound.",
+            "groups": null,
+            "next_lesson": "nl_ch1_5"
+        },
+        "content": "Diphthongs are vowel combinations that glide from one sound to another. Click each to hear how the sounds blend together.",
+        "assets": [
+            {
+                "dutch": "EI / IJ",
+                "english": "EI / IJ sound",
+                "type": "phoneme",
+                "tts": "trein",
+                "pronunciation": "ay (like 'day')",
+                "audio": "nl_ch1_4_ei.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "AAI",
+                "english": "AAI sound",
+                "type": "phoneme",
+                "tts": "taai",
+                "pronunciation": "tah-ee",
+                "audio": "nl_ch1_4_aai.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "OEI",
+                "english": "OEI sound",
+                "type": "phoneme",
+                "tts": "groei",
+                "pronunciation": "khroo-ee",
+                "audio": "nl_ch1_4_oei.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "OOI",
+                "english": "OOI sound",
+                "type": "phoneme",
+                "tts": "mooi",
+                "pronunciation": "moy",
+                "audio": "nl_ch1_4_ooi.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "OU / AU",
+                "english": "OU / AU sound",
+                "type": "phoneme",
+                "tts": "blauw",
+                "pronunciation": "blaw",
+                "audio": "nl_ch1_4_ou.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "EEUW",
+                "english": "EEUW sound",
+                "type": "phoneme",
+                "tts": "leeuw",
+                "pronunciation": "lay-oo",
+                "audio": "nl_ch1_4_eeuw.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "IEUW",
+                "english": "IEUW sound",
+                "type": "phoneme",
+                "tts": "nieuw",
+                "pronunciation": "nee-oo",
+                "audio": "nl_ch1_4_ieuw.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "UW",
+                "english": "UW sound",
+                "type": "phoneme",
+                "tts": "sluw",
+                "pronunciation": "sluu-oo",
+                "audio": "nl_ch1_4_uw.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "UI",
+                "english": "UI sound",
+                "type": "phoneme",
+                "tts": "huis",
+                "pronunciation": "ow-ee (said together)",
+                "audio": "nl_ch1_4_ui.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch1_5",
+        "metadata": {
+            "title": "Chapter 1: The Foundations",
+            "subtitle": "1.5 Counting to 100",
+            "template": "Sequence_List",
+            "content_type": "numbers",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "Time to master the numbers. Pay close attention to the inversion rule after you pass twenty.",
+            "groups": null,
+            "next_lesson": "nl_ch1_6"
+        },
+        "content": "Let us start with the base numbers. Once you pass 20, Dutch uses an inverted counting rule where the unit is said before the ten. For example, 21 is \"eenentwintig\", which translates to \"one-and-twenty\".",
+        "assets": [
+            {
+                "dutch": "0",
+                "english": "Zero",
+                "type": "word",
+                "tts": "nul",
+                "pronunciation": "nul",
+                "audio": "nl_ch1_5_0.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "1",
+                "english": "One",
+                "type": "word",
+                "tts": "\u00e9\u00e9n",
+                "pronunciation": "ayn",
+                "audio": "nl_ch1_5_1.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "2",
+                "english": "Two",
+                "type": "word",
+                "tts": "twee",
+                "pronunciation": "tway",
+                "audio": "nl_ch1_5_2.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "3",
+                "english": "Three",
+                "type": "word",
+                "tts": "drie",
+                "pronunciation": "dree",
+                "audio": "nl_ch1_5_3.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "4",
+                "english": "Four",
+                "type": "word",
+                "tts": "vier",
+                "pronunciation": "feer",
+                "audio": "nl_ch1_5_4.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "5",
+                "english": "Five",
+                "type": "word",
+                "tts": "vijf",
+                "pronunciation": "fayf",
+                "audio": "nl_ch1_5_5.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "6",
+                "english": "Six",
+                "type": "word",
+                "tts": "zes",
+                "pronunciation": "zes",
+                "audio": "nl_ch1_5_6.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "7",
+                "english": "Seven",
+                "type": "word",
+                "tts": "zeven",
+                "pronunciation": "zay-vun",
+                "audio": "nl_ch1_5_7.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "8",
+                "english": "Eight",
+                "type": "word",
+                "tts": "acht",
+                "pronunciation": "akht",
+                "audio": "nl_ch1_5_8.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "9",
+                "english": "Nine",
+                "type": "word",
+                "tts": "negen",
+                "pronunciation": "nay-khun",
+                "audio": "nl_ch1_5_9.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "10",
+                "english": "Ten",
+                "type": "word",
+                "tts": "tien",
+                "pronunciation": "teen",
+                "audio": "nl_ch1_5_10.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "11",
+                "english": "Eleven",
+                "type": "word",
+                "tts": "elf",
+                "pronunciation": "elf",
+                "audio": "nl_ch1_5_11.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "12",
+                "english": "Twelve",
+                "type": "word",
+                "tts": "twaalf",
+                "pronunciation": "twahlf",
+                "audio": "nl_ch1_5_12.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "20",
+                "english": "Twenty",
+                "type": "word",
+                "tts": "twintig",
+                "pronunciation": "twin-tikh",
+                "audio": "nl_ch1_5_20.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "21",
+                "english": "Twenty-one",
+                "type": "word",
+                "tts": "eenentwintig",
+                "pronunciation": "ay-nun-twin-tikh",
+                "audio": "nl_ch1_5_21.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "30",
+                "english": "Thirty",
+                "type": "word",
+                "tts": "dertig",
+                "pronunciation": "dehr-tikh",
+                "audio": "nl_ch1_5_30.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "40",
+                "english": "Forty",
+                "type": "word",
+                "tts": "veertig",
+                "pronunciation": "fayr-tikh",
+                "audio": "nl_ch1_5_40.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "50",
+                "english": "Fifty",
+                "type": "word",
+                "tts": "vijftig",
+                "pronunciation": "fayf-tikh",
+                "audio": "nl_ch1_5_50.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "60",
+                "english": "Sixty",
+                "type": "word",
+                "tts": "zestig",
+                "pronunciation": "zes-tikh",
+                "audio": "nl_ch1_5_60.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "70",
+                "english": "Seventy",
+                "type": "word",
+                "tts": "zeventig",
+                "pronunciation": "zay-vun-tikh",
+                "audio": "nl_ch1_5_70.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "80",
+                "english": "Eighty",
+                "type": "word",
+                "tts": "tachtig",
+                "pronunciation": "takh-tikh",
+                "audio": "nl_ch1_5_80.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "90",
+                "english": "Ninety",
+                "type": "word",
+                "tts": "negentig",
+                "pronunciation": "nay-khun-tikh",
+                "audio": "nl_ch1_5_90.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "100",
+                "english": "One hundred",
+                "type": "word",
+                "tts": "honderd",
+                "pronunciation": "hon-durt",
+                "audio": "nl_ch1_5_100.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "1000",
+                "english": "One thousand",
+                "type": "word",
+                "tts": "duizend",
+                "pronunciation": "dow-zunt",
+                "audio": "nl_ch1_5_1000.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch1_6",
+        "metadata": {
+            "title": "Chapter 1: The Foundations",
+            "subtitle": "1.6 Order, Sequence, and Colours",
+            "template": "Grouped_List",
+            "content_type": "vocabulary",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "Here we introduce ordinal numbers for sequencing, followed by basic colours to give you your first descriptive words.",
+            "groups": [
+                "ordinals",
+                "colours"
+            ],
+            "next_lesson": "nl_ch1_7"
+        },
+        "content": "Ordinal numbers are essential for making lists and dates. Alongside these, we will introduce basic colours to give you your first descriptive vocabulary words.",
+        "assets": [
+            {
+                "dutch": "eerste",
+                "english": "1st",
+                "type": "word",
+                "tts": "eerste",
+                "pronunciation": "ays-tuh",
+                "audio": "nl_ch1_6_1st.mp3",
+                "group": "ordinals",
+                "speaker": null
+            },
+            {
+                "dutch": "tweede",
+                "english": "2nd",
+                "type": "word",
+                "tts": "tweede",
+                "pronunciation": "tway-duh",
+                "audio": "nl_ch1_6_2nd.mp3",
+                "group": "ordinals",
+                "speaker": null
+            },
+            {
+                "dutch": "derde",
+                "english": "3rd",
+                "type": "word",
+                "tts": "derde",
+                "pronunciation": "dehr-duh",
+                "audio": "nl_ch1_6_3rd.mp3",
+                "group": "ordinals",
+                "speaker": null
+            },
+            {
+                "dutch": "rood",
+                "english": "Red",
+                "type": "word",
+                "tts": "rood",
+                "pronunciation": "road",
+                "audio": "nl_ch1_6_red.mp3",
+                "group": "colours",
+                "speaker": null
+            },
+            {
+                "dutch": "blauw",
+                "english": "Blue",
+                "type": "word",
+                "tts": "blauw",
+                "pronunciation": "blaw",
+                "audio": "nl_ch1_6_blue.mp3",
+                "group": "colours",
+                "speaker": null
+            },
+            {
+                "dutch": "groen",
+                "english": "Green",
+                "type": "word",
+                "tts": "groen",
+                "pronunciation": "khroon",
+                "audio": "nl_ch1_6_green.mp3",
+                "group": "colours",
+                "speaker": null
+            },
+            {
+                "dutch": "geel",
+                "english": "Yellow",
+                "type": "word",
+                "tts": "geel",
+                "pronunciation": "khayl",
+                "audio": "nl_ch1_6_yellow.mp3",
+                "group": "colours",
+                "speaker": null
+            },
+            {
+                "dutch": "zwart",
+                "english": "Black",
+                "type": "word",
+                "tts": "zwart",
+                "pronunciation": "zwahrt",
+                "audio": "nl_ch1_6_black.mp3",
+                "group": "colours",
+                "speaker": null
+            },
+            {
+                "dutch": "wit",
+                "english": "White",
+                "type": "word",
+                "tts": "wit",
+                "pronunciation": "vit",
+                "audio": "nl_ch1_6_white.mp3",
+                "group": "colours",
+                "speaker": null
+            },
+            {
+                "dutch": "oranje",
+                "english": "Orange",
+                "type": "word",
+                "tts": "oranje",
+                "pronunciation": "oh-rahn-yuh",
+                "audio": "nl_ch1_6_orange.mp3",
+                "group": "colours",
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch1_7",
+        "metadata": {
+            "title": "Chapter 1: The Foundations",
+            "subtitle": "1.7 Greetings & Quick Responses",
+            "template": "Audio_List",
+            "content_type": "phrases",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "These are your first Dutch words in the real world. Greetings open every conversation, so learn them until they feel automatic.",
+            "groups": null,
+            "next_lesson": "nl_ch2_1"
+        },
+        "content": "Let us learn some basic greetings and icebreakers. These simple phrases will help you feel conversational right from the start.",
+        "assets": [
+            {
+                "dutch": "Hallo",
+                "english": "Hello",
+                "type": "word",
+                "tts": "Hallo",
+                "pronunciation": "hah-low",
+                "audio": "nl_ch1_7_hallo.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Goedemorgen",
+                "english": "Good morning",
+                "type": "word",
+                "tts": "Goedemorgen",
+                "pronunciation": "khoo-duh-mor-khun",
+                "audio": "nl_ch1_7_goedemorgen.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Goedenavond",
+                "english": "Good evening",
+                "type": "word",
+                "tts": "Goedenavond",
+                "pronunciation": "khoo-duh-nah-vont",
+                "audio": "nl_ch1_7_goedenavond.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Tot ziens",
+                "english": "See you later",
+                "type": "phrase",
+                "tts": "Tot ziens",
+                "pronunciation": "tot zeens",
+                "audio": "nl_ch1_7_totziens.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Dag",
+                "english": "Goodbye",
+                "type": "word",
+                "tts": "Dag",
+                "pronunciation": "dakh",
+                "audio": "nl_ch1_7_dag.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Wat leuk!",
+                "english": "How nice!",
+                "type": "phrase",
+                "tts": "Wat leuk",
+                "pronunciation": "vat lurk",
+                "audio": "nl_ch1_7_watleuk.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Dank je",
+                "english": "Thank you",
+                "type": "phrase",
+                "tts": "Dank je",
+                "pronunciation": "dahnk yuh",
+                "audio": "nl_ch1_7_dankje.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Geen probleem",
+                "english": "No problem",
+                "type": "phrase",
+                "tts": "Geen probleem",
+                "pronunciation": "khayn pro-blaym",
+                "audio": "nl_ch1_7_geenprobleem.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch2_1",
+        "metadata": {
+            "title": "Chapter 2: Building Sentences",
+            "subtitle": "2.1 Who is doing it? (Subject Pronouns)",
+            "template": "Grid_Interactive",
+            "content_type": "grammar",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "Learn the core subject pronouns. Pay attention to the stressed and casual forms, as native speakers use the casual forms constantly in everyday speech.",
+            "groups": null,
+            "next_lesson": "nl_ch2_2"
+        },
+        "content": "Notice the cultural difference between the formal 'u' (for strangers or elders) and the informal 'jij/je'. In everyday speech, Dutch people often use reduced forms like 'k, ie, and 't.",
+        "assets": [
+            {
+                "dutch": "ik / 'k",
+                "english": "I (ik = stressed, 'k = casual)",
+                "type": "word",
+                "tts": "ik k",
+                "pronunciation": "ik / kuh",
+                "audio": "nl_ch2_1_ik.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "jij / je",
+                "english": "You informal (jij = stressed, je = casual)",
+                "type": "word",
+                "tts": "jij je",
+                "pronunciation": "yay / yuh",
+                "audio": "nl_ch2_1_jij.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "u",
+                "english": "You formal",
+                "type": "word",
+                "tts": "u",
+                "pronunciation": "uu",
+                "audio": "nl_ch2_1_u.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "hij / ie",
+                "english": "He (hij = stressed, ie = casual)",
+                "type": "word",
+                "tts": "hij ie",
+                "pronunciation": "hay / ee",
+                "audio": "nl_ch2_1_hij.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "zij / ze",
+                "english": "She (zij = stressed, ze = casual)",
+                "type": "word",
+                "tts": "zij ze",
+                "pronunciation": "zay / zuh",
+                "audio": "nl_ch2_1_zij_sing.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "het / 't",
+                "english": "It (het = stressed, 't = casual)",
+                "type": "word",
+                "tts": "het t",
+                "pronunciation": "het / ut",
+                "audio": "nl_ch2_1_het.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "wij / we",
+                "english": "We (wij = stressed, we = casual)",
+                "type": "word",
+                "tts": "wij we",
+                "pronunciation": "vay / wuh",
+                "audio": "nl_ch2_1_wij.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "jullie",
+                "english": "You plural",
+                "type": "word",
+                "tts": "jullie",
+                "pronunciation": "yuu-lee",
+                "audio": "nl_ch2_1_jullie.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "zij / ze",
+                "english": "They (zij = stressed, ze = casual)",
+                "type": "word",
+                "tts": "zij ze",
+                "pronunciation": "zay / zuh",
+                "audio": "nl_ch2_1_zij_plur.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "hen / die",
+                "english": "They non-binary (hen = formal, die = casual)",
+                "type": "word",
+                "tts": "hen die",
+                "pronunciation": "hen / dee",
+                "audio": "nl_ch2_1_hen.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch2_2",
+        "metadata": {
+            "title": "Chapter 2: Building Sentences",
+            "subtitle": "2.2 The Core Verbs (Zijn and Hebben)",
+            "template": "Audio_List",
+            "content_type": "grammar",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "Here are the present tense forms of the two most important irregular verbs in Dutch: zijn (to be) and hebben (to have).",
+            "groups": null,
+            "next_lesson": "nl_ch2_3"
+        },
+        "content": "The verb indicates the action and adapts to the subject. Most full verbs end in -en.",
+        "assets": [
+            {
+                "dutch": "ik ben",
+                "english": "I am",
+                "type": "phrase",
+                "tts": "ik ben",
+                "pronunciation": "ik ben",
+                "audio": "nl_ch2_2_ik_ben.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "jij bent",
+                "english": "You are (informal)",
+                "type": "phrase",
+                "tts": "jij bent",
+                "pronunciation": "yay bent",
+                "audio": "nl_ch2_2_jij_bent.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "u bent",
+                "english": "You are (formal)",
+                "type": "phrase",
+                "tts": "u bent",
+                "pronunciation": "uu bent",
+                "audio": "nl_ch2_2_u_bent.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "is",
+                "english": "He/She/It is",
+                "type": "word",
+                "tts": "is",
+                "pronunciation": "is",
+                "audio": "nl_ch2_2_is.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "zijn",
+                "english": "We/You/They are",
+                "type": "word",
+                "tts": "zijn",
+                "pronunciation": "zayn",
+                "audio": "nl_ch2_2_zijn.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "ik heb",
+                "english": "I have",
+                "type": "phrase",
+                "tts": "ik heb",
+                "pronunciation": "ik hep",
+                "audio": "nl_ch2_2_ik_heb.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "jij hebt",
+                "english": "You have (informal)",
+                "type": "phrase",
+                "tts": "jij hebt",
+                "pronunciation": "yay hept",
+                "audio": "nl_ch2_2_jij_hebt.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "u heeft / u hebt",
+                "english": "You have (formal)",
+                "type": "phrase",
+                "tts": "u heeft u hebt",
+                "pronunciation": "uu hayft / uu hept",
+                "audio": "nl_ch2_2_u_heeft.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "heeft",
+                "english": "He/She/It has",
+                "type": "word",
+                "tts": "heeft",
+                "pronunciation": "hayft",
+                "audio": "nl_ch2_2_heeft.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "hebben",
+                "english": "We/You/They have",
+                "type": "word",
+                "tts": "hebben",
+                "pronunciation": "heb-bun",
+                "audio": "nl_ch2_2_hebben.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch2_3",
+        "metadata": {
+            "title": "Chapter 2: Building Sentences",
+            "subtitle": "2.3 Nouns & Articles (de, het, een)",
+            "template": "Audio_List",
+            "content_type": "grammar",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "Dutch has two definite articles for 'the': 'de' and 'het'. Diminutives always take 'het'.",
+            "groups": null,
+            "next_lesson": "nl_ch2_4"
+        },
+        "content": "'De' is used for common nouns and 'het' for neuter nouns. The word 'een' means 'a' or 'an'. Remember that compound words always take the gender of the final word.",
+        "assets": [
+            {
+                "dutch": "de boom",
+                "english": "The tree",
+                "type": "phrase",
+                "tts": "de boom",
+                "pronunciation": "duh boam",
+                "audio": "nl_ch2_3_de_boom.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "de appel",
+                "english": "The apple",
+                "type": "phrase",
+                "tts": "de appel",
+                "pronunciation": "duh ah-pul",
+                "audio": "nl_ch2_3_de_appel.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "het goud",
+                "english": "The gold",
+                "type": "phrase",
+                "tts": "het goud",
+                "pronunciation": "het khowt",
+                "audio": "nl_ch2_3_het_goud.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "het meisje",
+                "english": "The girl",
+                "type": "phrase",
+                "tts": "het meisje",
+                "pronunciation": "het mays-yuh",
+                "audio": "nl_ch2_3_het_meisje.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "het wijnglas",
+                "english": "The wine glass",
+                "type": "phrase",
+                "tts": "het wijnglas",
+                "pronunciation": "het vayn-khlas",
+                "audio": "nl_ch2_3_het_wijnglas.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "een huis",
+                "english": "A house",
+                "type": "phrase",
+                "tts": "een huis",
+                "pronunciation": "un how-ees",
+                "audio": "nl_ch2_3_een_huis.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch2_4",
+        "metadata": {
+            "title": "Chapter 2: Building Sentences",
+            "subtitle": "2.4 Plurals and Spelling Quirks",
+            "template": "Audio_List",
+            "content_type": "grammar",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "To make nouns plural, usually add -en or -s. The golden rule is that all plural nouns take the article 'de', regardless of their singular gender.",
+            "groups": null,
+            "next_lesson": "nl_ch2_5"
+        },
+        "content": "Watch out for spelling changes to keep vowel sounds short or long. A small group of nouns takes an -eren ending instead.",
+        "assets": [
+            {
+                "dutch": "de boeken",
+                "english": "The books",
+                "type": "phrase",
+                "tts": "de boeken",
+                "pronunciation": "duh boo-kun",
+                "audio": "nl_ch2_4_de_boeken.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "de lepels",
+                "english": "The spoons",
+                "type": "phrase",
+                "tts": "de lepels",
+                "pronunciation": "duh lay-puls",
+                "audio": "nl_ch2_4_de_lepels.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "de kinderen",
+                "english": "The children",
+                "type": "phrase",
+                "tts": "de kinderen",
+                "pronunciation": "duh kin-duh-run",
+                "audio": "nl_ch2_4_de_kinderen.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "de meisjes",
+                "english": "The girls",
+                "type": "phrase",
+                "tts": "de meisjes",
+                "pronunciation": "duh mays-yus",
+                "audio": "nl_ch2_4_de_meisjes.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "de mannen",
+                "english": "The men",
+                "type": "phrase",
+                "tts": "de mannen",
+                "pronunciation": "duh mah-nun",
+                "audio": "nl_ch2_4_de_mannen.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "de bomen",
+                "english": "The trees",
+                "type": "phrase",
+                "tts": "de bomen",
+                "pronunciation": "duh boa-mun",
+                "audio": "nl_ch2_4_de_bomen.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch2_5",
+        "metadata": {
+            "title": "Chapter 2: Building Sentences",
+            "subtitle": "2.5 Pointing Things Out (Demonstratives)",
+            "template": "Audio_List",
+            "content_type": "grammar",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "Use 'deze' and 'die' for de-words and all plurals. Use 'dit' and 'dat' for singular het-words. Memory trick: de, deze, and die all start with the letter 'd'.",
+            "groups": null,
+            "next_lesson": "nl_ch2_6"
+        },
+        "content": "Use these words to point out specific objects, meaning \"this\" or \"that\".",
+        "assets": [
+            {
+                "dutch": "deze auto",
+                "english": "This car",
+                "type": "phrase",
+                "tts": "deze auto",
+                "pronunciation": "day-zuh ow-toe",
+                "audio": "nl_ch2_5_deze_auto.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "die auto",
+                "english": "That car",
+                "type": "phrase",
+                "tts": "die auto",
+                "pronunciation": "dee ow-toe",
+                "audio": "nl_ch2_5_die_auto.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "dit huis",
+                "english": "This house",
+                "type": "phrase",
+                "tts": "dit huis",
+                "pronunciation": "dit how-ees",
+                "audio": "nl_ch2_5_dit_huis.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "dat huis",
+                "english": "That house",
+                "type": "phrase",
+                "tts": "dat huis",
+                "pronunciation": "daht how-ees",
+                "audio": "nl_ch2_5_dat_huis.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "deze huizen",
+                "english": "These houses",
+                "type": "phrase",
+                "tts": "deze huizen",
+                "pronunciation": "day-zuh how-zun",
+                "audio": "nl_ch2_5_deze_huizen.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch2_6",
+        "metadata": {
+            "title": "Chapter 2: Building Sentences",
+            "subtitle": "2.6 Describing Things (Adjective Endings)",
+            "template": "Audio_List",
+            "content_type": "grammar",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "Adjectives before a noun usually get an -e ending. The big exception is an indefinite singular het-word.",
+            "groups": null,
+            "next_lesson": "nl_ch2_7"
+        },
+        "content": "Adjectives placed after the verb do not change at all. Remember spelling rules apply when adding the -e ending.",
+        "assets": [
+            {
+                "dutch": "het huis is groot",
+                "english": "The house is big",
+                "type": "phrase",
+                "tts": "het huis is groot",
+                "pronunciation": "het how-ees is khroat",
+                "audio": "nl_ch2_6_huis_groot.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "de grote man",
+                "english": "The big man",
+                "type": "phrase",
+                "tts": "de grote man",
+                "pronunciation": "duh khroa-tuh mahn",
+                "audio": "nl_ch2_6_grote_man.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "het grote huis",
+                "english": "The big house",
+                "type": "phrase",
+                "tts": "het grote huis",
+                "pronunciation": "het khroa-tuh how-ees",
+                "audio": "nl_ch2_6_grote_huis.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "een groot huis",
+                "english": "A big house",
+                "type": "phrase",
+                "tts": "een groot huis",
+                "pronunciation": "un khroat how-ees",
+                "audio": "nl_ch2_6_groot_huis.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "dikke",
+                "english": "Fat / Thick",
+                "type": "word",
+                "tts": "dikke",
+                "pronunciation": "dik-kuh",
+                "audio": "nl_ch2_6_dikke.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "dure",
+                "english": "Expensive",
+                "type": "word",
+                "tts": "dure",
+                "pronunciation": "duu-ruh",
+                "audio": "nl_ch2_6_dure.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch2_7",
+        "metadata": {
+            "title": "Chapter 2: Building Sentences",
+            "subtitle": "2.7 Word Order and Asking Questions",
+            "template": "Grouped_List",
+            "content_type": "grammar",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "The standard sentence order is Subject-Verb-Rest. If you start a sentence with time or place, swap the verb and subject (this is called inversion).",
+            "groups": [
+                "sentences",
+                "question_words"
+            ],
+            "next_lesson": "nl_ch3_1"
+        },
+        "content": "To ask a yes/no question, simply put the verb first. Here are examples of inversion, followed by the essential question words.",
+        "assets": [
+            {
+                "dutch": "Ik kom uit Duitsland",
+                "english": "I come from Germany",
+                "type": "phrase",
+                "tts": "Ik kom uit Duitsland",
+                "pronunciation": "ik kom owt dowts-lahnt",
+                "audio": "nl_ch2_7_ik_kom.mp3",
+                "group": "sentences",
+                "speaker": null
+            },
+            {
+                "dutch": "Morgen gaat mijn partner naar Rotterdam",
+                "english": "Tomorrow my partner goes to Rotterdam",
+                "type": "phrase",
+                "tts": "Morgen gaat mijn partner naar Rotterdam",
+                "pronunciation": "mor-khun khaht mayn pahrt-nur nahr rot-tur-dahm",
+                "audio": "nl_ch2_7_morgen_gaat.mp3",
+                "group": "sentences",
+                "speaker": null
+            },
+            {
+                "dutch": "Woon je in Amsterdam?",
+                "english": "Do you live in Amsterdam?",
+                "type": "phrase",
+                "tts": "Woon je in Amsterdam",
+                "pronunciation": "voan yuh in ahm-stur-dahm",
+                "audio": "nl_ch2_7_woon_je.mp3",
+                "group": "sentences",
+                "speaker": null
+            },
+            {
+                "dutch": "wie",
+                "english": "Who",
+                "type": "word",
+                "tts": "wie",
+                "pronunciation": "vee",
+                "audio": "nl_ch2_7_wie.mp3",
+                "group": "question_words",
+                "speaker": null
+            },
+            {
+                "dutch": "wat",
+                "english": "What",
+                "type": "word",
+                "tts": "wat",
+                "pronunciation": "vaht",
+                "audio": "nl_ch2_7_wat.mp3",
+                "group": "question_words",
+                "speaker": null
+            },
+            {
+                "dutch": "waar",
+                "english": "Where",
+                "type": "word",
+                "tts": "waar",
+                "pronunciation": "vahr",
+                "audio": "nl_ch2_7_waar.mp3",
+                "group": "question_words",
+                "speaker": null
+            },
+            {
+                "dutch": "waarom",
+                "english": "Why",
+                "type": "word",
+                "tts": "waarom",
+                "pronunciation": "vah-rom",
+                "audio": "nl_ch2_7_waarom.mp3",
+                "group": "question_words",
+                "speaker": null
+            },
+            {
+                "dutch": "hoe",
+                "english": "How",
+                "type": "word",
+                "tts": "hoe",
+                "pronunciation": "hoo",
+                "audio": "nl_ch2_7_hoe.mp3",
+                "group": "question_words",
+                "speaker": null
+            },
+            {
+                "dutch": "wanneer",
+                "english": "When",
+                "type": "word",
+                "tts": "wanneer",
+                "pronunciation": "vah-neer",
+                "audio": "nl_ch2_7_wanneer.mp3",
+                "group": "question_words",
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch3_1",
+        "metadata": {
+            "title": "Chapter 3: Time, Dates, and Gathering Information",
+            "subtitle": "3.1 The Calendar",
+            "template": "Grouped_List",
+            "content_type": "vocabulary",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "Let us learn the days, seasons, and ordinal numbers needed for dates. Remember that Dutch days and months are not capitalised.",
+            "groups": [
+                "days",
+                "seasons",
+                "ordinals",
+                "time_words"
+            ],
+            "next_lesson": "nl_ch3_2"
+        },
+        "content": "We have broken the calendar down into days, seasons, sequencing numbers, and relative time words to help you navigate your schedule.",
+        "assets": [
+            {
+                "dutch": "maandag",
+                "english": "Monday",
+                "type": "word",
+                "tts": "maandag",
+                "pronunciation": "mahn-dakh",
+                "audio": "nl_ch3_1_maandag.mp3",
+                "group": "days",
+                "speaker": null
+            },
+            {
+                "dutch": "dinsdag",
+                "english": "Tuesday",
+                "type": "word",
+                "tts": "dinsdag",
+                "pronunciation": "dins-dakh",
+                "audio": "nl_ch3_1_dinsdag.mp3",
+                "group": "days",
+                "speaker": null
+            },
+            {
+                "dutch": "woensdag",
+                "english": "Wednesday",
+                "type": "word",
+                "tts": "woensdag",
+                "pronunciation": "voons-dakh",
+                "audio": "nl_ch3_1_woensdag.mp3",
+                "group": "days",
+                "speaker": null
+            },
+            {
+                "dutch": "donderdag",
+                "english": "Thursday",
+                "type": "word",
+                "tts": "donderdag",
+                "pronunciation": "don-dur-dakh",
+                "audio": "nl_ch3_1_donderdag.mp3",
+                "group": "days",
+                "speaker": null
+            },
+            {
+                "dutch": "vrijdag",
+                "english": "Friday",
+                "type": "word",
+                "tts": "vrijdag",
+                "pronunciation": "fray-dakh",
+                "audio": "nl_ch3_1_vrijdag.mp3",
+                "group": "days",
+                "speaker": null
+            },
+            {
+                "dutch": "zaterdag",
+                "english": "Saturday",
+                "type": "word",
+                "tts": "zaterdag",
+                "pronunciation": "zah-tur-dakh",
+                "audio": "nl_ch3_1_zaterdag.mp3",
+                "group": "days",
+                "speaker": null
+            },
+            {
+                "dutch": "zondag",
+                "english": "Sunday",
+                "type": "word",
+                "tts": "zondag",
+                "pronunciation": "zon-dakh",
+                "audio": "nl_ch3_1_zondag.mp3",
+                "group": "days",
+                "speaker": null
+            },
+            {
+                "dutch": "de lente / het voorjaar",
+                "english": "Spring",
+                "type": "word",
+                "tts": "de lente het voorjaar",
+                "pronunciation": "duh len-tuh / het foar-yahr",
+                "audio": "nl_ch3_1_lente.mp3",
+                "group": "seasons",
+                "speaker": null
+            },
+            {
+                "dutch": "de zomer",
+                "english": "Summer",
+                "type": "word",
+                "tts": "de zomer",
+                "pronunciation": "duh zoa-mur",
+                "audio": "nl_ch3_1_zomer.mp3",
+                "group": "seasons",
+                "speaker": null
+            },
+            {
+                "dutch": "de herfst / het najaar",
+                "english": "Autumn",
+                "type": "word",
+                "tts": "de herfst het najaar",
+                "pronunciation": "duh hehrfst / het nah-yahr",
+                "audio": "nl_ch3_1_herfst.mp3",
+                "group": "seasons",
+                "speaker": null
+            },
+            {
+                "dutch": "de winter",
+                "english": "Winter",
+                "type": "word",
+                "tts": "de winter",
+                "pronunciation": "duh vin-tur",
+                "audio": "nl_ch3_1_winter.mp3",
+                "group": "seasons",
+                "speaker": null
+            },
+            {
+                "dutch": "vijfde",
+                "english": "5th",
+                "type": "word",
+                "tts": "vijfde",
+                "pronunciation": "fayf-duh",
+                "audio": "nl_ch3_1_5th.mp3",
+                "group": "ordinals",
+                "speaker": null
+            },
+            {
+                "dutch": "zesde",
+                "english": "6th",
+                "type": "word",
+                "tts": "zesde",
+                "pronunciation": "zes-duh",
+                "audio": "nl_ch3_1_6th.mp3",
+                "group": "ordinals",
+                "speaker": null
+            },
+            {
+                "dutch": "zevende",
+                "english": "7th",
+                "type": "word",
+                "tts": "zevende",
+                "pronunciation": "zay-vun-duh",
+                "audio": "nl_ch3_1_7th.mp3",
+                "group": "ordinals",
+                "speaker": null
+            },
+            {
+                "dutch": "achtste",
+                "english": "8th",
+                "type": "word",
+                "tts": "achtste",
+                "pronunciation": "akht-stuh",
+                "audio": "nl_ch3_1_8th.mp3",
+                "group": "ordinals",
+                "speaker": null
+            },
+            {
+                "dutch": "negende",
+                "english": "9th",
+                "type": "word",
+                "tts": "negende",
+                "pronunciation": "nay-khun-duh",
+                "audio": "nl_ch3_1_9th.mp3",
+                "group": "ordinals",
+                "speaker": null
+            },
+            {
+                "dutch": "tiende",
+                "english": "10th",
+                "type": "word",
+                "tts": "tiende",
+                "pronunciation": "teen-duh",
+                "audio": "nl_ch3_1_10th.mp3",
+                "group": "ordinals",
+                "speaker": null
+            },
+            {
+                "dutch": "elfde",
+                "english": "11th",
+                "type": "word",
+                "tts": "elfde",
+                "pronunciation": "elf-duh",
+                "audio": "nl_ch3_1_11th.mp3",
+                "group": "ordinals",
+                "speaker": null
+            },
+            {
+                "dutch": "twaalfde",
+                "english": "12th",
+                "type": "word",
+                "tts": "twaalfde",
+                "pronunciation": "twahlf-duh",
+                "audio": "nl_ch3_1_12th.mp3",
+                "group": "ordinals",
+                "speaker": null
+            },
+            {
+                "dutch": "dertiende",
+                "english": "13th",
+                "type": "word",
+                "tts": "dertiende",
+                "pronunciation": "dehr-teen-duh",
+                "audio": "nl_ch3_1_13th.mp3",
+                "group": "ordinals",
+                "speaker": null
+            },
+            {
+                "dutch": "veertiende",
+                "english": "14th",
+                "type": "word",
+                "tts": "veertiende",
+                "pronunciation": "fayr-teen-duh",
+                "audio": "nl_ch3_1_14th.mp3",
+                "group": "ordinals",
+                "speaker": null
+            },
+            {
+                "dutch": "vijftiende",
+                "english": "15th",
+                "type": "word",
+                "tts": "vijftiende",
+                "pronunciation": "fayf-teen-duh",
+                "audio": "nl_ch3_1_15th.mp3",
+                "group": "ordinals",
+                "speaker": null
+            },
+            {
+                "dutch": "zestiende",
+                "english": "16th",
+                "type": "word",
+                "tts": "zestiende",
+                "pronunciation": "zes-teen-duh",
+                "audio": "nl_ch3_1_16th.mp3",
+                "group": "ordinals",
+                "speaker": null
+            },
+            {
+                "dutch": "zeventiende",
+                "english": "17th",
+                "type": "word",
+                "tts": "zeventiende",
+                "pronunciation": "zay-vun-teen-duh",
+                "audio": "nl_ch3_1_17th.mp3",
+                "group": "ordinals",
+                "speaker": null
+            },
+            {
+                "dutch": "achttiende",
+                "english": "18th",
+                "type": "word",
+                "tts": "achttiende",
+                "pronunciation": "akht-teen-duh",
+                "audio": "nl_ch3_1_18th.mp3",
+                "group": "ordinals",
+                "speaker": null
+            },
+            {
+                "dutch": "negentiende",
+                "english": "19th",
+                "type": "word",
+                "tts": "negentiende",
+                "pronunciation": "nay-khun-teen-duh",
+                "audio": "nl_ch3_1_19th.mp3",
+                "group": "ordinals",
+                "speaker": null
+            },
+            {
+                "dutch": "twintigste",
+                "english": "20th",
+                "type": "word",
+                "tts": "twintigste",
+                "pronunciation": "twin-tikh-stuh",
+                "audio": "nl_ch3_1_20th.mp3",
+                "group": "ordinals",
+                "speaker": null
+            },
+            {
+                "dutch": "vandaag",
+                "english": "Today",
+                "type": "word",
+                "tts": "vandaag",
+                "pronunciation": "vahn-dahkh",
+                "audio": "nl_ch3_1_vandaag.mp3",
+                "group": "time_words",
+                "speaker": null
+            },
+            {
+                "dutch": "morgen",
+                "english": "Tomorrow",
+                "type": "word",
+                "tts": "morgen",
+                "pronunciation": "mor-khun",
+                "audio": "nl_ch3_1_morgen.mp3",
+                "group": "time_words",
+                "speaker": null
+            },
+            {
+                "dutch": "gisteren",
+                "english": "Yesterday",
+                "type": "word",
+                "tts": "gisteren",
+                "pronunciation": "khis-tur-un",
+                "audio": "nl_ch3_1_gisteren.mp3",
+                "group": "time_words",
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch3_2",
+        "metadata": {
+            "title": "Chapter 3: Time, Dates, and Gathering Information",
+            "subtitle": "3.2 Klokkijken (Telling Time)",
+            "template": "Sequence_List",
+            "content_type": "vocabulary",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "The Dutch analogue clock looks forward to the next hour starting from the half-hour mark. 2:30 is 'half drie' (halfway to three). Minutes revolve around this half-hour mark.",
+            "groups": null,
+            "next_lesson": "nl_ch3_3"
+        },
+        "content": "The Dutch analogue clock looks forward to the next hour starting from the half-hour mark. 2:30 is 'half drie' (halfway to three). Minutes revolve around this half-hour mark.",
+        "assets": [
+            {
+                "dutch": "twaalf uur",
+                "english": "12:00",
+                "type": "phrase",
+                "tts": "twaalf uur",
+                "pronunciation": "twahlf uur",
+                "audio": "nl_ch3_2_1200.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "vijf over twaalf",
+                "english": "12:05",
+                "type": "phrase",
+                "tts": "vijf over twaalf",
+                "pronunciation": "fayf oh-vur twahlf",
+                "audio": "nl_ch3_2_1205.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "tien over twaalf",
+                "english": "12:10",
+                "type": "phrase",
+                "tts": "tien over twaalf",
+                "pronunciation": "teen oh-vur twahlf",
+                "audio": "nl_ch3_2_1210.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "kwart over twaalf",
+                "english": "12:15",
+                "type": "phrase",
+                "tts": "kwart over twaalf",
+                "pronunciation": "kvahrt oh-vur twahlf",
+                "audio": "nl_ch3_2_1215.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "tien voor half een",
+                "english": "12:20",
+                "type": "phrase",
+                "tts": "tien voor half een",
+                "pronunciation": "teen foar hahlf ayn",
+                "audio": "nl_ch3_2_1220.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "vijf voor half een",
+                "english": "12:25",
+                "type": "phrase",
+                "tts": "vijf voor half een",
+                "pronunciation": "fayf foar hahlf ayn",
+                "audio": "nl_ch3_2_1225.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "half een",
+                "english": "12:30",
+                "type": "phrase",
+                "tts": "half een",
+                "pronunciation": "hahlf ayn",
+                "audio": "nl_ch3_2_1230.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "vijf over half een",
+                "english": "12:35",
+                "type": "phrase",
+                "tts": "vijf over half een",
+                "pronunciation": "fayf oh-vur hahlf ayn",
+                "audio": "nl_ch3_2_1235.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "tien over half een",
+                "english": "12:40",
+                "type": "phrase",
+                "tts": "tien over half een",
+                "pronunciation": "teen oh-vur hahlf ayn",
+                "audio": "nl_ch3_2_1240.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "kwart voor een",
+                "english": "12:45",
+                "type": "phrase",
+                "tts": "kwart voor een",
+                "pronunciation": "kvahrt foar ayn",
+                "audio": "nl_ch3_2_1245.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "tien voor een",
+                "english": "12:50",
+                "type": "phrase",
+                "tts": "tien voor een",
+                "pronunciation": "teen foar ayn",
+                "audio": "nl_ch3_2_1250.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "'s ochtends",
+                "english": "In the morning",
+                "type": "phrase",
+                "tts": "s ochtends",
+                "pronunciation": "sokh-tunts",
+                "audio": "nl_ch3_2_ochtend.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "'s middags",
+                "english": "In the afternoon",
+                "type": "phrase",
+                "tts": "s middags",
+                "pronunciation": "smid-dakhs",
+                "audio": "nl_ch3_2_middag.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "'s nachts",
+                "english": "At night",
+                "type": "phrase",
+                "tts": "s nachts",
+                "pronunciation": "snakhs",
+                "audio": "nl_ch3_2_nacht.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch3_3",
+        "metadata": {
+            "title": "Chapter 3: Time, Dates, and Gathering Information",
+            "subtitle": "3.3 Asking Specific Questions",
+            "template": "Audio_List",
+            "content_type": "phrases",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "You already know the basic question words. Now let us look at how to ask for quantities and specific choices using inversion to form full, practical sentences.",
+            "groups": null,
+            "next_lesson": "nl_ch3_4"
+        },
+        "content": "You already know the basic question words. Now let us look at how to ask for quantities and specific choices using inversion to form full, practical sentences.",
+        "assets": [
+            {
+                "dutch": "Hoeveel kost dit?",
+                "english": "How much does this cost?",
+                "type": "phrase",
+                "tts": "Hoeveel kost dit",
+                "pronunciation": "hoo-fayl kost dit",
+                "audio": "nl_ch3_3_hoeveel_kost.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Hoeveel mensen zijn er?",
+                "english": "How many people are there?",
+                "type": "phrase",
+                "tts": "Hoeveel mensen zijn er",
+                "pronunciation": "hoo-fayl men-sun zayn er",
+                "audio": "nl_ch3_3_hoeveel_mensen.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Welke trein neem jij?",
+                "english": "Which train are you taking?",
+                "type": "phrase",
+                "tts": "Welke trein neem jij",
+                "pronunciation": "vel-kuh trayn naym yay",
+                "audio": "nl_ch3_3_welke_trein.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Welk boek lees je?",
+                "english": "Which book are you reading?",
+                "type": "phrase",
+                "tts": "Welk boek lees je",
+                "pronunciation": "velk book lays yuh",
+                "audio": "nl_ch3_3_welk_boek.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Wat voor auto is dat?",
+                "english": "What kind of car is that?",
+                "type": "phrase",
+                "tts": "Wat voor auto is dat",
+                "pronunciation": "vaht foar ow-toe is daht",
+                "audio": "nl_ch3_3_wat_voor_auto.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Heb jij morgen tijd?",
+                "english": "Do you have time tomorrow?",
+                "type": "phrase",
+                "tts": "Heb jij morgen tijd",
+                "pronunciation": "hep yay mor-khun tayt",
+                "audio": "nl_ch3_3_heb_jij_tijd.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch3_4",
+        "metadata": {
+            "title": "Chapter 3: Time, Dates, and Gathering Information",
+            "subtitle": "3.4 Conjugating Regular Verbs",
+            "template": "Audio_List",
+            "content_type": "grammar",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "To find the verb stem, remove '-en' from the infinitive. 'Ik' uses the stem. 'Jij/Hij/Zij/Het' use stem + t. Plurals use the full infinitive.",
+            "groups": null,
+            "next_lesson": "nl_ch3_5"
+        },
+        "content": "To find the verb stem, remove '-en' from the infinitive. 'Ik' uses the stem. 'Jij/Hij/Zij/Het' use stem + t. Plurals use the full infinitive.",
+        "assets": [
+            {
+                "dutch": "ik werk",
+                "english": "I work (stem)",
+                "type": "phrase",
+                "tts": "ik werk",
+                "pronunciation": "ik vehrk",
+                "audio": "nl_ch3_4_ik_werk.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "jij werkt",
+                "english": "You work (stem + t)",
+                "type": "phrase",
+                "tts": "jij werkt",
+                "pronunciation": "yay vehrkt",
+                "audio": "nl_ch3_4_jij_werkt.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "wij fietsen",
+                "english": "We cycle (infinitive)",
+                "type": "phrase",
+                "tts": "wij fietsen",
+                "pronunciation": "vay feet-sun",
+                "audio": "nl_ch3_4_wij_fietsen.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "hij maakt",
+                "english": "He makes",
+                "type": "phrase",
+                "tts": "hij maakt",
+                "pronunciation": "hay mahkt",
+                "audio": "nl_ch3_4_hij_maakt.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Maak je?",
+                "english": "Do you make? (dropped t)",
+                "type": "phrase",
+                "tts": "Maak je",
+                "pronunciation": "mahk yuh",
+                "audio": "nl_ch3_4_maak_je.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "ik speel",
+                "english": "I play (spelling rule)",
+                "type": "phrase",
+                "tts": "ik speel",
+                "pronunciation": "ik spayl",
+                "audio": "nl_ch3_4_ik_speel.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "ik spel",
+                "english": "I spell (spelling rule)",
+                "type": "phrase",
+                "tts": "ik spel",
+                "pronunciation": "ik spel",
+                "audio": "nl_ch3_4_ik_spel.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "ik geef",
+                "english": "I give (v softens to f)",
+                "type": "phrase",
+                "tts": "ik geef",
+                "pronunciation": "ik khayf",
+                "audio": "nl_ch3_4_ik_geef.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "ik reis",
+                "english": "I travel (z softens to s)",
+                "type": "phrase",
+                "tts": "ik reis",
+                "pronunciation": "ik rays",
+                "audio": "nl_ch3_4_ik_reis.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch3_5",
+        "metadata": {
+            "title": "Chapter 3: Time, Dates, and Gathering Information",
+            "subtitle": "3.5 Weather and Small Talk",
+            "template": "Audio_List",
+            "content_type": "phrases",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "The Dutch love talking about the weather. Here are some essential phrases to help you break the ice and describe the climate.",
+            "groups": null,
+            "next_lesson": "nl_ch4_1"
+        },
+        "content": "The Dutch love talking about the weather. Here are some essential phrases to help you break the ice and describe the climate.",
+        "assets": [
+            {
+                "dutch": "Het is koud",
+                "english": "It is cold",
+                "type": "phrase",
+                "tts": "Het is koud",
+                "pronunciation": "het is kowt",
+                "audio": "nl_ch3_5_koud.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Het is warm",
+                "english": "It is warm",
+                "type": "phrase",
+                "tts": "Het is warm",
+                "pronunciation": "het is vahrm",
+                "audio": "nl_ch3_5_warm.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Het regent",
+                "english": "It is raining",
+                "type": "phrase",
+                "tts": "Het regent",
+                "pronunciation": "het ray-khunt",
+                "audio": "nl_ch3_5_regent.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Het sneeuwt",
+                "english": "It is snowing",
+                "type": "phrase",
+                "tts": "Het sneeuwt",
+                "pronunciation": "het snay-oot",
+                "audio": "nl_ch3_5_sneeuwt.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Het waait hard",
+                "english": "It is very windy",
+                "type": "phrase",
+                "tts": "Het waait hard",
+                "pronunciation": "het vaheeyt hahrt",
+                "audio": "nl_ch3_5_waait.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "De zon schijnt",
+                "english": "The sun is shining",
+                "type": "phrase",
+                "tts": "De zon schijnt",
+                "pronunciation": "duh zon skhaynt",
+                "audio": "nl_ch3_5_zon.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Wat een rotweer!",
+                "english": "What terrible weather!",
+                "type": "phrase",
+                "tts": "Wat een rotweer",
+                "pronunciation": "vaht un rot-vayr",
+                "audio": "nl_ch3_5_rotweer.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Het is 30 graden in de schaduw",
+                "english": "It is 30 degrees in the shade",
+                "type": "phrase",
+                "tts": "Het is dertig graden in de schaduw",
+                "pronunciation": "het is dehr-tikh khrah-dun in duh skhah-duu-oo",
+                "audio": "nl_ch3_5_graden.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch4_1",
+        "metadata": {
+            "title": "Chapter 4: Navigating the World",
+            "subtitle": "4.1 Negation Masterclass (Niet vs. Geen)",
+            "template": "Audio_List",
+            "content_type": "grammar",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "Use 'geen' to negate indefinite nouns, and 'niet' to negate verbs, adjectives, and definite nouns.",
+            "groups": null,
+            "next_lesson": "nl_ch4_2"
+        },
+        "content": "Use 'geen' to negate indefinite nouns (nouns preceded by 'a/an' or plurals with no article). Use 'niet' to negate verbs, adjectives, and definite nouns.",
+        "assets": [
+            {
+                "dutch": "Ik heb geen auto",
+                "english": "I do not have a car",
+                "type": "phrase",
+                "tts": "Ik heb geen auto",
+                "pronunciation": "ik hep khayn ow-toe",
+                "audio": "nl_ch4_1_geen_auto.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Ik spreek geen Nederlands",
+                "english": "I speak no Dutch",
+                "type": "phrase",
+                "tts": "Ik spreek geen Nederlands",
+                "pronunciation": "ik sprayk khayn nay-dur-lahnts",
+                "audio": "nl_ch4_1_geen_nederlands.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Ik heb geen tijd",
+                "english": "I have no time",
+                "type": "phrase",
+                "tts": "Ik heb geen tijd",
+                "pronunciation": "ik hep khayn tayt",
+                "audio": "nl_ch4_1_geen_tijd.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Ik zie de man niet",
+                "english": "I do not see the man",
+                "type": "phrase",
+                "tts": "Ik zie de man niet",
+                "pronunciation": "ik zee duh mahn neet",
+                "audio": "nl_ch4_1_niet_man.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Hij slaapt niet",
+                "english": "He is not sleeping",
+                "type": "phrase",
+                "tts": "Hij slaapt niet",
+                "pronunciation": "hay slahpt neet",
+                "audio": "nl_ch4_1_slaapt_niet.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Ik ben niet rijk",
+                "english": "I am not rich",
+                "type": "phrase",
+                "tts": "Ik ben niet rijk",
+                "pronunciation": "ik ben neet rayk",
+                "audio": "nl_ch4_1_niet_rijk.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch4_2",
+        "metadata": {
+            "title": "Chapter 4: Navigating the World",
+            "subtitle": "4.2 Getting Around and Directions",
+            "template": "Grouped_List",
+            "content_type": "vocabulary",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "Learn basic navigation, key landmarks, and how to sequence directions using 'eerst' (first), 'dan' (then), and 'daarna' (after that).",
+            "groups": [
+                "directions",
+                "transport_phrases"
+            ],
+            "next_lesson": "nl_ch4_3"
+        },
+        "content": "Learn basic navigation, key landmarks, and how to sequence directions using 'eerst' (first), 'dan' (then), and 'daarna' (after that).",
+        "assets": [
+            {
+                "dutch": "links",
+                "english": "Left",
+                "type": "word",
+                "tts": "links",
+                "pronunciation": "links",
+                "audio": "nl_ch4_2_links.mp3",
+                "group": "directions",
+                "speaker": null
+            },
+            {
+                "dutch": "rechts",
+                "english": "Right",
+                "type": "word",
+                "tts": "rechts",
+                "pronunciation": "rekhts",
+                "audio": "nl_ch4_2_rechts.mp3",
+                "group": "directions",
+                "speaker": null
+            },
+            {
+                "dutch": "rechtdoor",
+                "english": "Straight ahead",
+                "type": "word",
+                "tts": "rechtdoor",
+                "pronunciation": "rekht-doar",
+                "audio": "nl_ch4_2_rechtdoor.mp3",
+                "group": "directions",
+                "speaker": null
+            },
+            {
+                "dutch": "naast",
+                "english": "Next to",
+                "type": "word",
+                "tts": "naast",
+                "pronunciation": "nahst",
+                "audio": "nl_ch4_2_naast.mp3",
+                "group": "directions",
+                "speaker": null
+            },
+            {
+                "dutch": "tegenover",
+                "english": "Opposite",
+                "type": "word",
+                "tts": "tegenover",
+                "pronunciation": "tay-khun-oh-vur",
+                "audio": "nl_ch4_2_tegenover.mp3",
+                "group": "directions",
+                "speaker": null
+            },
+            {
+                "dutch": "het station",
+                "english": "The station",
+                "type": "phrase",
+                "tts": "het station",
+                "pronunciation": "het stah-shon",
+                "audio": "nl_ch4_2_station.mp3",
+                "group": "transport_phrases",
+                "speaker": null
+            },
+            {
+                "dutch": "het centrum",
+                "english": "The city centre",
+                "type": "phrase",
+                "tts": "het centrum",
+                "pronunciation": "het sen-trum",
+                "audio": "nl_ch4_2_centrum.mp3",
+                "group": "transport_phrases",
+                "speaker": null
+            },
+            {
+                "dutch": "U gaat eerst rechtdoor...",
+                "english": "First you go straight...",
+                "type": "phrase",
+                "tts": "U gaat eerst rechtdoor",
+                "pronunciation": "uu khaht aysrt rekht-doar",
+                "audio": "nl_ch4_2_eerst_rechtdoor.mp3",
+                "group": "transport_phrases",
+                "speaker": null
+            },
+            {
+                "dutch": "Ik ben de weg kwijt",
+                "english": "I have lost my way",
+                "type": "phrase",
+                "tts": "Ik ben de weg kwijt",
+                "pronunciation": "ik ben duh vekh kvayt",
+                "audio": "nl_ch4_2_weg_kwijt.mp3",
+                "group": "transport_phrases",
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch4_3",
+        "metadata": {
+            "title": "Chapter 4: Navigating the World",
+            "subtitle": "4.3 Receiving the Action (Object Pronouns)",
+            "template": "Audio_List",
+            "content_type": "grammar",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "These pronouns receive the action. Pay attention to the stressed and casual forms, as native speakers swallow the casual forms in normal speech.",
+            "groups": null,
+            "next_lesson": "nl_ch4_4"
+        },
+        "content": "These pronouns receive the action. In daily speech, the Dutch frequently use the 'unstressed' (swallowed) versions unless they are highlighting a specific person.",
+        "assets": [
+            {
+                "dutch": "Ik zie hem / 'm",
+                "english": "I see him (hem = stressed, 'm = casual)",
+                "type": "phrase",
+                "tts": "Ik zie hem m",
+                "pronunciation": "ik zee hem / um",
+                "audio": "nl_ch4_3_zie_hem.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Hij ziet haar / d'r",
+                "english": "He sees her (haar = stressed, d'r = casual)",
+                "type": "phrase",
+                "tts": "Hij ziet haar d r",
+                "pronunciation": "hay zeet hahr / dur",
+                "audio": "nl_ch4_3_ziet_haar.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Zij helpt ons",
+                "english": "She helps us",
+                "type": "phrase",
+                "tts": "Zij helpt ons",
+                "pronunciation": "zay helpt ons",
+                "audio": "nl_ch4_3_helpt_ons.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Ik geef het aan jou / je",
+                "english": "I give it to you (jou = stressed, je = casual)",
+                "type": "phrase",
+                "tts": "Ik geef het aan jou je",
+                "pronunciation": "ik khayf het ahn yow / yuh",
+                "audio": "nl_ch4_3_geef_jou.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Geef het aan mij / me",
+                "english": "Give it to me (mij = stressed, me = casual)",
+                "type": "phrase",
+                "tts": "Geef het aan mij me",
+                "pronunciation": "khayf het ahn may / muh",
+                "audio": "nl_ch4_3_aan_mij.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Ik bel hen / ze",
+                "english": "I call them (hen = formal, ze = casual)",
+                "type": "phrase",
+                "tts": "Ik bel hen ze",
+                "pronunciation": "ik bel hen / zuh",
+                "audio": "nl_ch4_3_bel_hen.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch4_4",
+        "metadata": {
+            "title": "Chapter 4: Navigating the World",
+            "subtitle": "4.4 Giving Commands and Softeners",
+            "template": "Audio_List",
+            "content_type": "grammar",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "To give a command, simply use the stem of the verb. Because a blunt command can sound rude, the Dutch soften them using conversational fillers.",
+            "groups": null,
+            "next_lesson": "nl_ch4_5"
+        },
+        "content": "To give a command, simply use the stem of the verb. Because a blunt command can sound rude, the Dutch soften them using conversational fillers like 'even', 'maar', or 'nou'.",
+        "assets": [
+            {
+                "dutch": "Drink!",
+                "english": "Drink!",
+                "type": "word",
+                "tts": "Drink",
+                "pronunciation": "drink",
+                "audio": "nl_ch4_4_drink.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Pas op!",
+                "english": "Watch out!",
+                "type": "phrase",
+                "tts": "Pas op",
+                "pronunciation": "pahs op",
+                "audio": "nl_ch4_4_pas_op.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Let op!",
+                "english": "Pay attention!",
+                "type": "phrase",
+                "tts": "Let op",
+                "pronunciation": "let op",
+                "audio": "nl_ch4_4_let_op.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Ga weg!",
+                "english": "Go away!",
+                "type": "phrase",
+                "tts": "Ga weg",
+                "pronunciation": "khah vekh",
+                "audio": "nl_ch4_4_ga_weg.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Komt u binnen!",
+                "english": "Come in! (Formal)",
+                "type": "phrase",
+                "tts": "Komt u binnen",
+                "pronunciation": "komt uu bin-nun",
+                "audio": "nl_ch4_4_komt_u_binnen.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Kom maar binnen!",
+                "english": "Just come in! (Softened)",
+                "type": "phrase",
+                "tts": "Kom maar binnen",
+                "pronunciation": "kom mahr bin-nun",
+                "audio": "nl_ch4_4_kom_maar_binnen.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Kijk eens!",
+                "english": "Just look! (Softened)",
+                "type": "phrase",
+                "tts": "Kijk eens",
+                "pronunciation": "kayk ayns",
+                "audio": "nl_ch4_4_kijk_eens.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch4_5",
+        "metadata": {
+            "title": "Chapter 4: Navigating the World",
+            "subtitle": "4.5 Hitting the Road (Transport)",
+            "template": "Audio_List",
+            "content_type": "phrases",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "When taking a vehicle, use the preposition 'met' (with), except for bicycles, where you go 'op de fiets' (on the bike).",
+            "groups": null,
+            "next_lesson": "nl_ch5_1"
+        },
+        "content": "The verb 'gaan' (to go) is highly irregular. When taking a vehicle, use the preposition 'met' (with), except for bicycles, where you go 'op de fiets' (on the bike).",
+        "assets": [
+            {
+                "dutch": "ik ga",
+                "english": "I go",
+                "type": "phrase",
+                "tts": "ik ga",
+                "pronunciation": "ik khah",
+                "audio": "nl_ch4_5_ik_ga.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Ik ga met de auto",
+                "english": "I go by car",
+                "type": "phrase",
+                "tts": "Ik ga met de auto",
+                "pronunciation": "ik khah met duh ow-toe",
+                "audio": "nl_ch4_5_met_auto.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Ik ga met de trein",
+                "english": "I go by train",
+                "type": "phrase",
+                "tts": "Ik ga met de trein",
+                "pronunciation": "ik khah met duh trayn",
+                "audio": "nl_ch4_5_met_trein.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Ik ga met de bus",
+                "english": "I go by bus",
+                "type": "phrase",
+                "tts": "Ik ga met de bus",
+                "pronunciation": "ik khah met duh bus",
+                "audio": "nl_ch4_5_met_bus.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Ik ga op de fiets",
+                "english": "I go by bike (exception)",
+                "type": "phrase",
+                "tts": "Ik ga op de fiets",
+                "pronunciation": "ik khah op duh feets",
+                "audio": "nl_ch4_5_op_fiets.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "het vliegveld",
+                "english": "The airport",
+                "type": "phrase",
+                "tts": "het vliegveld",
+                "pronunciation": "het fleekh-felt",
+                "audio": "nl_ch4_5_vliegveld.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "het spoor",
+                "english": "The platform",
+                "type": "phrase",
+                "tts": "het spoor",
+                "pronunciation": "het spoar",
+                "audio": "nl_ch4_5_spoor.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "het kruispunt",
+                "english": "The junction",
+                "type": "phrase",
+                "tts": "het kruispunt",
+                "pronunciation": "het krows-punt",
+                "audio": "nl_ch4_5_kruispunt.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "de rotonde",
+                "english": "The roundabout",
+                "type": "phrase",
+                "tts": "de rotonde",
+                "pronunciation": "duh roa-ton-duh",
+                "audio": "nl_ch4_5_rotonde.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "het stoplicht",
+                "english": "The traffic light",
+                "type": "phrase",
+                "tts": "het stoplicht",
+                "pronunciation": "het stop-likht",
+                "audio": "nl_ch4_5_stoplicht.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "de file",
+                "english": "The traffic jam",
+                "type": "phrase",
+                "tts": "de file",
+                "pronunciation": "duh fee-luh",
+                "audio": "nl_ch4_5_file.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "overstappen",
+                "english": "To transfer",
+                "type": "word",
+                "tts": "overstappen",
+                "pronunciation": "oh-vur-stah-pun",
+                "audio": "nl_ch4_5_overstappen.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch5_1",
+        "metadata": {
+            "title": "Chapter 5: Conjuring Fluency",
+            "subtitle": "5.1 The Selfish Learner (Family & Others)",
+            "template": "Audio_List",
+            "content_type": "vocabulary",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "Why did we wait until now to learn about other people? Because early language learning is inherently selfish. You must first learn to navigate the dark alone. Now, let us bring others into the context.",
+            "groups": null,
+            "next_lesson": "nl_ch5_2"
+        },
+        "content": "Why did we wait until now to learn about other people? Because early language learning is inherently selfish. You must first learn to navigate the dark alone. Now, let us bring others into the context.",
+        "assets": [
+            {
+                "dutch": "de moeder",
+                "english": "The mother",
+                "type": "word",
+                "tts": "de moeder",
+                "pronunciation": "duh moo-dur",
+                "audio": "nl_ch5_1_moeder.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "de vader",
+                "english": "The father",
+                "type": "word",
+                "tts": "de vader",
+                "pronunciation": "duh fah-dur",
+                "audio": "nl_ch5_1_vader.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "de broer",
+                "english": "The brother",
+                "type": "word",
+                "tts": "de broer",
+                "pronunciation": "duh broor",
+                "audio": "nl_ch5_1_broer.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "de zus",
+                "english": "The sister",
+                "type": "word",
+                "tts": "de zus",
+                "pronunciation": "duh zus",
+                "audio": "nl_ch5_1_zus.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "de vriend",
+                "english": "The friend (male)",
+                "type": "word",
+                "tts": "de vriend",
+                "pronunciation": "duh freent",
+                "audio": "nl_ch5_1_vriend.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "de vriendin",
+                "english": "The friend (female)",
+                "type": "word",
+                "tts": "de vriendin",
+                "pronunciation": "duh freen-din",
+                "audio": "nl_ch5_1_vriendin.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "de collega",
+                "english": "The colleague",
+                "type": "word",
+                "tts": "de collega",
+                "pronunciation": "duh koh-lay-khah",
+                "audio": "nl_ch5_1_collega.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "de buurman / de buurvrouw",
+                "english": "The neighbour (male / female)",
+                "type": "phrase",
+                "tts": "de buurman de buurvrouw",
+                "pronunciation": "duh buur-mahn / duh buur-frow",
+                "audio": "nl_ch5_1_buurman.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "de vreemdeling",
+                "english": "The stranger",
+                "type": "word",
+                "tts": "de vreemdeling",
+                "pronunciation": "duh fraym-duh-ling",
+                "audio": "nl_ch5_1_vreemdeling.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Hij is mijn vriend",
+                "english": "He is my friend",
+                "type": "phrase",
+                "tts": "Hij is mijn vriend",
+                "pronunciation": "hay is mayn freent",
+                "audio": "nl_ch5_1_hij_is_mijn_vriend.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Wij zijn familie",
+                "english": "We are family",
+                "type": "phrase",
+                "tts": "Wij zijn familie",
+                "pronunciation": "vay zayn fah-mee-lee",
+                "audio": "nl_ch5_1_wij_zijn_familie.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch5_2",
+        "metadata": {
+            "title": "Chapter 5: Conjuring Fluency",
+            "subtitle": "5.2 Hobbies and the Hours Between",
+            "template": "Audio_List",
+            "content_type": "vocabulary",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "What do you do when you are not speaking to strangers in the dark? Let us apply the present tense conjugations to some common hobbies.",
+            "groups": null,
+            "next_lesson": "nl_ch5_3"
+        },
+        "content": "To say you \"like to\" do something, add the word 'graag'. Let us apply the present tense conjugations to some common hobbies.",
+        "assets": [
+            {
+                "dutch": "fietsen",
+                "english": "To cycle",
+                "type": "word",
+                "tts": "fietsen",
+                "pronunciation": "feet-sun",
+                "audio": "nl_ch5_2_fietsen.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "ik fiets graag",
+                "english": "I like to cycle",
+                "type": "phrase",
+                "tts": "ik fiets graag",
+                "pronunciation": "ik feets khrahkh",
+                "audio": "nl_ch5_2_fiets_graag.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "lezen",
+                "english": "To read",
+                "type": "word",
+                "tts": "lezen",
+                "pronunciation": "lay-zun",
+                "audio": "nl_ch5_2_lezen.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "wandelen",
+                "english": "To walk",
+                "type": "word",
+                "tts": "wandelen",
+                "pronunciation": "vahn-duh-lun",
+                "audio": "nl_ch5_2_wandelen.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "wij wandelen 's nachts",
+                "english": "We walk at night",
+                "type": "phrase",
+                "tts": "wij wandelen s nachts",
+                "pronunciation": "vay vahn-duh-lun snakhs",
+                "audio": "nl_ch5_2_wandelen_nacht.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "naar muziek luisteren",
+                "english": "To listen to music",
+                "type": "phrase",
+                "tts": "naar muziek luisteren",
+                "pronunciation": "nahr muu-zeek low-stuh-run",
+                "audio": "nl_ch5_2_luisteren_muziek.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "koken",
+                "english": "To cook",
+                "type": "word",
+                "tts": "koken",
+                "pronunciation": "koa-kun",
+                "audio": "nl_ch5_2_koken.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "ik kook graag",
+                "english": "I like to cook",
+                "type": "phrase",
+                "tts": "ik kook graag",
+                "pronunciation": "ik koak khrahkh",
+                "audio": "nl_ch5_2_kook_graag.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "tv kijken",
+                "english": "To watch television",
+                "type": "phrase",
+                "tts": "tv kijken",
+                "pronunciation": "tay-fay kay-kun",
+                "audio": "nl_ch5_2_tv_kijken.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "slapen",
+                "english": "To sleep",
+                "type": "word",
+                "tts": "slapen",
+                "pronunciation": "slah-pun",
+                "audio": "nl_ch5_2_slapen.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch5_3",
+        "metadata": {
+            "title": "Chapter 5: Conjuring Fluency",
+            "subtitle": "5.3 The Daylight Hours (Everyday Transactions)",
+            "template": "Audio_List",
+            "content_type": "phrases",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "Before we return to the dark, we must survive the day. Here are the mundane, practical phrases you need for everyday transactions.",
+            "groups": null,
+            "next_lesson": "nl_ch5_4"
+        },
+        "content": "Here are the mundane, practical phrases you need for everyday transactions, work, and navigating public spaces.",
+        "assets": [
+            {
+                "dutch": "Ik werk van 9 tot 5",
+                "english": "I work from 9 to 5",
+                "type": "phrase",
+                "tts": "Ik werk van negen tot vijf",
+                "pronunciation": "ik vehrk fahn nay-khun tot fayf",
+                "audio": "nl_ch5_3_werk_9_tot_5.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Mag ik de rekening alstublieft?",
+                "english": "May I have the bill, please?",
+                "type": "phrase",
+                "tts": "Mag ik de rekening alstublieft",
+                "pronunciation": "makh ik duh ray-kuh-ning ahl-stuu-bleeft",
+                "audio": "nl_ch5_3_mag_ik_rekening.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Ik wil graag afrekenen",
+                "english": "I would like to pay",
+                "type": "phrase",
+                "tts": "Ik wil graag afrekenen",
+                "pronunciation": "ik vil khrahkh ahf-ray-kuh-nun",
+                "audio": "nl_ch5_3_wil_graag_afrekenen.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Een retourtje, alstublieft",
+                "english": "A return ticket, please",
+                "type": "phrase",
+                "tts": "Een retourtje alstublieft",
+                "pronunciation": "un ruh-toor-tyuh ahl-stuu-bleeft",
+                "audio": "nl_ch5_3_retourtje.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Een enkeltje, alstublieft",
+                "english": "A single ticket, please",
+                "type": "phrase",
+                "tts": "Een enkeltje alstublieft",
+                "pronunciation": "un en-kul-tyuh ahl-stuu-bleeft",
+                "audio": "nl_ch5_3_enkeltje.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Hoeveel kost dit?",
+                "english": "How much does this cost?",
+                "type": "phrase",
+                "tts": "Hoeveel kost dit",
+                "pronunciation": "hoo-fayl kost dit",
+                "audio": "nl_ch5_3_hoeveel_kost_dit.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Ik zoek de supermarkt",
+                "english": "I am looking for the supermarket",
+                "type": "phrase",
+                "tts": "Ik zoek de supermarkt",
+                "pronunciation": "ik zook duh suu-pur-mahrkt",
+                "audio": "nl_ch5_3_zoek_supermarkt.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Waar is het toilet?",
+                "english": "Where is the toilet?",
+                "type": "phrase",
+                "tts": "Waar is het toilet",
+                "pronunciation": "vahr is het twah-let",
+                "audio": "nl_ch5_3_waar_toilet.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch5_4",
+        "metadata": {
+            "title": "Chapter 5: Conjuring Fluency",
+            "subtitle": "5.4 Preferences and the 'Why'",
+            "template": "Audio_List",
+            "content_type": "phrases",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "A conversation requires depth. You need to express what you like and, more importantly, why.",
+            "groups": null,
+            "next_lesson": "nl_ch5_5"
+        },
+        "content": "A conversation requires depth. You need to express what you like and, more importantly, why. We use 'ik hou van' (I love) or 'ik vind ... leuk' (I like), paired with the conjunction 'want' (because).",
+        "assets": [
+            {
+                "dutch": "Ik hou van de nacht",
+                "english": "I love the night",
+                "type": "phrase",
+                "tts": "Ik hou van de nacht",
+                "pronunciation": "ik how fahn duh nakht",
+                "audio": "nl_ch5_4_hou_van_nacht.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Ik vind koffie lekker",
+                "english": "I like coffee",
+                "type": "phrase",
+                "tts": "Ik vind koffie lekker",
+                "pronunciation": "ik fint kof-fee lek-kur",
+                "audio": "nl_ch5_4_vind_koffie_lekker.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Ik vind dat mooi",
+                "english": "I think that is beautiful",
+                "type": "phrase",
+                "tts": "Ik vind dat mooi",
+                "pronunciation": "ik fint daht moy",
+                "audio": "nl_ch5_4_vind_dat_mooi.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "want het is stil",
+                "english": "Because it is quiet",
+                "type": "phrase",
+                "tts": "want het is stil",
+                "pronunciation": "vahnt het is stil",
+                "audio": "nl_ch5_4_want_stil.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "want het is koud",
+                "english": "Because it is cold",
+                "type": "phrase",
+                "tts": "want het is koud",
+                "pronunciation": "vahnt het is kowt",
+                "audio": "nl_ch5_4_want_koud.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "want het is leuk",
+                "english": "Because it is fun",
+                "type": "phrase",
+                "tts": "want het is leuk",
+                "pronunciation": "vahnt het is lurk",
+                "audio": "nl_ch5_4_want_leuk.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "want ik ben moe",
+                "english": "Because I am tired",
+                "type": "phrase",
+                "tts": "want ik ben moe",
+                "pronunciation": "vahnt ik ben moo",
+                "audio": "nl_ch5_4_want_moe.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Ik fiets, want ik hou van de regen",
+                "english": "I cycle, because I love the rain",
+                "type": "phrase",
+                "tts": "Ik fiets want ik hou van de regen",
+                "pronunciation": "ik feets vahnt ik how fahn duh ray-khun",
+                "audio": "nl_ch5_4_fiets_want_regen.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch5_5",
+        "metadata": {
+            "title": "Chapter 5: Conjuring Fluency",
+            "subtitle": "5.5 Turning the Mirror (Asking Questions)",
+            "template": "Audio_List",
+            "content_type": "phrases",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "Do not just talk about yourself; ask the Apparitions questions to keep the conversation flowing.",
+            "groups": null,
+            "next_lesson": "nl_ch5_6"
+        },
+        "content": "Do not just talk about yourself; ask the Apparitions questions. Remember your inversion rules (verb before subject) to keep the dialogue flowing naturally.",
+        "assets": [
+            {
+                "dutch": "Hoe gaat het met jou?",
+                "english": "How are you?",
+                "type": "phrase",
+                "tts": "Hoe gaat het met jou",
+                "pronunciation": "hoo khaht het met yow",
+                "audio": "nl_ch5_5_hoe_gaat_het.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "En jij? / En met jou?",
+                "english": "And you?",
+                "type": "phrase",
+                "tts": "En jij En met jou",
+                "pronunciation": "en yay / en met yow",
+                "audio": "nl_ch5_5_en_jij.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Wat doe jij graag?",
+                "english": "What do you like to do?",
+                "type": "phrase",
+                "tts": "Wat doe jij graag",
+                "pronunciation": "vaht doo yay khrahkh",
+                "audio": "nl_ch5_5_wat_doe_jij_graag.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Heb jij hobby's?",
+                "english": "Do you have hobbies?",
+                "type": "phrase",
+                "tts": "Heb jij hobbys",
+                "pronunciation": "hep yay hob-bees",
+                "audio": "nl_ch5_5_heb_jij_hobbys.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Waar kom jij vandaan?",
+                "english": "Where do you come from?",
+                "type": "phrase",
+                "tts": "Waar kom jij vandaan",
+                "pronunciation": "vahr kom yay fahn-dahn",
+                "audio": "nl_ch5_5_waar_kom_vandaan.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Vind jij de stad leuk?",
+                "english": "Do you like the city?",
+                "type": "phrase",
+                "tts": "Vind jij de stad leuk",
+                "pronunciation": "fint yay duh staht lurk",
+                "audio": "nl_ch5_5_vind_stad_leuk.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Wat voor werk doe jij?",
+                "english": "What kind of work do you do?",
+                "type": "phrase",
+                "tts": "Wat voor werk doe jij",
+                "pronunciation": "vaht foar vehrk doo yay",
+                "audio": "nl_ch5_5_wat_voor_werk.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Heb je het druk?",
+                "english": "Are you busy?",
+                "type": "phrase",
+                "tts": "Heb je het druk",
+                "pronunciation": "hep yuh het druk",
+                "audio": "nl_ch5_5_heb_je_het_druk.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch5_6",
+        "metadata": {
+            "title": "Chapter 5: Conjuring Fluency",
+            "subtitle": "5.6 Confessions in the Dark (Survival)",
+            "template": "Audio_List",
+            "content_type": "phrases",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "When the illusion starts to slip and you cannot find the words, you must know how to confess your limitations.",
+            "groups": null,
+            "next_lesson": "nl_ch5_7"
+        },
+        "content": "Use these phrases to pause the conversation and gather your thoughts.",
+        "assets": [
+            {
+                "dutch": "Ik begrijp het niet",
+                "english": "I do not understand",
+                "type": "phrase",
+                "tts": "Ik begrijp het niet",
+                "pronunciation": "ik buh-khrayp het neet",
+                "audio": "nl_ch5_6_begrijp_niet.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Ik weet het niet",
+                "english": "I do not know",
+                "type": "phrase",
+                "tts": "Ik weet het niet",
+                "pronunciation": "ik vayt het neet",
+                "audio": "nl_ch5_6_weet_niet.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Pardon? / Wat zegt u?",
+                "english": "Pardon? / Sorry?",
+                "type": "phrase",
+                "tts": "Pardon Wat zegt u",
+                "pronunciation": "pahr-don / vaht zekht uu",
+                "audio": "nl_ch5_6_pardon.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Ik leer Nederlands",
+                "english": "I am learning Dutch",
+                "type": "phrase",
+                "tts": "Ik leer Nederlands",
+                "pronunciation": "ik layr nay-dur-lahnts",
+                "audio": "nl_ch5_6_leer_nederlands.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Ik spreek een beetje Nederlands",
+                "english": "I speak a little Dutch",
+                "type": "phrase",
+                "tts": "Ik spreek een beetje Nederlands",
+                "pronunciation": "ik sprayk un bay-tyuh nay-dur-lahnts",
+                "audio": "nl_ch5_6_spreek_beetje.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Kunt u dat herhalen?",
+                "english": "Could you repeat that?",
+                "type": "phrase",
+                "tts": "Kunt u dat herhalen",
+                "pronunciation": "kunt uu daht hehr-hah-lun",
+                "audio": "nl_ch5_6_kunt_u_herhalen.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Spreek alstublieft langzaam",
+                "english": "Please speak slowly",
+                "type": "phrase",
+                "tts": "Spreek alstublieft langzaam",
+                "pronunciation": "sprayk ahl-stuu-bleeft lahng-zahm",
+                "audio": "nl_ch5_6_spreek_langzaam.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Kunt u mij helpen?",
+                "english": "Can you help me?",
+                "type": "phrase",
+                "tts": "Kunt u mij helpen",
+                "pronunciation": "kunt uu may hel-pun",
+                "audio": "nl_ch5_6_kunt_u_mij_helpen.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Wat betekent dat?",
+                "english": "What does that mean?",
+                "type": "phrase",
+                "tts": "Wat betekent dat",
+                "pronunciation": "vaht buh-tay-kunt daht",
+                "audio": "nl_ch5_6_wat_betekent_dat.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch5_7",
+        "metadata": {
+            "title": "Chapter 5: Conjuring Fluency",
+            "subtitle": "5.7 Initiating the Illusion (Roleplay)",
+            "template": "Dialogue_Scenario",
+            "content_type": "dialogue",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "You are at a night cafe in Amsterdam. A stranger sits nearby.",
+            "groups": null,
+            "next_lesson": "nl_ch5_8"
+        },
+        "content": "The Apparitions are waiting. Here are the specific phrases you need to initiate dialogue with the strangers at the bus stop, the barista in the night cafe, or to summon a story from the shadows.",
+        "assets": [
+            {
+                "dutch": "Goedenavond. Is het koud vanavond?",
+                "english": "Good evening. Is it cold tonight?",
+                "type": "phrase",
+                "tts": "Goedenavond Is het koud vanavond",
+                "pronunciation": "khoo-duh-nah-vont is het kowt fah-nah-vont",
+                "audio": "nl_ch5_7_koud_vanavond.mp3",
+                "group": null,
+                "speaker": "you"
+            },
+            {
+                "dutch": "Ja, de bus is te laat.",
+                "english": "Yes, the bus is late.",
+                "type": "phrase",
+                "tts": "Ja de bus is te laat",
+                "pronunciation": "yah duh bus is tuh laht",
+                "audio": "nl_ch5_7_bus_te_laat.mp3",
+                "group": null,
+                "speaker": "them"
+            },
+            {
+                "dutch": "Hallo. Ik kom binnen uit de regen.",
+                "english": "Hello. I am coming in out of the rain.",
+                "type": "phrase",
+                "tts": "Hallo Ik kom binnen uit de regen",
+                "pronunciation": "hah-low ik kom bin-nun owt duh ray-khun",
+                "audio": "nl_ch5_7_uit_de_regen.mp3",
+                "group": null,
+                "speaker": "you"
+            },
+            {
+                "dutch": "Hoe was je dag?",
+                "english": "How was your day?",
+                "type": "phrase",
+                "tts": "Hoe was je dag",
+                "pronunciation": "hoo vas yuh dakh",
+                "audio": "nl_ch5_7_hoe_was_je_dag.mp3",
+                "group": null,
+                "speaker": "them"
+            },
+            {
+                "dutch": "Ik wil praten over...",
+                "english": "I want to talk about...",
+                "type": "phrase",
+                "tts": "Ik wil praten over",
+                "pronunciation": "ik vil prah-tun oh-vur",
+                "audio": "nl_ch5_7_praten_over.mp3",
+                "group": null,
+                "speaker": "you"
+            },
+            {
+                "dutch": "Wat wil je drinken?",
+                "english": "What do you want to drink?",
+                "type": "phrase",
+                "tts": "Wat wil je drinken",
+                "pronunciation": "vaht vil yuh drin-kun",
+                "audio": null,
+                "group": null,
+                "speaker": "them"
+            },
+            {
+                "dutch": "Een koffie, alstublieft.",
+                "english": "One coffee, please.",
+                "type": "phrase",
+                "tts": "Een koffie alstublieft",
+                "pronunciation": "un kof-fee ahl-stuu-bleeft",
+                "audio": "nl_ch5_7_een_koffie.mp3",
+                "group": null,
+                "speaker": "you"
+            },
+            {
+                "dutch": "Komt eraan.",
+                "english": "Coming right up.",
+                "type": "phrase",
+                "tts": "Komt eraan",
+                "pronunciation": "komt er-ahn",
+                "audio": null,
+                "group": null,
+                "speaker": "them"
+            },
+            {
+                "dutch": "Vertel me een verhaaltje.",
+                "english": "Tell me a story.",
+                "type": "phrase",
+                "tts": "Vertel me een verhaaltje",
+                "pronunciation": "fur-tel muh un fur-hahl-tyuh",
+                "audio": "nl_ch5_7_vertel_verhaaltje.mp3",
+                "group": null,
+                "speaker": "you"
+            }
+        ]
+    },
+    {
+        "lesson_id": "nl_ch5_8",
+        "metadata": {
+            "title": "Chapter 5: Conjuring Fluency",
+            "subtitle": "5.8 The Holy Grail (Synthesising the Night)",
+            "template": "Audio_List",
+            "content_type": "phrases",
+            "level": "a1",
+            "tts_lang": "nl-NL",
+            "scene": "The night is ending. Use everything you have learned to navigate your way home.",
+            "groups": null,
+            "next_lesson": "END_OF_COURSE"
+        },
+        "content": "This is where all the fragments align. We are combining time, hobbies, preferences, negation, and questions into full, practical statements ready for the real world. Reflect on these before you speak.",
+        "assets": [
+            {
+                "dutch": "Ik drink geen koffie, want het is laat. En jij?",
+                "english": "I do not drink coffee, because it is late. And you?",
+                "type": "phrase",
+                "tts": "Ik drink geen koffie want het is laat En jij",
+                "pronunciation": "ik drink khayn kof-fee vahnt het is laht en yay",
+                "audio": "nl_ch5_8_geen_koffie_laat.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Morgen fiets ik naar de stad, want ik hou van de regen.",
+                "english": "Tomorrow I will cycle to the city, because I love the rain.",
+                "type": "phrase",
+                "tts": "Morgen fiets ik naar de stad want ik hou van de regen",
+                "pronunciation": "mor-khun feets ik nahr duh staht vahnt ik how fahn duh ray-khun",
+                "audio": "nl_ch5_8_morgen_fietsen_regen.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Waar is het station? Ik begrijp het niet.",
+                "english": "Where is the station? I do not understand it.",
+                "type": "phrase",
+                "tts": "Waar is het station Ik begrijp het niet",
+                "pronunciation": "vahr is het stah-shon ik buh-khrayp het neet",
+                "audio": "nl_ch5_8_waar_station_begrijp_niet.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Ik lees een boek, want ik heb morgen geen tijd.",
+                "english": "I am reading a book, because I have no time tomorrow.",
+                "type": "phrase",
+                "tts": "Ik lees een boek want ik heb morgen geen tijd",
+                "pronunciation": "ik lays un book vahnt ik hep mor-khun khayn tayt",
+                "audio": "nl_ch5_8_lees_boek_geen_tijd.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Wat een rotweer! Ik ga naar huis.",
+                "english": "What terrible weather! I am going home.",
+                "type": "phrase",
+                "tts": "Wat een rotweer Ik ga naar huis",
+                "pronunciation": "vaht un rot-vayr ik khah nahr how-ees",
+                "audio": "nl_ch5_8_rotweer_naar_huis.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Ik wil graag afrekenen, want ik moet naar werk.",
+                "english": "I would like to pay, because I must go to work.",
+                "type": "phrase",
+                "tts": "Ik wil graag afrekenen want ik moet naar werk",
+                "pronunciation": "ik vil khrahkh ahf-ray-kuh-nun vahnt ik moot nahr vehrk",
+                "audio": "nl_ch5_8_afrekenen_want_werk.mp3",
+                "group": null,
+                "speaker": null
+            },
+            {
+                "dutch": "Kunt u mij helpen? Ik zoek de trein.",
+                "english": "Can you help me? I am looking for the train.",
+                "type": "phrase",
+                "tts": "Kunt u mij helpen Ik zoek de trein",
+                "pronunciation": "kunt uu may hel-pun ik zook duh trayn",
+                "audio": "nl_ch5_8_helpen_zoek_trein.mp3",
+                "group": null,
+                "speaker": null
+            }
+        ]
+    }
+]

@@ -1,0 +1,7 @@
+{
+  "name": "Apparitions: Conjure up fluency",
+  "description": "A nocturnal brutalist Dutch language learning experience. Immerse yourself in the mist of the Netherlands and find fluency through cinematic roleplay with fleeting apparitions.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

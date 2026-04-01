@@ -1,0 +1,44 @@
+{
+  "name": "apparitions:-conjure-up-fluency",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@deck.gl/aggregation-layers": "^9.2.10",
+    "@deck.gl/core": "^9.2.10",
+    "@deck.gl/geo-layers": "^9.2.10",
+    "@deck.gl/layers": "^9.2.10",
+    "@deck.gl/mesh-layers": "^9.2.10",
+    "@deck.gl/react": "^9.2.10",
+    "@google/genai": "^1.41.0",
+    "@loaders.gl/3d-tiles": "^4.3.4",
+    "@loaders.gl/core": "^4.3.4",
+    "@loaders.gl/gltf": "^4.3.4",
+    "@loaders.gl/math": "^4.3.4",
+    "@loaders.gl/tiles": "^4.3.4",
+    "@math.gl/core": "^4.1.0",
+    "@math.gl/web-mercator": "^4.1.0",
+    "@turf/helpers": "^7.3.4",
+    "@turf/nearest-point-on-line": "^7.3.4",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.34.3",
+    "gsap": "^3.14.2",
+    "lucide-react": "^1.7.0",
+    "luma.gl": "^7.3.2",
+    "ogl": "^1.0.11",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tailwind-merge": "^3.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
+  }
+}

@@ -1,0 +1,6 @@
+# P2000 Web Scraper Dependencies
+beautifulsoup4==4.12.3
+lxml==5.1.0
+
+# Install with:
+# pip install beautifulsoup4 lxml
