@@ -22,3 +22,6 @@ steps:
 
 images:
   - 'europe-west2-docker.pkg.dev/$PROJECT_ID/apparitions-repo/apparitions-service:$COMMIT_SHA'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
