@@ -248,13 +248,13 @@ export const MemoryGame = ({ onWin, onRestart }: { onWin?: () => void, onRestart
 
                     if (card.isMatched) {
                         // Engraved state
-                        baseClasses += "bg-[#111] text-[#666] shadow-[inset_0_2px_10px_rgba(0,0,0,0.8)] border border-[#222]";
+                        baseClasses += "bg-[#222] text-[#666] shadow-[inset_0_2px_10px_rgba(0,0,0,0.8)] border border-[#333]";
                     } else if (card.isFlipped) {
                         // Flipped/Revealed state
                         baseClasses += "bg-[#2a2a2a] text-[#ddd] shadow-[0_0_10px_rgba(255,255,255,0.05)] border border-[#444] animate-digital-aberration";
                     } else {
                         // Raw concrete state (face down)
-                        baseClasses += "bg-[#111] border-t border-l border-[#2a2a2a] border-b border-r border-[#0a0a0a] shadow-[2px_2px_10px_rgba(0,0,0,0.5)] hover:bg-[#181818]";
+                        baseClasses += "bg-[#222] border border-[#333] shadow-[2px_2px_10px_rgba(0,0,0,0.5)] hover:bg-[#282828]";
                     }
 
                     return (
