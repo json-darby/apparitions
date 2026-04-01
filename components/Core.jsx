@@ -15,7 +15,7 @@ const Core = ({ onExit, onNavigate }) => {
   useEffect(() => {
     const fetchIndex = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:8080/api/index');
+        const res = await fetch('/api/index');
         const data = await res.json();
         setIndexData(data);
       } catch (err) {
@@ -28,7 +28,7 @@ const Core = ({ onExit, onNavigate }) => {
   const fetchLesson = async (requestStr, contextStr = "None") => {
     setIsLoading(true);
     try {
-      const res = await fetch('http://127.0.0.1:8080/api/lesson', {
+      const res = await fetch('/api/lesson', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_request: requestStr, context: contextStr })
@@ -50,7 +50,7 @@ const Core = ({ onExit, onNavigate }) => {
 
     const fallbackToTTS = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:8080/api/tts', {
+        const res = await fetch('/api/tts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text: asset.tts || asset.dutch || asset.subtext })

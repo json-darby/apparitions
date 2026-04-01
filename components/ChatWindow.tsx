@@ -179,7 +179,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
         text: draftTranscript,
         timestamp: new Date()
       }]);
-      fetch('http://127.0.0.1:8080/api/translate', { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({text: draftTranscript})})
+      fetch('/api/translate', { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({text: draftTranscript})})
         .then(r => r.json())
         .then(d => {
            if (d.translatedText) {
@@ -368,7 +368,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
                   if (responseModeRef.current === 'instant' && userTextRaw) {
                     const msgId = `u-${Date.now()}`;
                     setMessages(prev => [...prev, { id: msgId, sender: 'user', text: userTextRaw, timestamp: new Date() }]);
-                    fetch('http://127.0.0.1:8080/api/translate', { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({text: userTextRaw})})
+                    fetch('/api/translate', { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({text: userTextRaw})})
                       .then(r => r.json())
                       .then(d => {
                          if (d.translatedText) {
@@ -382,7 +382,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
                   if (botText) {
                     const msgId = `a-${Date.now()}`;
                     setMessages(prev => [...prev, { id: msgId, sender: scenario === ScenarioType.COMPREHENSION ? 'narrator' : 'apparition', text: botText, timestamp: new Date() }]);
-                    fetch('http://127.0.0.1:8080/api/translate', { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({text: botText})})
+                    fetch('/api/translate', { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({text: botText})})
                       .then(r => r.json())
                       .then(d => {
                          if (d.translatedText) {

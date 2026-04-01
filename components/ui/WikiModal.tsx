@@ -32,7 +32,7 @@ export const WikiModal: React.FC<WikiModalProps> = ({ building, city, coords, on
 
         const fetchWikiData = async () => {
             try {
-                const url = new URL(`http://127.0.0.1:8080/api/wikipedia/${encodeURIComponent(building.name!)}`);
+                const url = new URL(`/api/wikipedia/${encodeURIComponent(building.name!)}`, window.location.origin);
                 if (city) {
                     url.searchParams.append('city', city);
                 }

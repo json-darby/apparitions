@@ -1,6 +1,6 @@
 import { ScenarioType } from "../types";
 
-const LOCAL_WEBSOCKET_ADDRESS = "ws://127.0.0.1:8080/ws";
+const LOCAL_WEBSOCKET_ADDRESS = `ws${window.location.protocol === 'https:' ? 's' : ''}://${window.location.host}/ws`;
 
 export const ai = {
   live: {

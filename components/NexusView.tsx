@@ -233,7 +233,7 @@ const NexusView: React.FC<NexusViewProps> = ({ onExit, onNavigate }) => {
 
     // Live Transit via usePollingEffect Hook
     const { data: transitData, error: transitError, loading: transitLoading } = usePollingEffect<any>({
-        apiEndpoint: 'http://127.0.0.1:8080/api/transit',
+        apiEndpoint: '/api/transit',
         pollingIntervalMs: transitInterval,
         queryParams: {
             bbox: apiBbox
@@ -405,7 +405,7 @@ const NexusView: React.FC<NexusViewProps> = ({ onExit, onNavigate }) => {
 
     // Crowd Density via usePollingEffect Hook
     const { data: rawCrowdData, error: crowdError } = usePollingEffect<any>({
-        apiEndpoint: 'http://127.0.0.1:8080/api/crowds',
+        apiEndpoint: '/api/crowds',
         pollingIntervalMs: crowdsInterval,
         queryParams: {
             bbox: apiBbox

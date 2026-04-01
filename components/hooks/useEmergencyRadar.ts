@@ -52,7 +52,7 @@ const MOCK_STARTUP_DELAY_MS = 500;
 const LOCALITY_BUFFER_RATIO = 0.20;
 
 /** The backend endpoint for stateless P2000 incident data. */
-const P2000_RADAR_ENDPOINT = 'http://127.0.0.1:8080/api/p2000/radar';
+const P2000_RADAR_ENDPOINT = '/api/p2000/radar';
 
 /** Amsterdam-specific mock incident injected on radar activation. */
 const MOCK_INCIDENTS: EmergencyIncident[] = [

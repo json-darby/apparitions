@@ -21,7 +21,7 @@ interface PDOKBuildingLayerProps {
 export const createPDOKBuildingLayer = ({ scannerActive, onHover, onClick }: PDOKBuildingLayerProps) => {
     return new MVTLayer({
         id: 'pdok-buildings-layer',
-        data: 'http://127.0.0.1:8080/api/pdok/tiles/{z}/{x}/{y}',
+        data: '/api/pdok/tiles/{z}/{x}/{y}',
         minZoom: MIN_ZOOM_LEVEL,
         maxZoom: MAX_ZOOM_LEVEL,
         extruded: true,

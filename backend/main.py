@@ -794,6 +794,13 @@ async def handle_gemini(ws: WebSocket):
     except Exception as e:
         print(f"WebSocket Error: {e}")
 
+from fastapi.staticfiles import StaticFiles
+import os
+
+# Create dist directory if it doesn't exist to prevent crash during development
+os.makedirs(os.path.join(os.path.dirname(__file__), "../dist"), exist_ok=True)
+app.mount("/", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "../dist"), html=True), name="frontend")
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="127.0.0.1", port=8080)

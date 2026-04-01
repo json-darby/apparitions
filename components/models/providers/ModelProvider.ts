@@ -16,7 +16,7 @@ export class ModelProvider implements IModelProvider {
     if (!botTranscript || !botTranscript.trim()) return [];
 
     try {
-      const response = await fetch('http://127.0.0.1:8080/api/whisper/suggestions', {
+      const response = await fetch('/api/whisper/suggestions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

@@ -106,7 +106,7 @@ export const ComprehensionGame = ({ onExit, onWin }: { onExit: () => void, onWin
                 // @ts-ignore
                 const fullText = story.full_nl_text || story.sentences.map(s => s.nl).join(' ');
 
-                const response = await fetch('http://localhost:8000/api/tts', {
+                const response = await fetch('/api/tts', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ text: fullText })
