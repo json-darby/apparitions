@@ -19,6 +19,20 @@ RUN apt-get update && apt-get install -y \
 COPY backend/requirements.txt backend/requirements.txt
 RUN pip install --no-cache-dir -r backend/requirements.txt
 
+# Smoke-test: verify every critical import resolves at BUILD time
+# If anything is missing, Docker fails here — not on Cloud Run
+RUN python -c "\
+import nest_asyncio; \
+from llama_index.core import VectorStoreIndex; \
+from llama_index.llms.mistralai import MistralAI; \
+from llama_index.embeddings.mistralai import MistralAIEmbedding; \
+import argostranslate.translate; \
+import edge_tts; \
+import wikipediaapi; \
+from google import genai; \
+import httpx; \
+print('All imports verified OK')"
+
 # Copy source code
 COPY backend/ backend/
 COPY public/ public/
