@@ -254,7 +254,7 @@ export const MemoryGame = ({ onWin, onRestart }: { onWin?: () => void, onRestart
                         baseClasses += "bg-[#2a2a2a] text-[#ddd] shadow-[0_0_10px_rgba(255,255,255,0.05)] border border-[#444] animate-digital-aberration";
                     } else {
                         // Raw concrete state (face down)
-                        baseClasses += "bg-[url('https://www.transparenttextures.com/patterns/concrete-wall.png')] bg-[#222] border-t border-l border-[#3a3a3a] border-b border-r border-[#111] shadow-[2px_2px_10px_rgba(0,0,0,0.5)] hover:bg-[#282828]";
+                        baseClasses += "bg-[#111] border-t border-l border-[#2a2a2a] border-b border-r border-[#0a0a0a] shadow-[2px_2px_10px_rgba(0,0,0,0.5)] hover:bg-[#181818]";
                     }
 
                     return (
