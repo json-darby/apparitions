@@ -1,6 +1,8 @@
 import os
 import sys
-sys.path.append(os.path.join(os.path.dirname(__file__), 'libs'))
+libs_path = os.path.join(os.path.dirname(__file__), 'libs')
+if os.path.isdir(libs_path):
+    sys.path.insert(0, libs_path)
 import asyncio
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.responses import Response
