@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from google import genai
 from google.genai import types
 from pydantic import BaseModel
+from typing import Optional, List, Dict, Any
 from dotenv import load_dotenv
 import edge_tts
 import httpx
@@ -161,15 +162,31 @@ class WhisperRequest(BaseModel):
     bot_transcript: str
     model: int = 2
     scenario: str = "START_INTRO"
+    chat_history: Optional[List[Dict[str, Any]]] = None
+
+class ReviewRequest(BaseModel):
+    chat_history: List[Dict[str, Any]]
+    scenario: str
 
 @app.post("/api/whisper/suggestions")
 async def fetch_whisper_suggestions(request: WhisperRequest):
     try:
-        suggestions = get_whisper_suggestions(request.bot_transcript, request.model, request.scenario)
+        from whisper_system import get_whisper_suggestions
+        suggestions = get_whisper_suggestions(request.bot_transcript, request.model, request.scenario, request.chat_history)
         return {"suggestions": suggestions}
     except Exception as e:
         print(f"Whisper Generation Error: {e}")
         raise HTTPException(status_code=500, detail="Failed to generate whisper suggestions.")
+
+@app.post("/api/review")
+async def generate_review(request: ReviewRequest):
+    try:
+        from whisper_system import generate_conversation_review
+        review = generate_conversation_review(request.chat_history, request.scenario)
+        return review
+    except Exception as e:
+        print(f"Review API Error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to general review.")
 
 @app.get("/api/index")
 async def get_lesson_index():

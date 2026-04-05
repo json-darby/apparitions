@@ -83,6 +83,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
   const [draftTranscript, setDraftTranscript] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isFetchingWhispers, setIsFetchingWhispers] = useState(false);
+  const [speechAvailable, setSpeechAvailable] = useState(true);
+  const [manualInput, setManualInput] = useState('');
+  const [suggestionMemory, setSuggestionMemory] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [reviewReport, setReviewReport] = useState<any>(null);
+  const [isReviewing, setIsReviewing] = useState(false);
+  const [sessionCounter, setSessionCounter] = useState(0);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -94,6 +101,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
   const transcriptionRef = useRef({ user: '', bot: '', botSnapshot: '' });
   const recognitionRef = useRef<any>(null);
   const responseModeRef = useRef<ResponseMode>(responseMode);
+  const speechRetryRef = useRef(0);
+  const manualInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     responseModeRef.current = responseMode;
@@ -133,6 +142,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
   }, [whisperUnlocked, visibleCount, allSuggestions, isFetchingWhispers, isBotSpeaking]);
 
   useEffect(() => {
+    const MAX_SPEECH_RETRIES = 3;
     try {
       if (typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
         const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
@@ -141,6 +151,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
         recognitionRef.current.interimResults = true;
         recognitionRef.current.lang = 'nl-NL';
         recognitionRef.current.onresult = (event: any) => {
+          /* Successful result resets the retry counter */
+          speechRetryRef.current = 0;
           let finalTranscript = '';
           for (let i = event.resultIndex; i < event.results.length; ++i) {
             if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript;
@@ -149,20 +161,50 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
         };
         recognitionRef.current.onstart = () => setIsRecording(true);
         recognitionRef.current.onend = () => setIsRecording(false);
-        recognitionRef.current.onerror = (e: any) => setError(`Spraakherkenning fout: ${e.error}`);
+        recognitionRef.current.onerror = (e: any) => {
+          const errCode = e.error;
+          if (errCode === 'network' || errCode === 'service-not-allowed') {
+            /* Auto-retry on transient network errors.
+             * Chrome's Web Speech API sends audio to Google's cloud
+             * servers; local dev environments (VPN, firewall, DNS)
+             * often block this. Retry a few times before falling
+             * back to the manual text input. */
+            speechRetryRef.current += 1;
+            if (speechRetryRef.current <= MAX_SPEECH_RETRIES) {
+              console.warn(`[Speech] Network error — retry ${speechRetryRef.current}/${MAX_SPEECH_RETRIES}`);
+              setTimeout(() => {
+                try { recognitionRef.current?.start(); } catch (_) { /* already started */ }
+              }, speechRetryRef.current * 800);
+              return;
+            }
+            /* Exhausted retries — fall back to text input */
+            console.warn('[Speech] Retries exhausted — switching to manual text input');
+            setSpeechAvailable(false);
+            setIsRecording(false);
+            setError(null); /* Clear any stale banner */
+          } else if (errCode !== 'aborted' && errCode !== 'no-speech') {
+            setError(`Spraakherkenning fout: ${errCode}`);
+          }
+        };
+      } else {
+        setSpeechAvailable(false);
       }
     } catch (err) {
       console.error("Speech Recognition setup error:", err);
+      setSpeechAvailable(false);
     }
   }, []);
 
   const toggleRecording = () => {
     try {
-      if (!recognitionRef.current) {
-        setError("Browser ondersteunt geen spraakherkenning.");
-        return;
+      if (!recognitionRef.current || !speechAvailable) return;
+      if (isRecording) {
+        recognitionRef.current.stop();
+      } else {
+        speechRetryRef.current = 0;
+        setDraftTranscript('');
+        recognitionRef.current.start();
       }
-      isRecording ? recognitionRef.current.stop() : (setDraftTranscript(''), recognitionRef.current.start());
     } catch (err) {
       setError("Fout bij starten opname.");
     }
@@ -170,16 +212,18 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
 
   const confirmSend = () => {
     try {
-      if (!draftTranscript.trim() || !sessionRef.current) return;
-      sessionRef.current.sendRealtimeInput({ text: draftTranscript });
+      /* Accept text from either the speech draft or the manual input fallback */
+      const textToSend = (draftTranscript || manualInput).trim();
+      if (!textToSend || !sessionRef.current) return;
+      sessionRef.current.sendRealtimeInput({ text: textToSend });
       const msgId = `u-${Date.now()}`;
       setMessages(prev => [...prev, {
         id: msgId,
         sender: 'user',
-        text: draftTranscript,
+        text: textToSend,
         timestamp: new Date()
       }]);
-      fetch('/api/translate', { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({text: draftTranscript})})
+      fetch('/api/translate', { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({text: textToSend})})
         .then(r => r.json())
         .then(d => {
            if (d.translatedText) {
@@ -187,6 +231,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
            }
         }).catch(err => console.error(err));
       setDraftTranscript('');
+      setManualInput('');
       setVisibleCount(0);
       setIsFetchingWhispers(true);
       if (isRecording) recognitionRef.current.stop();
@@ -202,18 +247,20 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.code === 'KeyW' || e.key === 'w' || e.key === 'W') && !isRecording) {
+      /* When the manual text input is focused, don't intercept normal typing keys */
+      const isTypingInInput = document.activeElement === manualInputRef.current;
+      if ((e.code === 'KeyW' || e.key === 'w' || e.key === 'W') && !isRecording && !isTypingInInput) {
         e.preventDefault();
         toggleWhispers();
       }
-      if (responseMode === 'review') {
+      if (responseMode === 'review' && speechAvailable) {
         if (e.code === 'Space') { e.preventDefault(); toggleRecording(); }
         if (e.code === 'Enter' && draftTranscript.trim()) { e.preventDefault(); confirmSend(); }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [responseMode, isRecording, draftTranscript, whisperUnlocked, allSuggestions]);
+  }, [responseMode, isRecording, draftTranscript, whisperUnlocked, allSuggestions, speechAvailable]);
 
   useEffect(() => {
     let checkInterval: number;
@@ -235,8 +282,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
           setError("Microfoontoegang geweigerd. Activeer de microfoon om de nacht te betreden.");
           return;
         }
-        inputAudioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: INPUT_SAMPLE_RATE });
-        outputAudioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: OUTPUT_SAMPLE_RATE });
+        if (!inputAudioCtxRef.current) {
+          inputAudioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: INPUT_SAMPLE_RATE });
+        }
+        if (!outputAudioCtxRef.current) {
+          outputAudioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: OUTPUT_SAMPLE_RATE });
+        }
 
         const liveConfig = getLiveConfig(scenario);
         activeSession = await (ai.live.connect({
@@ -390,7 +441,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
                          }
                       }).catch(err => console.error(err));
                     
-                    shhh.getWhispers(botText, scenario).then(suggestions => {
+                    shhh.getWhispers(botText, scenario, suggestionMemory ? messages : undefined).then(suggestions => {
                       if (suggestions && suggestions.length > 0) {
                         setAllSuggestions(suggestions);
                       }
@@ -451,10 +502,52 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
       clearInterval(checkInterval);
       activeSession?.close();
       sessionRef.current = null;
-      inputAudioCtxRef.current?.close();
-      outputAudioCtxRef.current?.close();
     };
-  }, [scenario]);
+  }, [scenario, sessionCounter]);
+
+  const restartSession = () => {
+    setMessages([]);
+    setDraftTranscript('');
+    setManualInput('');
+    setAllSuggestions([]);
+    setVisibleCount(0);
+    setWhisperUnlocked(false);
+    transcriptionRef.current = { user: '', bot: '', botSnapshot: '' };
+    
+    // Close existing connection
+    if (sessionRef.current) {
+      try {
+        sessionRef.current.close();
+      } catch(e) {}
+      sessionRef.current = null;
+    }
+    
+    // Trigger reconnection
+    setSessionCounter(prev => prev + 1);
+  };
+
+  const endAndReview = async () => {
+    setIsReviewing(true);
+    setShowReviewModal(true);
+    try {
+      const response = await fetch('/api/review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_history: messages.map(m => ({ sender: m.sender, text: m.text })),
+          scenario: scenario
+        })
+      });
+      if (!response.ok) throw new Error("Review fetch failed");
+      const data = await response.json();
+      setReviewReport(data);
+    } catch (err) {
+      console.error(err);
+      // Let modal handle empty or error states
+    } finally {
+      setIsReviewing(false);
+    }
+  };
 
   const getPersonaName = () => {
     if (scenario === ScenarioType.INTRO) return 'Lotte';
@@ -491,7 +584,61 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
           <div className="flex items-center gap-6">
             <div className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" />
             <span className="text-gray-300 text-[10px] uppercase tracking-[0.3em] font-light flex-1">{error}</span>
-            <button onClick={() => setError(null)} className="text-gray-400 hover:text-white transition-colors text-[9px] uppercase tracking-widest pl-4 border-l border-white/10">Sluiten</button>
+            <button onClick={() => setError(null)} className="text-gray-400 hover:text-white transition-colors text-[9px] uppercase tracking-widest pl-4 border-l border-white/10">CLOSE</button>
+          </div>
+        </div>
+      )}
+
+      {/* Review Modal Overlap */}
+      {showReviewModal && (
+        <div className="absolute inset-0 z-[200] bg-black/98 backdrop-blur-md flex items-center justify-center p-4 md:p-8">
+          <div className="w-full max-w-4xl max-h-[90vh] flex flex-col bg-[#0a0a0a] border border-[#222] relative animate-in fade-in slide-in-from-bottom-8 duration-700">
+            {/* Header + Close button */}
+            <div className="flex items-center justify-between p-8 md:p-10 border-b border-[#222] shrink-0">
+               <div>
+                 <h2 className="font-display font-bold text-3xl md:text-5xl text-white tracking-tighter uppercase relative"><span className="absolute -left-6 top-2 w-2 h-2 bg-white rounded-full"></span>Session Report</h2>
+                 <p className="text-[#888] text-[11px] uppercase tracking-[0.3em] font-bold mt-2">Grammatical Evaluation</p>
+               </div>
+               <button 
+                onClick={() => setShowReviewModal(false)}
+                className="text-[10px] uppercase tracking-widest text-[#555] hover:text-white transition-all border-b border-transparent hover:border-white"
+               >
+                 CLOSE
+               </button>
+            </div>
+            
+            <div className="p-8 md:p-10 overflow-y-auto custom-scrollbar flex-1">
+            {isReviewing ? (
+              <div className="py-20 flex flex-col items-center justify-center gap-6">
+                <div className="w-3 h-3 bg-white rounded-full animate-ping" />
+                <span className="text-[10px] uppercase tracking-[0.4em] font-bold text-[#666]">Analysing...</span>
+              </div>
+            ) : reviewReport?.error ? (
+              <div className="py-10 text-center text-red-500 font-medium">The review could not be completed: {reviewReport.error}</div>
+            ) : reviewReport?.summary ? (
+              <div className="space-y-6 pb-4">
+                <div className="mb-10 text-gray-300 font-body text-xl md:text-2xl tracking-tight leading-relaxed whitespace-pre-wrap border-l-2 border-[#555] pl-6 md:pl-8 italic">
+                  {reviewReport.summary}
+                </div>
+
+                {reviewReport.topic_suggestions && reviewReport.topic_suggestions.length > 0 && (
+                  <div className="mt-12 pt-8 border-t border-[#222]">
+                    <h3 className="font-display font-bold text-xl text-white tracking-tighter mb-6 uppercase relative"><span className="absolute -left-4 top-2 w-1.5 h-1.5 bg-[#555] rounded-full"></span>Other Useful Phrases</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                       {reviewReport.topic_suggestions.map((suggestion: any, sIdx: number) => (
+                         <div key={`ts-${sIdx}`} className="bg-[#111] p-4 border border-[#222] hover:border-white transition-colors cursor-default">
+                           <div className="text-white font-body font-bold text-lg mb-1 tracking-tight">"{suggestion.dutch}"</div>
+                           <div className="text-[#888] text-[9.5px] uppercase tracking-widest border-t border-[#222] pt-3 leading-relaxed font-bold">EN: {suggestion.english}</div>
+                         </div>
+                       ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="py-10 text-center text-[#555]">No data available. Try again.</div>
+            )}
+            </div>
           </div>
         </div>
       )}
@@ -565,17 +712,41 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
         {/* CONTROLS & VISUALISER (Brutalist Footer) */}
         <div className="px-8 md:px-12 pb-12 pt-10 flex flex-col items-start gap-6 relative z-10 border-t border-[#111111]/30 bg-gradient-to-t from-[#050505] via-[#050505]/80 to-transparent">
           {responseMode === 'review' ? (
-            <div className="flex items-center gap-6">
-              <button onClick={toggleRecording} className={`group px-8 py-3 transition-colors duration-500 flex items-center gap-4 ${isRecording ? 'bg-white text-black' : 'bg-transparent border border-[#333] text-white hover:bg-white/10'}`}>
-                <div className={`w-1.5 h-1.5 rounded-full ${isRecording ? 'bg-black animate-ping' : 'bg-white'}`} />
-                <span className="text-[10px] uppercase tracking-[0.3em] font-bold">{isRecording ? 'STOP' : 'RECORD'}</span>
-              </button>
-              {draftTranscript.trim() && (
-                <button onClick={confirmSend} className="px-8 py-3 bg-white text-black hover:bg-gray-200 transition-colors duration-500">
-                  <span className="text-[10px] uppercase tracking-[0.3em] font-bold">SEND</span>
+            speechAvailable ? (
+              <div className="flex items-center gap-6">
+                <button onClick={toggleRecording} className={`group px-8 py-3 transition-colors duration-500 flex items-center gap-4 ${isRecording ? 'bg-white text-black' : 'bg-transparent border border-[#333] text-white hover:bg-white/10'}`}>
+                  <div className={`w-1.5 h-1.5 rounded-full ${isRecording ? 'bg-black animate-ping' : 'bg-white'}`} />
+                  <span className="text-[10px] uppercase tracking-[0.3em] font-bold">{isRecording ? 'STOP' : 'RECORD'}</span>
                 </button>
-              )}
-            </div>
+                {draftTranscript.trim() && (
+                  <button onClick={confirmSend} className="px-8 py-3 bg-white text-black hover:bg-gray-200 transition-colors duration-500">
+                    <span className="text-[10px] uppercase tracking-[0.3em] font-bold">SEND</span>
+                  </button>
+                )}
+              </div>
+            ) : (
+              /* Manual text input fallback when Web Speech API is unavailable */
+              <div className="flex items-center gap-4 w-full md:w-auto">
+                <div className="flex-1 md:flex-none flex items-center gap-3 border border-[#333] bg-transparent px-4 py-2 min-w-[300px] focus-within:border-white/40 transition-colors">
+                  <div className="w-1.5 h-1.5 bg-[#555]" />
+                  <input
+                    ref={manualInputRef}
+                    type="text"
+                    value={manualInput}
+                    onChange={(e) => setManualInput(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' && manualInput.trim()) { e.preventDefault(); confirmSend(); } }}
+                    placeholder="Type je antwoord in het Nederlands..."
+                    className="bg-transparent text-white text-sm font-light tracking-wide outline-none flex-1 placeholder:text-[#444] placeholder:tracking-wider"
+                    autoFocus
+                  />
+                </div>
+                {manualInput.trim() && (
+                  <button onClick={confirmSend} className="px-8 py-3 bg-white text-black hover:bg-gray-200 transition-colors duration-500 shrink-0">
+                    <span className="text-[10px] uppercase tracking-[0.3em] font-bold">SEND</span>
+                  </button>
+                )}
+              </div>
+            )
           ) : (
             <div className="flex items-end gap-1.5 h-10 w-full md:w-auto">
               {/* Brutalist SPEECH VISUALISER BARS */}
@@ -595,9 +766,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
           <div className="text-[9px] uppercase tracking-[0.5em] text-[#666] flex items-center gap-4 mt-2 font-bold w-full justify-between md:w-auto md:justify-start">
             <div className="flex items-center gap-4 border-r border-[#333] pr-6">
               <div className={`w-1.5 h-1.5 ${isRecording || audioLevel > AUDIO_THRESHOLD ? 'bg-white' : 'bg-[#333]'}`} />
-              {responseMode === 'review' ? (isRecording ? 'LISTENING...' : 'WAITING...') : (audioLevel > AUDIO_THRESHOLD ? 'INPUT ACTIVE' : 'AWAITING INPUT')}
+              {responseMode === 'review'
+                ? (speechAvailable
+                    ? (isRecording ? 'LISTENING...' : 'WAITING...')
+                    : (manualInput.trim() ? 'READY TO SEND' : 'TYPE TO RESPOND'))
+                : (audioLevel > AUDIO_THRESHOLD ? 'INPUT ACTIVE' : 'AWAITING INPUT')}
             </div>
-            <span className="md:border-none pl-2 md:pl-0">MIC / DIRECT</span>
+            <span className="md:border-none pl-2 md:pl-0">{responseMode === 'review' && !speechAvailable ? 'TEXT / MANUAL' : 'MIC / DIRECT'}</span>
           </div>
         </div>
       </div>
@@ -660,6 +835,36 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
             <div className="h-full flex flex-col items-center justify-center pb-32 opacity-20 hover:opacity-100 transition-opacity duration-1000 cursor-pointer" onClick={toggleWhispers}>
               <span className="text-[5vw] font-display font-bold mix-blend-overlay">?</span>
             </div>
+          )}
+        </div>
+
+        {/* Lower Control Bar */}
+        <div className="border-t border-[#111] bg-[#050505] flex items-center h-16">
+          <button onClick={restartSession} className="flex-1 h-full text-[9px] uppercase tracking-[0.2em] font-bold text-[#666] hover:text-white hover:bg-white/5 transition-all outline-none flex items-center justify-center">
+            RESTART
+          </button>
+
+          {scenario !== ScenarioType.COMPREHENSION && (
+            <>
+              <div className="w-[1px] h-8 bg-[#111]" />
+              
+              <button 
+                onClick={endAndReview} 
+                disabled={isReviewing} 
+                className="flex-1 h-full text-[9px] uppercase tracking-[0.2em] font-bold text-[#666] hover:text-white hover:bg-white/5 transition-all outline-none flex items-center justify-center gap-2"
+              >
+                {isReviewing ? 'REVIEWING...' : 'REVIEW'}
+              </button>
+
+              <div className="w-[1px] h-8 bg-[#111]" />
+              
+              <button 
+                onClick={() => setSuggestionMemory(!suggestionMemory)}
+                className="flex-1 h-full text-[9px] uppercase tracking-[0.2em] font-bold text-[#666] hover:text-white hover:bg-white/5 transition-all outline-none flex items-center justify-center"
+              >
+                MEMORY: {suggestionMemory ? 'ON' : 'OFF'}
+              </button>
+            </>
           )}
         </div>
       </div>

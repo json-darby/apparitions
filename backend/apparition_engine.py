@@ -141,7 +141,12 @@ class ApparitionEngine:
         Real World Context: {real_world_context}
 
         INSTRUCTIONS:
-        1. Select the most appropriate "template" based on the topic (e.g., "Dialogue_Scenario", "Audio_List", or "Grid_Interactive").
+        1. Select the most appropriate "template" based on the topic. There are exactly five available templates, each with a distinct use:
+           - "Audio_List": Use for a standard, flat list of vocabulary or phrases.
+           - "Grid_Interactive": Use for short, visually grid-based items (single words, short phrases).
+           - "Sequence_List": Use when the order of items matters, such as step-by-step instructions or navigation.
+           - "Dialogue_Scenario": Use for conversations between two speakers (use 'you' or 'them' for speaker field).
+           - "Grouped_List": Use when words or phrases fit naturally into categories (use 'group' field for each asset).
         2. Generate an appropriate number of assets to cover the scenario.
         3. CRITICAL: Ensure all Dutch vocabulary and grammar strictly adheres to CEFR A1 and A2 levels.
         4. Aesthetics: Write the "scene" and "content" introductions in a melancholic, Nocturnal Brutalist style.
@@ -172,7 +177,7 @@ class ApparitionEngine:
                     "tts": "[Cleaned text for text-to-speech, without punctuation]",
                     "pronunciation": "[Phonetic pronunciation guide]",
                     "audio": null,
-                    "group": null,
+                    "group": "[If Grouped_List, use category name, otherwise null]",
                     "speaker": "[If Dialogue_Scenario, use 'you' or 'them', otherwise null]"
                 }}
             ]

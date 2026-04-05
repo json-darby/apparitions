@@ -1,4 +1,5 @@
 import { IModelProvider, Suggestion } from './types';
+import { Message } from '../../types';
 import { ModelProvider } from './providers/ModelProvider';
 
 class ShhhSystem {
@@ -18,9 +19,9 @@ class ShhhSystem {
   /**
    * Generates whisper suggestions using the currently configured provider.
    */
-  async getWhispers(botTranscript: string, scenario?: string): Promise<Suggestion[]> {
+  async getWhispers(botTranscript: string, scenario?: string, chatHistory?: Message[]): Promise<Suggestion[]> {
     try {
-      return await this.provider.generateSuggestions(botTranscript, scenario);
+      return await this.provider.generateSuggestions(botTranscript, scenario, chatHistory);
     } catch (err) {
       console.error("Shhh system error:", err);
       return [];
