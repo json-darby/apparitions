@@ -25,6 +25,7 @@ import argostranslate.translate
 import wikipediaapi
 import difflib
 
+# Test for cloud run problem - ctrl + f
 wiki_en = wikipediaapi.Wikipedia(user_agent='Apparitions/1.0 (contact@apparitions.nl)', language='en')
 wiki_nl = wikipediaapi.Wikipedia(user_agent='Apparitions/1.0 (contact@apparitions.nl)', language='nl')
 
@@ -402,16 +403,23 @@ async def get_wikipedia_info(structure_name: str, city: str = None, lat: float =
         
         # Helper to determine if an article is valid or just a disambiguation
         def is_valid_article(p):
-            if not p.exists(): return False
-            summary = p.summary.lower()
-            title = p.title.lower()
-            return not (
-                "may refer to:" in summary or 
-                "kan verwijzen naar:" in summary or
-                "disambiguation" in title or
-                "doorverwijspagina" in title or 
-                "meerdere betekenissen" in summary
-            )
+            try:
+                if not p.exists(): return False
+                summary = p.summary.lower()
+                title = p.title.lower()
+                return not (
+                    "may refer to:" in summary or 
+                    "kan verwijzen naar:" in summary or
+                    "disambiguation" in title or
+                    "doorverwijspagina" in title or 
+                    "meerdere betekenissen" in summary
+                )
+            except KeyError:
+                return False
+
+        # Properly format the provided title, stripping language tags
+        if wikipedia_title and wikipedia_title.startswith(('nl:', 'en:')):
+            wikipedia_title = wikipedia_title[3:]
 
         # 1. Direct Tag Lock
         if wikipedia_title:
@@ -466,6 +474,9 @@ async def get_wikipedia_info(structure_name: str, city: str = None, lat: float =
                 async with httpx.AsyncClient() as http_client:
                     for radius in [100, 300, 1000]:
                         if page: break
+                        
+                        # Added delay to respect Wikipedia rate limits when running in the cloud
+                        await asyncio.sleep(1.5)
                         
                         # 2a. Wikidata GeoSearch
                         try:
@@ -549,6 +560,10 @@ async def get_wikipedia_info(structure_name: str, city: str = None, lat: float =
             
             for cand in candidates:
                 if page: break
+                
+                # Added delay to prevent rapid fire guesses from triggering a cloud IP block
+                await asyncio.sleep(1.5)
+                
                 p_en = wiki_en.page(cand)
                 if is_valid_article(p_en):
                     if c and c.lower() not in p_en.text.lower() and c.lower() not in p_en.title.lower():
@@ -558,6 +573,9 @@ async def get_wikipedia_info(structure_name: str, city: str = None, lat: float =
                     
             if not page:
                 for cand in candidates:
+                    # Delay before checking the Dutch variations
+                    await asyncio.sleep(1.5)
+                    
                     p_nl = wiki_nl.page(cand)
                     if is_valid_article(p_nl):
                         if c and c.lower() not in p_nl.text.lower() and c.lower() not in p_nl.title.lower():
