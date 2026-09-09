@@ -126,127 +126,218 @@ async def get_emergency_radar():
             
             soup = BeautifulSoup(res.text, 'html.parser')
             
-            # Handle multiple potential site layouts (A/B testing or environment-specific)
-            # Layout A: div.flex.items-start.p-4
-            # Layout B: div.message-item or div.message-card
-            selectors = [
-                ('div', {'class': lambda c: c and 'flex' in c and 'items-start' in c and 'p-4' in c}),
-                ('div', {'class': 'message-item'}),
-                ('div', {'class': 'message-card'})
-            ]
+            # Modern Layout (2026): article.card with semantic data attributes and classes
+            articles = [art for art in soup.find_all('article') if 'ad-card' not in (art.get('class') or [])]
             
-            alert_containers = []
-            for tag, attrs in selectors:
-                found = soup.find_all(tag, **attrs)
-                if found:
-                    alert_containers.extend(found)
-            
-            print(f"[P2000] Found {len(alert_containers)} potential alert containers.")
-            
-            for container in alert_containers:
-                title_elem = container.find('h3')
-                body_elem = container.find('p')
-                time_span = container.find('span', attrs={"title": True}) # Absolute time is in title attr (Layout A)
-                
-                if not title_elem:
-                    continue
+            if articles:
+                print(f"[P2000] Found {len(articles)} modern semantic article cards.")
+                for art in articles:
+                    classes = art.get('class', [])
                     
-                title_text = title_elem.get_text(strip=True)
-                body_text = body_elem.get_text(strip=True) if body_elem else ""
-                
-                # Use absolute all text from container to catch agency/service spans
-                raw_text = container.get_text(separator=" ", strip=True)
-                
-                # Extract time
-                extracted_time = None
-                
-                # Try Layout A: Title attribute (e.g. "08-03-2026 21:45:28")
-                if time_span:
-                    time_str = time_span['title']
-                    try:
-                        extracted_time = datetime.strptime(time_str, "%d-%m-%Y %H:%M:%S")
-                    except:
-                        pass
-                
-                # Try Layout B or Fallback: Regex in text
-                if not extracted_time:
-                    # Look for HH:mm:ss or HH:mm
-                    time_match = re.search(r'\b([0-2]?[0-9]):([0-5][0-9])(?::([0-5][0-9]))?\b', container.get_text())
-                    if time_match:
-                        hour, minute = int(time_match.group(1)), int(time_match.group(2))
-                        second = int(time_match.group(3)) if time_match.group(3) else 0
-                        extracted_time = now.replace(hour=hour, minute=minute, second=second, microsecond=0)
-                
-                if not extracted_time:
-                    continue
+                    # 1. Agency detection from class list or text
+                    agency = None
+                    for cls in classes:
+                        cls_lower = cls.lower()
+                        if 'ambu' in cls_lower:
+                            agency = 'AMBULANCE'
+                        elif 'brandweer' in cls_lower:
+                            agency = 'FIRE'
+                        elif 'politie' in cls_lower:
+                            agency = 'POLICE'
+                        elif 'trauma' in cls_lower or 'lifeliner' in cls_lower:
+                            agency = 'TRAUMA'
+                            
+                    agency_colors = {
+                        "POLICE": [220, 38, 38, 255],
+                        "AMBULANCE": [59, 130, 246, 255],
+                        "FIRE": [234, 88, 12, 255],
+                        "TRAUMA": [234, 179, 8, 255]
+                    }
+                    raw_text = art.get_text(separator=" ", strip=True)
+                    if not agency:
+                        agency, color = parse_agency_and_color(raw_text.lower())
+                    else:
+                        color = agency_colors.get(agency, [100, 100, 100, 255])
+                        
+                    if not agency:
+                        continue
 
-                # Timezone and rollover handling
-                diff_seconds = (extracted_time - now).total_seconds()
-                if diff_seconds > 1800:
-                    offset_hours = round(diff_seconds / 3600)
-                    extracted_time -= timedelta(hours=offset_hours)
-                
-                if (extracted_time - now).total_seconds() > 3600:
-                    extracted_time = extracted_time - timedelta(days=1)
-                elif (now - extracted_time).total_seconds() < -60:
-                     extracted_time = now
-                
-                age_delta = now - extracted_time
-                if age_delta > timedelta(minutes=5): # Strict 5-minute window for queue ingestion
-                    continue
-                
-                text_lower = raw_text.lower()
-                agency, color = parse_agency_and_color(text_lower)
-                if not agency:
-                    continue
-                
-                # Priority 1 detection
-                prio_keywords = ["a1", "p1", "prio 1", "prio1", "spoed", "noodgeval", "urgent", "urgente", "levensgevaar"]
-                is_prio_1 = any(k in text_lower for k in prio_keywords)
-                
-                cleaned_text = clean_alert_text(raw_text)
-                alert_timestamp = extracted_time.timestamp()
-                id_basis = (cleaned_text + str(int(alert_timestamp))).encode('utf-8')
-                incident_id = hashlib.md5(id_basis).hexdigest()
-                
-                # Check for agency in the combined text
-                agency, color = parse_agency_and_color(text_lower)
-                if not agency:
-                    continue
-                
-                # Only process geocoding and queueing for Priority 1 alerts
-                if is_prio_1:
-                    # Clean address guess: remove time/date/prio from end
-                    words = cleaned_text.split()
-                    addr_words = [w for w in words if w.upper() not in ["PRIO", "1", "2", "3"]]
-                    address_guess = " ".join(addr_words[-5:]) if addr_words else "Amsterdam"
+                    # 2. Timestamp extraction
+                    extracted_time = None
+                    data_ts = art.get('data-timestamp')
+                    if data_ts:
+                        try:
+                            extracted_time = datetime.fromtimestamp(float(data_ts))
+                        except Exception:
+                            pass
+                    if not extracted_time:
+                        time_el = art.find('time')
+                        if time_el and time_el.get('datetime'):
+                            try:
+                                extracted_time = datetime.fromisoformat(time_el['datetime'])
+                                if extracted_time.tzinfo:
+                                    extracted_time = extracted_time.replace(tzinfo=None)
+                            except Exception:
+                                pass
+                    if not extracted_time:
+                        extracted_time = now
+
+                    # 3. Time diff & filter (15-minute window for emergency radar)
+                    age_delta = now - extracted_time
+                    if age_delta > timedelta(minutes=15) or age_delta < timedelta(minutes=-5):
+                        continue
+
+                    # 4. Text & Location extraction
+                    title_el = art.find(['h2', 'h3'], class_=lambda c: c and 'title' in c) or art.find('h2') or art.find('h3')
+                    title_text = title_el.get_text(strip=True) if title_el else ""
                     
-                    coords = await geocode_address(address_guess)
+                    loc_el = art.find('p', class_=lambda c: c and 'location' in c) or art.find(class_='location')
+                    loc_text = loc_el.get_text(separator=' ', strip=True) if loc_el else ""
                     
-                    if coords:
-                        inc_obj = {
-                            "id": incident_id,
-                            "text": cleaned_text,
-                            "rawText": raw_text,
-                            "agency": agency,
-                            "color": color,
-                            "isPrio1": is_prio_1,
-                            "longitude": coords["lon"],
-                            "latitude": coords["lat"],
-                            "timestamp": alert_timestamp,
-                            "ageMinutes": age_delta.total_seconds() / 60
-                        }
+                    combined_description = f"{title_text} - {loc_text}" if (title_text and loc_text) else (title_text or raw_text)
+                    cleaned_text = clean_alert_text(combined_description)
+
+                    # 5. Priority 1 detection
+                    prio_keywords = ["a1", "p1", "prio 1", "prio1", "spoed", "noodgeval", "urgent", "urgente", "levensgevaar"]
+                    is_prio_1 = any('prio-1' in c.lower() or 'prio1' in c.lower() for c in classes) or any(k in raw_text.lower() for k in prio_keywords)
+
+                    incident_id = art.get('data-id')
+                    if not incident_id:
+                        id_basis = (cleaned_text + str(int(extracted_time.timestamp()))).encode('utf-8')
+                        incident_id = hashlib.md5(id_basis).hexdigest()
+
+                    # 6. Geocode Priority 1 incidents
+                    if is_prio_1:
+                        # Prefer clean location text if available (e.g. "Azaleapark in Wateringen , Zuid-Holland")
+                        address_to_geocode = loc_text if loc_text else cleaned_text
+                        coords = await geocode_address(address_to_geocode)
                         
-                        current_queue = read_queue()
-                        if not is_already_queued(incident_id, current_queue):
-                            current_queue.append(inc_obj)
-                            write_queue(current_queue)
+                        if coords:
+                            inc_obj = {
+                                "id": incident_id,
+                                "text": cleaned_text,
+                                "rawText": raw_text,
+                                "agency": agency,
+                                "color": color,
+                                "isPrio1": is_prio_1,
+                                "longitude": coords["lon"],
+                                "latitude": coords["lat"],
+                                "timestamp": extracted_time.timestamp(),
+                                "ageMinutes": max(0, age_delta.total_seconds() / 60)
+                            }
+                            
+                            current_queue = read_queue()
+                            if not is_already_queued(incident_id, current_queue):
+                                current_queue.append(inc_obj)
+                                write_queue(current_queue)
+                            
+                            if agency in category_counts:
+                                category_counts[agency] += 1
+                            
+                            incidents.append(inc_obj)
+            else:
+                # Fallback: Legacy selectors
+                selectors = [
+                    ('div', {'class': lambda c: c and 'flex' in c and 'items-start' in c and 'p-4' in c}),
+                    ('div', {'class': 'message-item'}),
+                    ('div', {'class': 'message-card'})
+                ]
+                
+                alert_containers = []
+                for tag, attrs in selectors:
+                    found = soup.find_all(tag, **attrs)
+                    if found:
+                        alert_containers.extend(found)
+                
+                print(f"[P2000] Fallback: Found {len(alert_containers)} potential legacy alert containers.")
+                
+                for container in alert_containers:
+                    title_elem = container.find('h3')
+                    body_elem = container.find('p')
+                    time_span = container.find('span', attrs={"title": True})
+                    
+                    if not title_elem:
+                        continue
                         
-                        # Only count geocoded Prio 1s
-                        if agency in category_counts:
-                            category_counts[agency] += 1
+                    title_text = title_elem.get_text(strip=True)
+                    body_text = body_elem.get_text(strip=True) if body_elem else ""
+                    raw_text = container.get_text(separator=" ", strip=True)
+                    
+                    extracted_time = None
+                    if time_span:
+                        time_str = time_span['title']
+                        try:
+                            extracted_time = datetime.strptime(time_str, "%d-%m-%Y %H:%M:%S")
+                        except Exception:
+                            pass
+                    
+                    if not extracted_time:
+                        time_match = re.search(r'\b([0-2]?[0-9]):([0-5][0-9])(?::([0-5][0-9]))?\b', container.get_text())
+                        if time_match:
+                            hour, minute = int(time_match.group(1)), int(time_match.group(2))
+                            second = int(time_match.group(3)) if time_match.group(3) else 0
+                            extracted_time = now.replace(hour=hour, minute=minute, second=second, microsecond=0)
+                    
+                    if not extracted_time:
+                        continue
+
+                    diff_seconds = (extracted_time - now).total_seconds()
+                    if diff_seconds > 1800:
+                        offset_hours = round(diff_seconds / 3600)
+                        extracted_time -= timedelta(hours=offset_hours)
+                    
+                    if (extracted_time - now).total_seconds() > 3600:
+                        extracted_time = extracted_time - timedelta(days=1)
+                    elif (now - extracted_time).total_seconds() < -60:
+                        extracted_time = now
+                    
+                    age_delta = now - extracted_time
+                    if age_delta > timedelta(minutes=10):
+                        continue
+                    
+                    text_lower = raw_text.lower()
+                    agency, color = parse_agency_and_color(text_lower)
+                    if not agency:
+                        continue
+                    
+                    prio_keywords = ["a1", "p1", "prio 1", "prio1", "spoed", "noodgeval", "urgent", "urgente", "levensgevaar"]
+                    is_prio_1 = any(k in text_lower for k in prio_keywords)
+                    
+                    cleaned_text = clean_alert_text(raw_text)
+                    alert_timestamp = extracted_time.timestamp()
+                    id_basis = (cleaned_text + str(int(alert_timestamp))).encode('utf-8')
+                    incident_id = hashlib.md5(id_basis).hexdigest()
+                    
+                    if is_prio_1:
+                        words = cleaned_text.split()
+                        addr_words = [w for w in words if w.upper() not in ["PRIO", "1", "2", "3"]]
+                        address_guess = " ".join(addr_words[-5:]) if addr_words else "Amsterdam"
                         
-                        incidents.append(inc_obj)
+                        coords = await geocode_address(address_guess)
+                        
+                        if coords:
+                            inc_obj = {
+                                "id": incident_id,
+                                "text": cleaned_text,
+                                "rawText": raw_text,
+                                "agency": agency,
+                                "color": color,
+                                "isPrio1": is_prio_1,
+                                "longitude": coords["lon"],
+                                "latitude": coords["lat"],
+                                "timestamp": alert_timestamp,
+                                "ageMinutes": age_delta.total_seconds() / 60
+                            }
+                            
+                            current_queue = read_queue()
+                            if not is_already_queued(incident_id, current_queue):
+                                current_queue.append(inc_obj)
+                                write_queue(current_queue)
+                            
+                            if agency in category_counts:
+                                category_counts[agency] += 1
+                            
+                            incidents.append(inc_obj)
                     
         radar_cache["incidents"] = incidents
         radar_cache["timestamp"] = current_time

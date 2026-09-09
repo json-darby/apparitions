@@ -15,6 +15,8 @@ interface HUDProps {
   };
   onPauseToggle?: () => void;
   onSpecialWeapon?: () => void;
+  onToggleMode?: () => void;
+  onQuit?: () => void;
 }
 
 const TulipIcon = ({ active }: { active: boolean; key?: number | string }) => (
@@ -28,47 +30,74 @@ const TulipIcon = ({ active }: { active: boolean; key?: number | string }) => (
   </svg>
 );
 
-export default function HUD({ state, onPauseToggle, onSpecialWeapon }: HUDProps) {
+export default function HUD({ state, onPauseToggle, onSpecialWeapon, onToggleMode, onQuit }: HUDProps) {
   const levels = ['A0', 'A1', 'A2', 'B1'];
 
   return (
-    <div className="w-full bg-black border-b border-gray-800 p-2 flex justify-between items-start z-10 shrink-0">
-      {/* Left: Score, Level, Pause */}
-      <div className="flex items-center gap-4">
+    <div className="w-full bg-black border-b border-gray-800 p-2 flex justify-between items-center z-10 shrink-0 select-none">
+      {/* Left: Exit, Score, Level, Pause */}
+      <div className="flex items-center gap-2.5 sm:gap-3 md:gap-4">
+        {onQuit && (
+          <button 
+            onClick={onQuit}
+            className="text-[8px] md:text-[9px] font-mono font-bold tracking-widest text-gray-400 hover:text-white border border-white/25 px-1.5 py-0.5 uppercase active:bg-white active:text-black transition-colors"
+            title="Exit Mission"
+          >
+            EXIT
+          </button>
+        )}
         <div>
-          <div className="text-[8px] text-gray-500 mb-0.5">SCORE</div>
-          <div className="text-sm">{state.score.toString().padStart(6, '0')}</div>
+          <div className="text-[7px] md:text-[8px] text-gray-500 mb-0.5 font-mono">SCORE</div>
+          <div className="text-xs md:text-sm font-mono font-bold">{state.score.toString().padStart(6, '0')}</div>
         </div>
         <div>
-          <div className="text-[8px] text-gray-500 mb-0.5">LEVEL</div>
-          <div className="text-sm text-red-600">{levels[state.level]}</div>
+          <div className="text-[7px] md:text-[8px] text-gray-500 mb-0.5 font-mono">LEVEL</div>
+          <div className="text-xs md:text-sm text-red-600 font-mono font-bold">{levels[state.level]}</div>
         </div>
         <button 
           onClick={onPauseToggle}
-          className="pointer-events-auto text-lg text-white hover:text-red-500 transition-colors ml-2"
+          className="pointer-events-auto text-base md:text-lg text-white hover:text-red-500 transition-colors ml-0.5 font-mono font-bold"
           title="Pause Game"
         >
           ||
         </button>
       </div>
 
-      {/* Center: Articles & Beam */}
-      <div className="flex items-center gap-6">
-        <div className="flex gap-2">
-          <div className={`px-3 py-1 text-xs border ${state.mode === 'de' ? 'bg-red-600 border-red-600 text-white' : 'border-gray-800 text-gray-600'}`}>
+      {/* Centre: Articles & Beam */}
+      <div className="flex items-center gap-3 md:gap-6">
+        <div className="flex gap-1.5 md:gap-2">
+          <button 
+            onClick={onToggleMode}
+            className={`px-2 md:px-3 py-1 text-[10px] md:text-xs border transition-colors cursor-pointer pointer-events-auto font-mono font-bold ${
+              state.mode === 'de' ? 'bg-red-600 border-red-600 text-white' : 'border-gray-800 text-gray-600 hover:text-white'
+            }`}
+            title="Toggle article (Shift / Tap)"
+          >
             DE
-          </div>
-          <div className={`px-3 py-1 text-xs border ${state.mode === 'het' ? 'bg-white border-white text-black' : 'border-gray-800 text-gray-600'}`}>
+          </button>
+          <button 
+            onClick={onToggleMode}
+            className={`px-2 md:px-3 py-1 text-[10px] md:text-xs border transition-colors cursor-pointer pointer-events-auto font-mono font-bold ${
+              state.mode === 'het' ? 'bg-white border-white text-black' : 'border-gray-800 text-gray-600 hover:text-white'
+            }`}
+            title="Toggle article (Shift / Tap)"
+          >
             HET
-          </div>
+          </button>
         </div>
 
         <button 
           onClick={onSpecialWeapon}
           disabled={state.specialWeaponState !== 'ready' || state.lives <= 0}
-          className={`flex items-center gap-1 text-xs font-bold transition-colors pointer-events-auto ${state.specialWeaponState === 'ready' ? 'text-cyan-400 hover:text-cyan-300 cursor-pointer' : state.specialWeaponState === 'charging' ? 'text-cyan-200 animate-pulse' : 'text-gray-600'}`}
+          className={`hidden sm:flex items-center gap-1 text-[10px] md:text-xs font-bold transition-colors pointer-events-auto ${
+            state.specialWeaponState === 'ready' 
+              ? 'text-cyan-400 hover:text-cyan-300 cursor-pointer' 
+              : state.specialWeaponState === 'charging' 
+              ? 'text-cyan-200 animate-pulse' 
+              : 'text-gray-600'
+          }`}
         >
-          <Zap className="w-4 h-4" />
+          <Zap className="w-3.5 h-3.5 md:w-4 md:h-4" />
           [R] BEAM
         </button>
       </div>

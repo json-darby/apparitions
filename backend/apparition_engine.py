@@ -39,7 +39,7 @@ class ApparitionEngine:
         
         """Configures Mistral, explicitly setting max_tokens to prevent JSON truncation."""
         Settings.llm = MistralAI(
-            model="mistral-large-latest", 
+            model="ministral-8b-latest", 
             temperature=0.7, 
             max_tokens=2048, 
             api_key=api_key
@@ -184,19 +184,33 @@ class ApparitionEngine:
         }}
         """
 
-        response = query_engine.query(prompt)
-        raw_output = response.response.strip()
-        
-        """Cleans the output to ensure strict JSON parsing."""
-        if raw_output.startswith("```json"):
-            raw_output = raw_output[7:-3].strip()
-        elif raw_output.startswith("```"):
-            raw_output = raw_output[3:-3].strip()
-            
         try:
+            response = query_engine.query(prompt)
+            raw_output = response.response.strip()
+            if raw_output.startswith("```json"):
+                raw_output = raw_output[7:-3].strip()
+            elif raw_output.startswith("```"):
+                raw_output = raw_output[3:-3].strip()
             return json.loads(raw_output)
-        except json.JSONDecodeError:
-            return {"error": "Failed to parse AI output as JSON", "raw_output": raw_output}
+        except Exception as e:
+            print(f"[ApparitionEngine] Mistral query failed ({e}), initiating fallback to Gemini...")
+            try:
+                from google import genai
+                gemini_key = os.getenv("APPARITIONS_LESSON_KEY") or os.getenv("GEMINI_API_KEY")
+                client = genai.Client(api_key=gemini_key)
+                res = client.models.generate_content(
+                    model="gemini-2.5-flash",
+                    contents=prompt
+                )
+                raw_output = res.text.strip()
+                if raw_output.startswith("```json"):
+                    raw_output = raw_output[7:-3].strip()
+                elif raw_output.startswith("```"):
+                    raw_output = raw_output[3:-3].strip()
+                return json.loads(raw_output)
+            except Exception as fallback_err:
+                print(f"[ApparitionEngine] Gemini fallback failed: {fallback_err}")
+                return {"error": f"Failed to conjure lesson: {fallback_err}"}
 
 if __name__ == "__main__":
     """

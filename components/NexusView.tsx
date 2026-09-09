@@ -55,6 +55,34 @@ const DEFAULT_CROWDS_INTERVAL_MS = 60000;
 const WEATHER_FETCH_INTERVAL_MS = 300000;
 const WEATHER_CODE_THRESHOLD = 50;
 
+/** Helper to query Overpass with form-encoded post body and automatic mirror fallback */
+async function fetchOverpassData(query: string): Promise<any> {
+    const endpoints = [
+        'https://overpass-api.de/api/interpreter',
+        'https://maps.mail.ru/osm/tools/overpass/api/interpreter'
+    ];
+    let lastError: any = null;
+    for (const url of endpoints) {
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                },
+                body: `data=${encodeURIComponent(query)}`
+            });
+            if (res.ok) {
+                return await res.json();
+            }
+            console.warn(`[Overpass] ${url} returned status ${res.status}`);
+        } catch (e) {
+            lastError = e;
+            console.warn(`[Overpass] Failed on ${url}:`, e);
+        }
+    }
+    throw lastError || new Error('Overpass fetch failed on all endpoints');
+}
+
 
 interface NexusViewProps {
     onExit: () => void;
@@ -184,9 +212,7 @@ const NexusView: React.FC<NexusViewProps> = ({ onExit, onNavigate }) => {
                 if (cachedResponse) {
                     data = await cachedResponse.json();
                 } else {
-                    const res = await fetch('https://overpass-api.de/api/interpreter', { method: 'POST', body: query });
-                    if (!res.ok) throw new Error('Overpass Net Error');
-                    data = await res.json();
+                    data = await fetchOverpassData(query);
                     await cache.put(cacheKey, new Response(JSON.stringify(data)));
                 }
 
@@ -522,12 +548,7 @@ const NexusView: React.FC<NexusViewProps> = ({ onExit, onNavigate }) => {
                 }
 
                 if (!useCache) {
-                    const res = await fetch('https://overpass-api.de/api/interpreter', {
-                        method: 'POST',
-                        body: query
-                    });
-                    if (!res.ok) throw new Error('Overpass Error');
-                    const data = await res.json();
+                    const data = await fetchOverpassData(query);
 
                     if (!isActive) return;
 

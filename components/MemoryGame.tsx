@@ -240,21 +240,29 @@ export const MemoryGame = ({ onWin, onRestart }: { onWin?: () => void, onRestart
     }
 
     return (
-        <div className="w-full max-w-[700px] aspect-[3/2] p-4 mx-auto pointer-events-auto">
-            <div className="grid grid-cols-6 grid-rows-4 gap-2 w-full h-full">
+        <div className="w-full max-w-[750px] h-[74vh] sm:h-auto sm:aspect-[3/2] p-2 sm:p-4 mx-auto pointer-events-auto flex flex-col justify-center">
+            {/* Subtle Top Info Bar */}
+            <div className="flex justify-between items-center px-1 mb-2 text-[10px] sm:text-xs font-mono text-gray-500 tracking-widest uppercase">
+                <span>MOVES: <strong className="text-white font-bold">{moves}</strong></span>
+                <button onClick={handleRestart} className="hover:text-white transition-colors cursor-pointer">
+                    [RESTART]
+                </button>
+            </div>
+
+            <div className="grid grid-cols-4 grid-rows-6 sm:grid-cols-6 sm:grid-rows-4 gap-1.5 sm:gap-2 w-full flex-1">
                 {board.map((card, index) => {
                     // Dynamic classes based on state
-                    let baseClasses = "relative w-full h-full flex items-center justify-center text-center p-2 rounded-sm cursor-pointer transition-all duration-300 select-none overflow-hidden ";
+                    let baseClasses = "relative w-full h-full flex items-center justify-center text-center p-1 sm:p-2 rounded-sm cursor-pointer transition-all duration-300 select-none overflow-hidden ";
 
                     if (card.isMatched) {
                         // Engraved state
-                        baseClasses += "bg-[#222] text-[#666] shadow-[inset_0_2px_10px_rgba(0,0,0,0.8)] border border-[#333]";
+                        baseClasses += "bg-[#181818] text-[#555] shadow-[inset_0_2px_10px_rgba(0,0,0,0.8)] border border-[#2a2a2a]";
                     } else if (card.isFlipped) {
                         // Flipped/Revealed state
-                        baseClasses += "bg-[#2a2a2a] text-[#ddd] shadow-[0_0_10px_rgba(255,255,255,0.05)] border border-[#444] animate-digital-aberration";
+                        baseClasses += "bg-[#2a2a2a] text-[#fff] shadow-[0_0_10px_rgba(255,255,255,0.08)] border border-[#555] animate-digital-aberration";
                     } else {
                         // Raw concrete state (face down)
-                        baseClasses += "bg-[#222] border border-[#333] shadow-[2px_2px_10px_rgba(0,0,0,0.5)] hover:bg-[#282828]";
+                        baseClasses += "bg-[#1f1f1f] border border-[#333] shadow-[2px_2px_8px_rgba(0,0,0,0.6)] hover:bg-[#282828] active:bg-[#333]";
                     }
 
                     return (
@@ -269,8 +277,13 @@ export const MemoryGame = ({ onWin, onRestart }: { onWin?: () => void, onRestart
                         >
                             {/* Text content only visible when flipped or matched */}
                             <span
-                                className={`font-semibold tracking-wider font-mono transition-opacity duration-300 leading-tight text-center break-words ${card.isFlipped || card.isMatched ? 'opacity-100' : 'opacity-0'}`}
-                                style={{ fontSize: card.word.length > 14 ? '0.6rem' : card.word.length > 10 ? '0.7rem' : '0.8rem' }}
+                                className={`font-semibold tracking-wider font-mono transition-opacity duration-300 leading-tight text-center break-words px-1 ${card.isFlipped || card.isMatched ? 'opacity-100' : 'opacity-0'} ${
+                                    card.word.length > 14 
+                                        ? 'text-[9px] sm:text-[10px] md:text-xs' 
+                                        : card.word.length > 9 
+                                        ? 'text-[10px] sm:text-xs md:text-sm' 
+                                        : 'text-xs sm:text-sm md:text-base'
+                                }`}
                             >
                                 {card.word}
                             </span>

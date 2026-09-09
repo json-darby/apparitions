@@ -28,6 +28,9 @@ export const ComprehensionGame = ({ onExit, onWin }: { onExit: () => void, onWin
     /* State tracking the completion of the decryption task */
     const [isGameWon, setIsGameWon] = useState(false);
 
+    /* Mobile tap-to-select word state */
+    const [selectedWord, setSelectedWord] = useState<string | null>(null);
+
     // Audio / Sync state
     const [isPlaying, setIsPlaying] = useState(false);
     const [useNeuralVoice, setUseNeuralVoice] = useState(false);
@@ -119,70 +122,60 @@ export const ComprehensionGame = ({ onExit, onWin }: { onExit: () => void, onWin
                 }
 
                 const blob = await response.blob();
-                const url = URL.createObjectURL(blob);
-                const audio = new Audio(url);
+                const audioUrl = URL.createObjectURL(blob);
+                const audio = new Audio(audioUrl);
                 neuralAudioRef.current = audio;
 
-                audio.onended = () => setIsPlaying(false);
-                audio.onerror = () => setIsPlaying(false);
+                audio.onended = () => {
+                    setIsPlaying(false);
+                };
 
-                audio.play();
-
+                audio.play().catch(e => {
+                    console.error("Neural playback failed", e);
+                    setIsPlaying(false);
+                });
             } catch (err) {
-                console.error("Failed to fetch Neural TTS", err);
+                console.error("Neural TTS request error", err);
                 setIsPlaying(false);
             }
         } else {
+            // Local Web Speech synthesis
             if (!('speechSynthesis' in window)) {
                 setIsPlaying(false);
                 return;
             }
 
-            const REDACTED_PAUSE_MS = 600;
-
             const playSentence = (idx: number) => {
                 if (idx >= story.sentences.length) {
-                    setIsPlaying(false);
-                    setActiveSentenceIdx(null);
+                    stopPlayback();
                     return;
                 }
 
                 setActiveSentenceIdx(idx);
+                const s = story.sentences[idx];
+                const words = s.nl.split(' ');
 
-                const sentence = story.sentences[idx];
-                const words = sentence.nl.split(' ');
-
-                /* Build segments: group consecutive spoken words together,
-                   and mark gaps where unplaced redacted words sit. */
-                type Segment = { type: 'speak'; text: string } | { type: 'pause' };
-                const segments: Segment[] = [];
+                /* Split sentence into spoken text and pauses for redacted words */
+                const segments: { type: 'speak' | 'pause'; text: string }[] = [];
                 let currentSpoken: string[] = [];
 
-                words.forEach((word, wIdx) => {
-                    const cleanWord = word.replace(/[.,!?]/g, '');
-                    const isRedacted = sentence.redacted_words.includes(cleanWord);
-                    const dropId = `s${idx}_w${wIdx}`;
-                    const isPlaced = !!droppedWords[dropId];
-
-                    if (isRedacted && !isPlaced) {
-                        /* Unplaced redacted word — flush any accumulated spoken words, then insert a pause */
+                words.forEach(w => {
+                    const clean = w.replace(/[.,!?]/g, '');
+                    if (s.redacted_words.includes(clean)) {
                         if (currentSpoken.length > 0) {
                             segments.push({ type: 'speak', text: currentSpoken.join(' ') });
                             currentSpoken = [];
                         }
-                        segments.push({ type: 'pause' });
+                        segments.push({ type: 'pause', text: clean });
                     } else {
-                        /* Normal word or correctly placed redacted word — accumulate */
-                        currentSpoken.push(word);
+                        currentSpoken.push(w);
                     }
                 });
 
-                /* Flush any remaining spoken words */
                 if (currentSpoken.length > 0) {
                     segments.push({ type: 'speak', text: currentSpoken.join(' ') });
                 }
 
-                /* Play segments sequentially: speak text, pause for gaps */
                 const playSegment = (segIdx: number) => {
                     if (segIdx >= segments.length) {
                         playSentence(idx + 1);
@@ -192,7 +185,7 @@ export const ComprehensionGame = ({ onExit, onWin }: { onExit: () => void, onWin
                     const seg = segments[segIdx];
 
                     if (seg.type === 'pause') {
-                        setTimeout(() => playSegment(segIdx + 1), REDACTED_PAUSE_MS);
+                        setTimeout(() => playSegment(segIdx + 1), 700);
                     } else {
                         const utterance = new SpeechSynthesisUtterance(seg.text);
                         utterance.lang = 'nl-NL';
@@ -223,6 +216,7 @@ export const ComprehensionGame = ({ onExit, onWin }: { onExit: () => void, onWin
         const shuffled = [...allRedacted].sort(() => Math.random() - 0.5);
         setDecryptionPool(shuffled);
         setDroppedWords({});
+        setSelectedWord(null);
         setIsGameWon(false);
     }, [storyIndex]);
 
@@ -236,43 +230,57 @@ export const ComprehensionGame = ({ onExit, onWin }: { onExit: () => void, onWin
         }
     }, [decryptionPool, droppedWords, onWin]);
 
-    const handleDragStart = (e: React.DragEvent, word: string) => {
-        e.dataTransfer.setData("text/plain", word);
-    };
+    // Unified placement logic for both Drag-and-Drop and Tap-to-Place
+    const handlePlaceWord = (sentenceIdx: number, wordIdx: number, expectedWord: string, candidateWord?: string) => {
+        const wordToTest = candidateWord || selectedWord;
+        if (!wordToTest) return;
 
-    const handleDragOver = (e: React.DragEvent) => {
-        e.preventDefault(); // Necessary to allow dropping
-    };
-
-    const handleDrop = (e: React.DragEvent, sentenceIdx: number, wordIdx: number, expectedWord: string) => {
-        e.preventDefault();
-        const draggedWord = e.dataTransfer.getData("text/plain");
-
-        /* Cleans the expected word of punctuation for matching */
         const cleanExpected = expectedWord.replace(/[.,!?]/g, '');
 
-        if (draggedWord === cleanExpected) {
+        if (wordToTest === cleanExpected) {
             playSFX('clack');
-            // Success
             setDroppedWords(prev => ({
                 ...prev,
-                [`s${sentenceIdx}_w${wordIdx}`]: draggedWord
+                [`s${sentenceIdx}_w${wordIdx}`]: wordToTest
             }));
 
-            /* Removes the first matching instance of the placed word from the pool */
             setDecryptionPool(prev => {
                 const newPool = [...prev];
-                const index = newPool.indexOf(draggedWord);
+                const index = newPool.indexOf(wordToTest);
                 if (index > -1) newPool.splice(index, 1);
                 return newPool;
             });
+            setSelectedWord(null);
         } else {
-            /* Handles incorrect placements by playing an error sound and pulsing the drop zone */
             playSFX('error');
             const dropId = `s${sentenceIdx}_w${wordIdx}`;
             setErrorDropId(dropId);
             setTimeout(() => setErrorDropId(null), ERROR_FEEDBACK_DURATION_MS);
         }
+    };
+
+    const handleReturnWord = (dropId: string, placedWord: string) => {
+        playSFX('clack');
+        setDroppedWords(prev => {
+            const updated = { ...prev };
+            delete updated[dropId];
+            return updated;
+        });
+        setDecryptionPool(prev => [...prev, placedWord]);
+    };
+
+    const handleDragStart = (e: React.DragEvent, word: string) => {
+        e.dataTransfer.setData("text/plain", word);
+    };
+
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+    };
+
+    const handleDrop = (e: React.DragEvent, sentenceIdx: number, wordIdx: number, expectedWord: string) => {
+        e.preventDefault();
+        const draggedWord = e.dataTransfer.getData("text/plain");
+        handlePlaceWord(sentenceIdx, wordIdx, expectedWord, draggedWord);
     };
 
     if (isGameWon) {
@@ -308,24 +316,24 @@ export const ComprehensionGame = ({ onExit, onWin }: { onExit: () => void, onWin
 
     return (
         <div className="w-full max-w-5xl h-full flex flex-col items-center animate-in slide-in-from-bottom-8 duration-1000">
-            <div className="w-full h-full flex flex-col bg-black border border-white/10 p-8 shadow-2xl overflow-hidden relative group">
+            <div className="w-full h-full flex flex-col bg-black border border-white/10 p-3 sm:p-8 shadow-2xl overflow-hidden relative group">
                 {/* Title */}
-                <div className="w-full flex justify-between items-baseline mb-12 border-b border-white/20 pb-4">
-                    <h2 className="text-3xl font-mono tracking-[0.2em]">{story.title_nl}</h2>
-                    <span className="text-sm font-mono tracking-widest text-[#666] uppercase">{story.theme}</span>
+                <div className="w-full flex justify-between items-baseline mb-4 sm:mb-6 border-b border-white/20 pb-3">
+                    <h2 className="text-lg sm:text-2xl md:text-3xl font-mono tracking-[0.2em]">{story.title_nl}</h2>
+                    <span className="text-[10px] sm:text-xs md:text-sm font-mono tracking-widest text-[#666] uppercase">{story.theme}</span>
                 </div>
 
                 {/* Workspace (Layout split) */}
-                <div className="flex-1 w-full flex flex-col md:flex-row gap-8 min-h-0">
-                    {/* Left: Transcript reader */}
-                    <div className="w-full md:w-2/3 h-full overflow-y-auto pr-4 scrollbar-hide flex flex-col gap-6 font-mono text-lg md:text-xl leading-relaxed">
+                <div className="flex-1 w-full flex flex-col md:flex-row gap-4 md:gap-8 min-h-0 overflow-hidden">
+                    {/* Left/Main: Transcript reader */}
+                    <div className="flex-1 h-full overflow-y-auto pr-2 sm:pr-4 scrollbar-hide flex flex-col gap-4 sm:gap-6 font-mono text-sm sm:text-base md:text-xl leading-relaxed">
                         {story.sentences.map((sentence, sIdx) => {
                             const words = sentence.nl.split(" ");
                             const isSentenceActive = activeSentenceIdx === sIdx;
 
                             return (
-                                <div key={sIdx} className={`w-full leading-[2.5] transition-all duration-300 ${isSentenceActive ? 'opacity-100 font-medium' : 'opacity-80'}`}>
-                                    <div className="flex flex-wrap gap-x-2 gap-y-1">
+                                <div key={sIdx} className={`w-full leading-[2.2] sm:leading-[2.5] transition-all duration-300 ${isSentenceActive ? 'opacity-100 font-medium' : 'opacity-80'}`}>
+                                    <div className="flex flex-wrap gap-x-1.5 sm:gap-x-2 gap-y-1 items-center">
                                         {words.map((word, wIdx) => {
                                             const cleanWord = word.replace(/[.,!?]/g, '');
                                             const isRedacted = sentence.redacted_words.includes(cleanWord);
@@ -335,22 +343,35 @@ export const ComprehensionGame = ({ onExit, onWin }: { onExit: () => void, onWin
 
                                             if (isRedacted) {
                                                 if (droppedWord) {
-                                                    // Successfully filled
+                                                    // Successfully filled - tap to return to pool
                                                     return (
-                                                        <span key={wIdx} className="text-white font-bold tracking-wider inline-flex items-center shadow-[0_0_15px_rgba(255,255,255,0.2)] animate-in fade-in zoom-in-50 duration-300">
+                                                        <span 
+                                                            key={wIdx} 
+                                                            onClick={() => handleReturnWord(dropId, droppedWord)}
+                                                            className="text-white font-bold tracking-wider inline-flex items-center shadow-[0_0_15px_rgba(255,255,255,0.2)] animate-in fade-in zoom-in-50 duration-300 cursor-pointer hover:text-red-400 transition-colors"
+                                                            title="Tap to return word to pool"
+                                                        >
                                                             {word}
                                                         </span>
                                                     );
                                                 }
-                                                // Empty Drop Zone
+                                                // Empty Drop Zone (drag or tap-to-place)
                                                 return (
                                                     <span
                                                         key={wIdx}
                                                         onDragOver={handleDragOver}
                                                         onDrop={(e) => handleDrop(e, sIdx, wIdx, word)}
-                                                        className={`inline-block ${isError ? 'bg-red-900 border-red-500 animate-digital-aberration' : 'bg-[#111] border-[#333] hover:bg-[#222] hover:border-white/50'} text-transparent border px-4 select-none min-w-[80px] transition-colors`}
+                                                        onClick={() => handlePlaceWord(sIdx, wIdx, word)}
+                                                        className={`inline-block border px-2 sm:px-4 py-0.5 select-none min-w-[65px] sm:min-w-[80px] text-center cursor-pointer transition-all ${
+                                                            isError 
+                                                                ? 'bg-red-900 border-red-500 text-transparent animate-digital-aberration' 
+                                                                : selectedWord 
+                                                                ? 'bg-[#1a1a1a] border-white/60 text-white/60 animate-pulse hover:bg-white/20' 
+                                                                : 'bg-[#111] border-[#333] text-transparent hover:bg-[#222] hover:border-white/50'
+                                                        }`}
+                                                        title={selectedWord ? `Tap to insert "${selectedWord}"` : 'Select a word from pool to insert here'}
                                                     >
-                                                        {cleanWord}
+                                                        {selectedWord ? `[ ? ]` : cleanWord}
                                                     </span>
                                                 );
                                             }
@@ -359,7 +380,7 @@ export const ComprehensionGame = ({ onExit, onWin }: { onExit: () => void, onWin
                                             return <span key={wIdx} className={`${isSentenceActive ? 'text-white' : 'text-[#888]'} transition-colors duration-300 cursor-help hover:text-white`} title={sentence.en}>{word}</span>;
                                         })}
                                     </div>
-                                    <span className="block mt-2 text-xs text-[#444] tracking-widest uppercase truncate w-full hover:text-white transition-colors duration-300 cursor-help" title={sentence.en}>
+                                    <span className="block mt-1 text-[10px] sm:text-xs text-[#444] tracking-widest uppercase truncate w-full hover:text-white transition-colors duration-300 cursor-help" title={sentence.en}>
                                         [ {sentence.en} ]
                                     </span>
                                 </div>
@@ -368,9 +389,16 @@ export const ComprehensionGame = ({ onExit, onWin }: { onExit: () => void, onWin
                     </div>
 
                     {/* Right: Decryption Pool / Work area */}
-                    <div className="w-full md:w-1/3 h-full flex flex-col gap-4 border-t md:border-t-0 md:border-l border-white/10 pt-6 md:pt-0 md:pl-8">
-                        <div className="mb-4 flex flex-col gap-4 w-full">
-                            <span className="text-xs tracking-[0.3em] text-[#666] uppercase">Decryption Pool</span>
+                    <div className="w-full md:w-1/3 max-h-[35vh] md:max-h-full flex flex-col gap-3 sm:gap-4 border-t md:border-t-0 md:border-l border-white/10 pt-3 md:pt-0 md:pl-8 overflow-y-auto">
+                        <div className="flex flex-col gap-2 w-full">
+                            <div className="flex justify-between items-center">
+                                <span className="text-[10px] sm:text-xs tracking-[0.3em] text-[#888] uppercase font-mono">Decryption Pool</span>
+                                {selectedWord && (
+                                    <span className="text-[10px] text-yellow-400 font-mono tracking-wider animate-pulse">
+                                        TAP TARGET BLANK ➔
+                                    </span>
+                                )}
+                            </div>
                             {/* Media Player */}
                             <div className="flex items-center gap-3 w-full">
                                 <button
@@ -378,20 +406,20 @@ export const ComprehensionGame = ({ onExit, onWin }: { onExit: () => void, onWin
                                         stopPlayback();
                                         setUseNeuralVoice(!useNeuralVoice);
                                     }}
-                                    className="text-xs font-mono tracking-[0.2em] border border-[#333] px-3 py-1 flex items-center justify-between transition-all hover:bg-[#1a1a1a] group uppercase w-36"
+                                    className="text-[10px] sm:text-xs font-mono tracking-[0.2em] border border-[#333] px-2.5 py-1 flex items-center justify-between transition-all hover:bg-[#1a1a1a] group uppercase w-32 sm:w-36"
                                 >
                                     <span className="text-gray-600 group-hover:text-white flex-shrink-0">VOICE:</span>
                                     <span className="text-white text-right">{useNeuralVoice ? "NEURAL" : "SYNTH"}</span>
                                 </button>
 
-                                <button onClick={handlePlayStory} className="hover:text-white transition-colors flex items-center justify-center text-[#aaa] w-8 h-8">
+                                <button onClick={handlePlayStory} className="hover:text-white transition-colors flex items-center justify-center text-[#aaa] w-7 h-7 sm:w-8 sm:h-8 border border-[#333]">
                                     {isPlaying ? (
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                            <rect x="5" y="4" width="2" height="8" />
-                                            <rect x="9" y="4" width="2" height="8" />
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                            <rect x="4" y="3" width="3" height="10" />
+                                            <rect x="9" y="3" width="3" height="10" />
                                         </svg>
                                     ) : (
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
                                             <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z" />
                                         </svg>
                                     )}
@@ -400,20 +428,28 @@ export const ComprehensionGame = ({ onExit, onWin }: { onExit: () => void, onWin
                         </div>
 
                         {/* Word Pool */}
-                        <div className="w-full flex flex-wrap gap-3">
-                            {decryptionPool.map((word, idx) => (
-                                <div
-                                    key={`${word}-${idx}`}
-                                    draggable
-                                    onDragStart={(e) => handleDragStart(e, word)}
-                                    className="px-4 py-2 bg-[#1a1a1a] border border-[#444] text-[#ddd] text-sm tracking-widest cursor-move hover:bg-white hover:text-black hover:border-white transition-colors select-none shadow-[2px_2px_10px_rgba(0,0,0,0.5)] active:scale-95"
-                                >
-                                    {word}
-                                </div>
-                            ))}
+                        <div className="w-full flex flex-wrap gap-2 sm:gap-3">
+                            {decryptionPool.map((word, idx) => {
+                                const isSelected = selectedWord === word;
+                                return (
+                                    <div
+                                        key={`${word}-${idx}`}
+                                        draggable
+                                        onDragStart={(e) => handleDragStart(e, word)}
+                                        onClick={() => setSelectedWord(isSelected ? null : word)}
+                                        className={`px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm tracking-widest cursor-pointer select-none transition-all shadow-[2px_2px_8px_rgba(0,0,0,0.6)] active:scale-95 border ${
+                                            isSelected
+                                                ? 'bg-white text-black border-white ring-2 ring-white font-bold scale-105'
+                                                : 'bg-[#1a1a1a] border-[#444] text-[#ddd] hover:bg-white hover:text-black hover:border-white'
+                                        }`}
+                                    >
+                                        {word}
+                                    </div>
+                                );
+                            })}
                             {decryptionPool.length === 0 && (
-                                <div className="w-full text-center text-[#444] text-xs font-mono tracking-widest uppercase mt-4">
-                                    Decryption Complete
+                                <div className="w-full text-center text-emerald-400 text-xs font-mono tracking-widest uppercase mt-2">
+                                    ✓ Decryption Complete
                                 </div>
                             )}
                         </div>

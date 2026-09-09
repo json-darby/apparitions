@@ -84,6 +84,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
   const [error, setError] = useState<string | null>(null);
   const [isFetchingWhispers, setIsFetchingWhispers] = useState(false);
   const [speechAvailable, setSpeechAvailable] = useState(true);
+  const [inputPreference, setInputPreference] = useState<'voice' | 'text'>('voice');
   const [manualInput, setManualInput] = useState('');
   const [suggestionMemory, setSuggestionMemory] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -146,8 +147,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
     try {
       if (typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
         const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+        const isMobile = typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         recognitionRef.current = new SpeechRecognition();
-        recognitionRef.current.continuous = true;
+        recognitionRef.current.continuous = !isMobile;
         recognitionRef.current.interimResults = true;
         recognitionRef.current.lang = 'nl-NL';
         recognitionRef.current.onresult = (event: any) => {
@@ -157,7 +159,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
           for (let i = event.resultIndex; i < event.results.length; ++i) {
             if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript;
           }
-          if (finalTranscript) setDraftTranscript(prev => (prev + ' ' + finalTranscript).trim());
+          if (finalTranscript) {
+            setDraftTranscript(prev => (prev + ' ' + finalTranscript).trim());
+            setManualInput(prev => (prev ? prev + ' ' + finalTranscript : finalTranscript).trim());
+          }
         };
         recognitionRef.current.onstart = () => setIsRecording(true);
         recognitionRef.current.onend = () => setIsRecording(false);
@@ -247,20 +252,35 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      /* When the manual text input is focused, don't intercept normal typing keys */
-      const isTypingInInput = document.activeElement === manualInputRef.current;
-      if ((e.code === 'KeyW' || e.key === 'w' || e.key === 'W') && !isRecording && !isTypingInInput) {
+      /* When typing in any input or textarea, DO NOT intercept normal typing keys (Space, letters, etc.) */
+      const target = e.target as HTMLElement | null;
+      const isTypingInInput = 
+        target?.tagName === 'INPUT' || 
+        target?.tagName === 'TEXTAREA' || 
+        document.activeElement === manualInputRef.current;
+
+      if (isTypingInInput) {
+        return; // Allow native typing including spacebar and backspace
+      }
+
+      if ((e.code === 'KeyW' || e.key === 'w' || e.key === 'W') && !isRecording) {
         e.preventDefault();
         toggleWhispers();
       }
       if (responseMode === 'review' && speechAvailable) {
-        if (e.code === 'Space') { e.preventDefault(); toggleRecording(); }
-        if (e.code === 'Enter' && draftTranscript.trim()) { e.preventDefault(); confirmSend(); }
+        if (e.code === 'Space') { 
+          e.preventDefault(); 
+          toggleRecording(); 
+        }
+        if (e.code === 'Enter' && (draftTranscript.trim() || manualInput.trim())) { 
+          e.preventDefault(); 
+          confirmSend(); 
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [responseMode, isRecording, draftTranscript, whisperUnlocked, allSuggestions, speechAvailable]);
+  }, [responseMode, isRecording, draftTranscript, manualInput, whisperUnlocked, allSuggestions, speechAvailable]);
 
   useEffect(() => {
     let checkInterval: number;
@@ -654,11 +674,21 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
               {isLive ? `${scenario === ScenarioType.COMPREHENSION ? 'STORY' : 'CONVERSATION'}` : 'OFFLINE'}
             </span>
           </div>
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-4 md:gap-8">
             <div className="flex bg-white/5 p-0.5 rounded-sm overflow-hidden border border-white/10">
-              <button onClick={() => { setResponseMode('instant'); setDraftTranscript(''); }} className={`px-4 py-1.5 text-[9px] uppercase tracking-widest transition-all ${responseMode === 'instant' ? 'bg-white text-black font-medium' : 'text-gray-500 hover:text-gray-300'}`}>Instant</button>
-              <button onClick={() => setResponseMode('review')} className={`px-4 py-1.5 text-[9px] uppercase tracking-widest transition-all ${responseMode === 'review' ? 'bg-white text-black font-medium' : 'text-gray-500 hover:text-gray-300'}`}>Reflection</button>
+              <button onClick={() => { setResponseMode('instant'); setDraftTranscript(''); }} className={`px-3 md:px-4 py-1.5 text-[9px] uppercase tracking-widest transition-all ${responseMode === 'instant' ? 'bg-white text-black font-medium' : 'text-gray-500 hover:text-gray-300'}`}>Instant</button>
+              <button onClick={() => setResponseMode('review')} className={`px-3 md:px-4 py-1.5 text-[9px] uppercase tracking-widest transition-all ${responseMode === 'review' ? 'bg-white text-black font-medium' : 'text-gray-500 hover:text-gray-300'}`}>Reflection</button>
             </div>
+            {responseMode === 'review' && scenario !== ScenarioType.COMPREHENSION && (
+              <button
+                onClick={endAndReview}
+                disabled={isReviewing}
+                className="md:hidden px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 text-[9px] uppercase tracking-widest text-white font-bold transition-all disabled:opacity-50"
+                aria-label="Review Session"
+              >
+                {isReviewing ? '...' : 'REVIEW'}
+              </button>
+            )}
             <button onClick={onExit} className="text-[10px] uppercase tracking-[0.2em] font-bold border-b border-transparent hover:border-[#888888] text-[#888888] hover:text-white transition-all">EXIT</button>
           </div>
         </div>
@@ -712,41 +742,70 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
         {/* CONTROLS & VISUALISER (Brutalist Footer) */}
         <div className="px-8 md:px-12 pb-12 pt-10 flex flex-col items-start gap-6 relative z-10 border-t border-[#111111]/30 bg-gradient-to-t from-[#050505] via-[#050505]/80 to-transparent">
           {responseMode === 'review' ? (
-            speechAvailable ? (
-              <div className="flex items-center gap-6">
-                <button onClick={toggleRecording} className={`group px-8 py-3 transition-colors duration-500 flex items-center gap-4 ${isRecording ? 'bg-white text-black' : 'bg-transparent border border-[#333] text-white hover:bg-white/10'}`}>
-                  <div className={`w-1.5 h-1.5 rounded-full ${isRecording ? 'bg-black animate-ping' : 'bg-white'}`} />
-                  <span className="text-[10px] uppercase tracking-[0.3em] font-bold">{isRecording ? 'STOP' : 'RECORD'}</span>
-                </button>
-                {draftTranscript.trim() && (
-                  <button onClick={confirmSend} className="px-8 py-3 bg-white text-black hover:bg-gray-200 transition-colors duration-500">
-                    <span className="text-[10px] uppercase tracking-[0.3em] font-bold">SEND</span>
-                  </button>
-                )}
-              </div>
-            ) : (
-              /* Manual text input fallback when Web Speech API is unavailable */
-              <div className="flex items-center gap-4 w-full md:w-auto">
-                <div className="flex-1 md:flex-none flex items-center gap-3 border border-[#333] bg-transparent px-4 py-2 min-w-[300px] focus-within:border-white/40 transition-colors">
-                  <div className="w-1.5 h-1.5 bg-[#555]" />
-                  <input
-                    ref={manualInputRef}
-                    type="text"
-                    value={manualInput}
-                    onChange={(e) => setManualInput(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter' && manualInput.trim()) { e.preventDefault(); confirmSend(); } }}
-                    placeholder="Type je antwoord in het Nederlands..."
-                    className="bg-transparent text-white text-sm font-light tracking-wide outline-none flex-1 placeholder:text-[#444] placeholder:tracking-wider"
-                    autoFocus
-                  />
+            <div className="w-full flex flex-col gap-3">
+              {/* Draft speech indication if speaking */}
+              {isRecording && draftTranscript && (
+                <div className="text-gray-400 italic text-sm md:text-base border-l-2 border-white/40 pl-3 py-0.5 animate-pulse">
+                  "{draftTranscript}"
                 </div>
-                {manualInput.trim() && (
-                  <button onClick={confirmSend} className="px-8 py-3 bg-white text-black hover:bg-gray-200 transition-colors duration-500 shrink-0">
-                    <span className="text-[10px] uppercase tracking-[0.3em] font-bold">SEND</span>
+              )}
+
+              {/* Unified Brutalist Input Console */}
+              <div className="flex items-center gap-2 w-full max-w-3xl bg-[#080808] border border-[#222] focus-within:border-white/50 transition-all p-1.5 md:p-2 shadow-2xl">
+                {/* Voice Record / Mic Button */}
+                {speechAvailable && (
+                  <button
+                    type="button"
+                    onClick={toggleRecording}
+                    className={`px-3 md:px-4 py-2.5 transition-all duration-300 flex items-center gap-2 shrink-0 border ${
+                      isRecording
+                        ? 'bg-white text-black border-white shadow-[0_0_15px_rgba(255,255,255,0.4)]'
+                        : 'bg-transparent border-[#222] text-gray-400 hover:text-white hover:border-[#444]'
+                    }`}
+                    title={isRecording ? 'Klik om te stoppen' : 'Klik om in te spreken'}
+                  >
+                    <div className={`w-1.5 h-1.5 rounded-full ${isRecording ? 'bg-black animate-ping' : 'bg-white'}`} />
+                    <span className="text-[9px] uppercase tracking-[0.25em] font-bold">{isRecording ? 'REC' : 'MIC'}</span>
                   </button>
                 )}
+
+                {/* Text input - spaces allowed, speech drafts auto-populate here */}
+                <input
+                  ref={manualInputRef}
+                  type="text"
+                  value={manualInput}
+                  onChange={(e) => setManualInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && (manualInput.trim() || draftTranscript.trim())) {
+                      e.preventDefault();
+                      confirmSend();
+                    }
+                  }}
+                  placeholder={isRecording ? "Aan het luisteren... (spreek in het Nederlands)" : "Spreek of typ in het Nederlands..."}
+                  className="bg-transparent text-white text-xs md:text-sm font-light tracking-wide outline-none flex-1 px-3 py-1 placeholder:text-[#444] placeholder:tracking-wider min-w-0"
+                />
+
+                {/* Send button */}
+                <button
+                  type="button"
+                  onClick={confirmSend}
+                  disabled={!(manualInput.trim() || draftTranscript.trim())}
+                  className={`px-4 md:px-6 py-2.5 text-[9px] uppercase tracking-[0.25em] font-bold transition-all shrink-0 ${
+                    (manualInput.trim() || draftTranscript.trim())
+                      ? 'bg-white text-black hover:bg-gray-200 cursor-pointer shadow-[0_0_12px_rgba(255,255,255,0.2)]'
+                      : 'bg-transparent text-[#333] border border-[#1a1a1a] cursor-not-allowed'
+                  }`}
+                >
+                  SEND
+                </button>
               </div>
-            )
+
+              {/* Mobile / Desktop Status Indicator */}
+              <div className="flex items-center justify-between text-[8.5px] uppercase tracking-[0.3em] text-[#555] font-bold px-1">
+                <span>{isRecording ? 'MICROFOON ACTIEF' : 'SPREEK OF TYP JE ANTWOORD'}</span>
+                <span className="hidden md:inline">ENTER OM TE VERSTUREN</span>
+              </div>
+            </div>
           ) : (
             <div className="flex items-end gap-1.5 h-10 w-full md:w-auto">
               {/* Brutalist SPEECH VISUALISER BARS */}
