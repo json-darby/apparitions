@@ -59,15 +59,12 @@ export const ai = {
 };
 
 /**
- * Generates the default configuration for local testing.
- * @param scenario The current conversational scenario to load.
+ * Session setup sent to the backend relay.
+ *
+ * Only the scenario travels over the wire: the model id, voice, tools and system
+ * instruction all live server-side (see backend/main.py `get_live_config`), so the
+ * API key never reaches the browser and the two can't drift out of sync.
  */
 export function getLiveConfig(scenario: ScenarioType) {
-  return {
-    model: "gemini-2.5-flash-native-audio-preview-12-2025",
-    config: {
-      responseModalities: ["AUDIO"],
-      scenario: scenario
-    }
-  };
+  return { config: { scenario } };
 }

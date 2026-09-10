@@ -15,6 +15,18 @@ from llama_index.embeddings.mistralai import MistralAIEmbedding
 """Applies nest_asyncio to allow nested event loops in environments like FastAPI."""
 nest_asyncio.apply()
 
+def _strip_code_fence(text):
+    """Peel the ```json fences some models still wrap their output in."""
+    text = (text or "").strip()
+    if text.startswith("```json"):
+        text = text[7:]
+    elif text.startswith("```"):
+        text = text[3:]
+    if text.endswith("```"):
+        text = text[:-3]
+    return text.strip()
+
+
 class ApparitionEngine:
     """The robust, intelligent core for the Apparitions Dutch language application."""
 
@@ -150,7 +162,10 @@ class ApparitionEngine:
         2. Generate an appropriate number of assets to cover the scenario.
         3. CRITICAL: Ensure all Dutch vocabulary and grammar strictly adheres to CEFR A1 and A2 levels.
         4. Aesthetics: Write the "scene" and "content" introductions in a melancholic, Nocturnal Brutalist style.
-        5. You MUST strictly adhere to the exact JSON schema provided below.
+        5. LANGUAGE SPLIT (CRITICAL): The framing of the lesson is English; only the lesson material is Dutch.
+           - "title", "subtitle", "scene" and "content" MUST be written in ENGLISH. Never write these in Dutch.
+           - The "assets" stay as they are: "dutch" holds the Dutch text, "english" its translation.
+        6. You MUST strictly adhere to the exact JSON schema provided below.
 
         Output ONLY valid JSON.
         
@@ -158,17 +173,17 @@ class ApparitionEngine:
         {{
             "lesson_id": "nl_dynamic_1",
             "metadata": {{
-                "title": "Custom: [2-3 word summary]",
-                "subtitle": "[Incorporate the context provided]",
+                "title": "Custom: [2-3 word summary, in English]",
+                "subtitle": "[One short line in English describing the lesson, incorporating the context provided]",
                 "template": "[Audio_List, Grid_Interactive, Dialogue_Scenario, etc.]",
                 "content_type": "[dialogue, vocabulary, or grammar]",
                 "level": "a1",
                 "tts_lang": "nl-NL",
-                "scene": "[Melancholic scene description setting the mood]",
+                "scene": "[Melancholic scene description setting the mood, in English]",
                 "groups": null,
                 "next_lesson": "END_OF_COURSE"
             }},
-            "content": "[English explanation fitting the aesthetic]",
+            "content": "[English explanation fitting the aesthetic. English only.]",
             "assets": [
                 {{
                     "dutch": "[Dutch text]",
@@ -186,31 +201,15 @@ class ApparitionEngine:
 
         try:
             response = query_engine.query(prompt)
-            raw_output = response.response.strip()
-            if raw_output.startswith("```json"):
-                raw_output = raw_output[7:-3].strip()
-            elif raw_output.startswith("```"):
-                raw_output = raw_output[3:-3].strip()
+            raw_output = _strip_code_fence(response.response)
             return json.loads(raw_output)
+        except json.JSONDecodeError as e:
+            print(f"[ApparitionEngine] Mistral returned unreadable JSON: {e}")
+            return {"error": "The Apparitions returned a malformed lesson. Try again."}
         except Exception as e:
-            print(f"[ApparitionEngine] Mistral query failed ({e}), initiating fallback to Gemini...")
-            try:
-                from google import genai
-                gemini_key = os.getenv("APPARITIONS_LESSON_KEY") or os.getenv("GEMINI_API_KEY")
-                client = genai.Client(api_key=gemini_key)
-                res = client.models.generate_content(
-                    model="gemini-2.5-flash",
-                    contents=prompt
-                )
-                raw_output = res.text.strip()
-                if raw_output.startswith("```json"):
-                    raw_output = raw_output[7:-3].strip()
-                elif raw_output.startswith("```"):
-                    raw_output = raw_output[3:-3].strip()
-                return json.loads(raw_output)
-            except Exception as fallback_err:
-                print(f"[ApparitionEngine] Gemini fallback failed: {fallback_err}")
-                return {"error": f"Failed to conjure lesson: {fallback_err}"}
+            print(f"[ApparitionEngine] Mistral query failed: {e}")
+            return {"error": f"Failed to conjure lesson: {e}"}
+
 
 if __name__ == "__main__":
     """

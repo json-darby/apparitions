@@ -14,7 +14,7 @@ import { usePollingEffect } from './hooks/usePollingEffect';
 import { useEmergencyRadar } from './hooks/useEmergencyRadar';
 import { BrutalistSlider } from './ui/BrutalistSlider';
 import { WikiModal } from './ui/WikiModal';
-import MobileNav from './ui/MobileNav';
+import SiteHeader from './ui/SiteHeader';
 import MobileAlertBar from './ui/MobileAlertBar';
 
 
@@ -685,7 +685,10 @@ const NexusView: React.FC<NexusViewProps> = ({ onExit, onNavigate }) => {
     const isNL = ['ams_centrum', 'ams_zuidas', 'ams_depijp', 'rot_centrum', 'rot_blaak', 'rot_zuidplein', 'dhg_centrum', 'dhg_statenkwartier', 'dhg_binckhorst', 'utr_centrum', 'utr_sciencepark', 'utr_leidscherijn', 'ein_centrum', 'ein_strijps', 'ein_hightech'].includes(currentLocation.id);
 
     const handleBuildingClick = useCallback((info: any) => {
-        if (info.object && info.object.name) {
+        /* A building with no `name` tag can still be identified from its Wikidata
+           QID, so open the panel whenever any identifying tag is present. */
+        const o = info.object;
+        if (o && (o.name || o.wikidata || o.wikipedia)) {
             setSelectedBuilding(info.object);
             if (info.coordinate) {
                 setSelectedCoords({ lat: info.coordinate[1], lon: info.coordinate[0] });
@@ -716,7 +719,7 @@ const NexusView: React.FC<NexusViewProps> = ({ onExit, onNavigate }) => {
     };
 
     return (
-        <div className="relative w-full h-screen bg-black overflow-hidden font-body text-white selection:bg-white/20 selection:text-white noise">
+        <div className="relative w-full h-dvh bg-black overflow-hidden font-body text-white selection:bg-white/20 selection:text-white noise">
             <style dangerouslySetInnerHTML={{
                 __html: `
           canvas {
@@ -752,27 +755,12 @@ const NexusView: React.FC<NexusViewProps> = ({ onExit, onNavigate }) => {
         `
             }} />
 
-            {/* ── Global Nav ── */}
-            <nav className="relative top-0 left-0 w-full h-[65px] md:h-[100px] z-[100] px-4 md:px-12 flex items-center justify-between pointer-events-none mix-blend-difference">
-                <div className="font-display font-bold text-xl md:text-2xl tracking-tighter text-white pointer-events-auto">
-                    APPARITIONS: NEXUS
-                </div>
-
-                <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-[40px] text-xs font-bold tracking-[0.2em] pointer-events-auto">
-                    <button onClick={onExit} className="text-[#555] hover:text-white transition-colors duration-300 tracking-[0.2em] focus:outline-none">HOME</button>
-                    <button onClick={() => onNavigate && onNavigate('menu')} className="text-[#555] hover:text-white transition-colors duration-300 tracking-[0.2em] focus:outline-none">GAMES</button>
-                    <button onClick={() => onNavigate && onNavigate('core')} className="text-[#555] hover:text-white transition-colors duration-300 tracking-[0.2em] focus:outline-none">CORE</button>
-                    <button onClick={() => onNavigate && onNavigate('nexus')} className="text-white font-bold transition-colors duration-300 tracking-[0.2em] focus:outline-none drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">NEXUS</button>
-                    <button onClick={() => onNavigate && onNavigate('help')} className="text-[#555] hover:text-white transition-colors duration-300 tracking-[0.2em] focus:outline-none">HELP</button>
-                </div>
-
-                <div className="pointer-events-auto font-sans relative flex items-center gap-4">
-                    <MobileNav current="nexus" title="APPARITIONS: NEXUS" onNavigate={(scene) => scene === null ? onExit() : (onNavigate && onNavigate(scene))} />
-                    <button onClick={() => onNavigate && onNavigate('contact')} className="hidden sm:inline-block px-6 py-2 border border-white/20 rounded-full text-xs font-bold uppercase tracking-wider text-white hover:bg-white hover:text-black transition-colors duration-500">
-                        Contact
-                    </button>
-                </div>
-            </nav>
+            <SiteHeader
+                title="APPARITIONS: NEXUS"
+                current="nexus"
+                position="relative"
+                onNavigate={(scene) => (scene === null ? onExit() : onNavigate && onNavigate(scene))}
+            />
 
             {/* Emergency Notification UI (Below Contact) — full card on desktop */}
             {radarActive && activeAlert && (
@@ -883,8 +871,19 @@ const NexusView: React.FC<NexusViewProps> = ({ onExit, onNavigate }) => {
                 setRadarActive={setRadarActive}
             />
 
-            {/* Minimal Compass — lifted clear of the mobile notification bar */}
-            <div className="absolute bottom-24 md:bottom-8 right-8 z-40 pointer-events-auto">
+            {/* Minimal Compass — lifted clear of the mobile notification bar.
+                On phones the control panel is nearly full-width, so an expanded panel
+                would sit right underneath the compass; fade it almost out and stop it
+                swallowing taps while that's the case. */}
+            <div
+                className={`absolute bottom-24 md:bottom-8 right-8 z-40 transition-opacity duration-300 ${
+                    panelExpanded
+                        /* 460px is the width at which the 320px panel (offset 32px)
+                           stops reaching the compass, so above it nothing overlaps. */
+                        ? 'opacity-5 pointer-events-none min-[460px]:opacity-100 min-[460px]:pointer-events-auto'
+                        : 'opacity-100 pointer-events-auto'
+                }`}
+            >
                 <button
                     onClick={() => {
                         setViewState(prev => ({

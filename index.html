@@ -54,6 +54,16 @@
             background: url('https://grainy-gradients.vercel.app/noise.svg');
             z-index: 50;
         }
+        /* Full-height utilities that respect the *visible* viewport.
+           100dvh shrinks/grows with the mobile URL bar; 100vh does not. */
+        .h-dvh {
+            height: 100vh;
+            height: 100dvh;
+        }
+        .min-h-dvh {
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
         .vignette {
             box-shadow: inset 0 0 200px rgba(0,0,0,0.9);
         }
@@ -92,7 +102,6 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
 </head>
 <body>
     <div id="root"></div>

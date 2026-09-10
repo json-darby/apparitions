@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import MobileNav from './ui/MobileNav';
+import SiteHeader from './ui/SiteHeader';
 
 const Core = ({ onExit, onNavigate }) => {
   const [commsMode, setCommsMode] = useState('INDEX');
@@ -159,29 +159,14 @@ const Core = ({ onExit, onNavigate }) => {
         .layer-4 { animation: pulse-opacity 4.5s ease-in-out infinite 0.5s, morph-line 4s ease-in-out infinite 1.5s; }
         .layer-5 { animation: pulse-opacity 5.5s ease-in-out infinite 1.5s, morph-line 6s ease-in-out infinite 0.5s; }
       `}</style>
-      <div className="w-full h-screen bg-[#050505] text-white font-body flex flex-col overflow-hidden selection:bg-white/20 selection:text-white noise">
+      <div className="w-full h-dvh bg-[#050505] text-white font-body flex flex-col overflow-hidden selection:bg-white/20 selection:text-white noise">
 
-      {/* ── Global Nav (matching NexusView / App landing) ── */}
-      <nav className="relative top-0 left-0 w-full h-[65px] md:h-[100px] z-[100] px-4 md:px-12 flex items-center justify-between pointer-events-none mix-blend-difference flex-shrink-0">
-        <div className="font-display font-bold text-xl md:text-2xl tracking-tighter text-white pointer-events-auto">
-          APPARITIONS: CORE
-        </div>
-
-        <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-[40px] text-xs font-bold tracking-[0.2em] pointer-events-auto">
-          <button onClick={onExit} className="text-[#555] hover:text-white transition-colors duration-300 tracking-[0.2em] focus:outline-none">HOME</button>
-          <button onClick={() => onNavigate && onNavigate('menu')} className="text-[#555] hover:text-white transition-colors duration-300 tracking-[0.2em] focus:outline-none">GAMES</button>
-          <button onClick={() => onNavigate && onNavigate('core')} className="text-white font-bold transition-colors duration-300 tracking-[0.2em] focus:outline-none drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">CORE</button>
-          <button onClick={() => onNavigate && onNavigate('nexus')} className="text-[#555] hover:text-white transition-colors duration-300 tracking-[0.2em] focus:outline-none">NEXUS</button>
-          <button onClick={() => onNavigate && onNavigate('help')} className="text-[#555] hover:text-white transition-colors duration-300 tracking-[0.2em] focus:outline-none">HELP</button>
-        </div>
-
-        <div className="pointer-events-auto flex items-center gap-4">
-          <MobileNav current="core" title="APPARITIONS: CORE" onNavigate={(scene) => scene === null ? (onExit && onExit()) : (onNavigate && onNavigate(scene))} />
-          <button onClick={() => onNavigate && onNavigate('contact')} className="hidden sm:inline-block px-6 py-2 border border-white/20 rounded-full text-xs font-bold uppercase tracking-wider text-white hover:bg-white hover:text-black transition-colors duration-500">
-            Contact
-          </button>
-        </div>
-      </nav>
+      <SiteHeader
+        title="APPARITIONS: CORE"
+        current="core"
+        position="relative"
+        onNavigate={(scene) => (scene === null ? onExit && onExit() : onNavigate && onNavigate(scene))}
+      />
 
       {/* ── Content Area ── */}
       <div className="flex flex-col md:flex-row flex-1 overflow-hidden relative">

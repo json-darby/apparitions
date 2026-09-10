@@ -9,7 +9,7 @@ import Core from './components/Core';
 import GenderWarsGame from './components/gender_wars/GenderWarsGame';
 import ContactPage from './components/ContactPage';
 import HelpPage from './components/HelpPage';
-import MobileNav from './components/ui/MobileNav';
+import SiteHeader from './components/ui/SiteHeader';
 
 const DigitalAberrationStyles = () => (
   <style>{`
@@ -53,7 +53,7 @@ const App: React.FC = () => {
 
   if (currentScenario) {
     return (
-      <div className="w-full h-screen h-[100dvh] bg-editorial-bg text-white overflow-hidden animate-in fade-in duration-1000">
+      <div className="w-full h-dvh bg-editorial-bg text-white overflow-hidden animate-in fade-in duration-1000">
         <ChatWindow scenario={currentScenario} onExit={() => setCurrentScenario(null)} />
       </div>
     );
@@ -61,32 +61,10 @@ const App: React.FC = () => {
 
   if (gameScene === 'menu') {
     return (
-      <div className="w-full h-screen h-[100dvh] bg-black text-white relative flex flex-col items-center justify-center overflow-hidden animate-in fade-in duration-1000">
+      <div className="w-full h-dvh bg-black text-white relative flex flex-col items-center justify-center overflow-hidden animate-in fade-in duration-1000">
         <DigitalAberrationStyles />
 
-        {/* Top Header - mirrored from landing page */}
-        <nav className="fixed top-0 left-0 w-full h-[65px] md:h-[100px] z-50 mix-blend-difference px-4 md:px-12 flex items-center justify-between">
-          <div className="font-display font-bold text-xl md:text-2xl tracking-tighter text-white pointer-events-auto">
-            APPARITIONS: SPELEN
-          </div>
-
-          {/* Centre Navigation Links */}
-          <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-[40px] text-xs font-bold tracking-[0.2em] pointer-events-auto">
-            <button onClick={() => setGameScene(null)} className="text-[#555] hover:text-white transition-colors duration-300 tracking-[0.2em] focus:outline-none">HOME</button>
-            <button className="text-white font-bold transition-colors duration-300 tracking-[0.2em] focus:outline-none drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] cursor-default">GAMES</button>
-            <button onClick={() => setGameScene('core')} className="text-[#555] hover:text-white transition-colors duration-300 tracking-[0.2em] focus:outline-none">CORE</button>
-            <button onClick={() => setGameScene('nexus')} className="text-[#555] hover:text-white transition-colors duration-300 tracking-[0.2em] focus:outline-none">NEXUS</button>
-            <button onClick={() => setGameScene('help')} className="text-[#555] hover:text-white transition-colors duration-300 tracking-[0.2em] focus:outline-none">HELP</button>
-          </div>
-
-          {/* Right - Contact / Mobile Menu */}
-          <div className="pointer-events-auto flex items-center gap-4">
-            <MobileNav current="menu" title="APPARITIONS: SPELEN" onNavigate={(scene) => setGameScene(scene as any)} />
-            <button onClick={() => setGameScene('contact')} className="hidden sm:inline-block px-6 py-2 border border-white/20 rounded-full text-xs font-bold uppercase tracking-wider text-white hover:bg-white hover:text-black transition-colors duration-500">
-              Contact
-            </button>
-          </div>
-        </nav>
+        <SiteHeader title="APPARITIONS: SPELEN" current="menu" onNavigate={(scene) => setGameScene(scene as any)} />
 
         {/* Backing large text matched to the landing page style */}
         <div className="absolute bottom-[2vh] md:bottom-10 left-3 md:left-12 z-0 pointer-events-none transition-all duration-300 opacity-30 md:opacity-100">
@@ -145,7 +123,7 @@ const App: React.FC = () => {
 
   if (gameScene === 'comprehension') {
     return (
-      <div className="relative w-full h-screen h-[100dvh] bg-[#0a0a0c] text-white overflow-hidden animate-in fade-in duration-[3000ms]">
+      <div className="relative w-full h-dvh bg-[#0a0a0c] text-white overflow-hidden animate-in fade-in duration-[3000ms]">
         <DigitalAberrationStyles />
 
         {/* CRT Scanline Overlay */}
@@ -174,7 +152,7 @@ const App: React.FC = () => {
 
   if (gameScene === 'memory') {
     return (
-      <div className="w-full h-screen h-[100dvh] bg-black text-white overflow-hidden relative animate-in fade-in duration-[3000ms]">
+      <div className="w-full h-dvh bg-black text-white overflow-hidden relative animate-in fade-in duration-[3000ms]">
         <DigitalAberrationStyles />
 
         {/* Full-screen Film Grain Noise Overlay */}
@@ -218,7 +196,7 @@ const App: React.FC = () => {
 
   if (gameScene === 'gender_wars') {
     return (
-      <div className="w-full h-screen h-[100dvh] bg-black text-white relative flex flex-col items-center justify-center overflow-hidden animate-in fade-in duration-[3000ms]">
+      <div className="w-full h-dvh bg-black text-white relative flex flex-col items-center justify-center overflow-hidden animate-in fade-in duration-[3000ms]">
         <DigitalAberrationStyles />
 
         {/* Minimal navigation bar for desktop viewports (>= 1024px) */}
@@ -252,34 +230,12 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-editorial-bg text-white font-body selection:bg-white/20 selection:text-white relative noise overflow-x-hidden">
+    <div className="min-h-dvh bg-editorial-bg text-white font-body selection:bg-white/20 selection:text-white relative noise overflow-x-hidden">
 
-      {/* Sticky Mix-Blend Nav */}
-      <nav className="fixed top-0 left-0 w-full h-[65px] md:h-[100px] z-50 mix-blend-difference px-4 md:px-12 flex items-center justify-between">
-        <div className="font-display font-bold text-xl md:text-2xl tracking-tighter text-white pointer-events-auto">
-          APPARITIONS
-        </div>
-
-        {/* Centre Navigation Links */}
-        <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-[40px] text-xs font-bold tracking-[0.2em] pointer-events-auto">
-          <button className="text-white font-bold transition-colors duration-300 tracking-[0.2em] focus:outline-none drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] cursor-default">HOME</button>
-          <button onClick={() => setGameScene('menu')} className="text-[#555] hover:text-white transition-colors duration-300 tracking-[0.2em] focus:outline-none">GAMES</button>
-          <button onClick={() => setGameScene('core')} className="text-[#555] hover:text-white transition-colors duration-300 tracking-[0.2em] focus:outline-none">CORE</button>
-          <button onClick={() => setGameScene('nexus')} className="text-[#555] hover:text-white transition-colors duration-300 tracking-[0.2em] focus:outline-none">NEXUS</button>
-          <button onClick={() => setGameScene('help')} className="text-[#555] hover:text-white transition-colors duration-300 tracking-[0.2em] focus:outline-none">HELP</button>
-        </div>
-
-        {/* Right - Contact / Mobile Menu */}
-        <div className="pointer-events-auto flex items-center gap-4">
-          <MobileNav current="home" onNavigate={(scene) => setGameScene(scene as any)} />
-          <button onClick={() => setGameScene('contact')} className="hidden sm:inline-block px-6 py-2 border border-white/20 rounded-full text-xs font-bold uppercase tracking-wider text-white hover:bg-white hover:text-black transition-colors duration-500">
-            Contact
-          </button>
-        </div>
-      </nav>
+      <SiteHeader title="APPARITIONS" current="home" onNavigate={(scene) => setGameScene(scene as any)} />
 
       {/* Hero Section */}
-      <section className="relative w-full h-screen h-[100dvh] flex flex-col items-center justify-center p-8 overflow-hidden">
+      <section className="relative w-full h-dvh flex flex-col items-center justify-center p-8 overflow-hidden">
 
         {/* Base Title (Behind the Image) */}
         <div className="absolute bottom-[5vh] md:bottom-10 left-4 md:left-12 z-0 pointer-events-none">

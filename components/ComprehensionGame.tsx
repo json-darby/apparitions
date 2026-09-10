@@ -285,12 +285,12 @@ export const ComprehensionGame = ({ onExit, onWin }: { onExit: () => void, onWin
 
     if (isGameWon) {
         return (
-            <div className="absolute inset-0 flex flex-col items-center justify-center z-50 bg-black/50 backdrop-blur-sm transition-opacity duration-1000">
-                <h2 className="text-white text-4xl mb-4 tracking-[0.3em] font-light">DECRYPTION COMPLETE</h2>
-                <div className="text-gray-400 text-xl font-mono mb-12 tracking-widest text-center">
+            <div className="absolute inset-0 flex flex-col items-center justify-center z-50 bg-black/50 backdrop-blur-sm transition-opacity duration-1000 px-6 py-10 text-center">
+                <h2 className="text-white text-[clamp(1.1rem,6vw,2.25rem)] mb-4 tracking-[0.2em] sm:tracking-[0.3em] font-light leading-tight">DECRYPTION COMPLETE</h2>
+                <div className="text-gray-400 text-sm sm:text-lg md:text-xl font-mono mb-8 sm:mb-12 tracking-wider text-center max-w-full break-words">
                     STORY: <span className="text-white font-bold">{story.title_en}</span>
                 </div>
-                <div className="flex gap-6">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 w-full max-w-xs sm:max-w-none sm:w-auto">
                     <button
                         onClick={() => {
                             if (storyIndex < comprehensionData.comprehension_stories.length - 1) {
@@ -299,13 +299,13 @@ export const ComprehensionGame = ({ onExit, onWin }: { onExit: () => void, onWin
                                 setStoryIndex(0); // Loop back
                             }
                         }}
-                        className="px-8 py-4 bg-[#1a1a1a] border border-[#333] text-[#aaa] font-mono tracking-widest uppercase hover:text-white hover:bg-[#222] hover:border-[#555] transition-all duration-300 shadow-[0_0_15px_rgba(0,0,0,0.8)] focus:outline-none"
+                        className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 bg-[#1a1a1a] border border-[#333] text-[#aaa] text-xs sm:text-sm font-mono tracking-widest uppercase hover:text-white hover:bg-[#222] hover:border-[#555] transition-all duration-300 shadow-[0_0_15px_rgba(0,0,0,0.8)] focus:outline-none"
                     >
                         NEXT_TRANSCRIPT
                     </button>
                     <button
                         onClick={onExit}
-                        className="px-8 py-4 bg-transparent border border-[#333] text-[#666] font-mono tracking-widest uppercase hover:text-white hover:border-[#555] transition-all duration-300 focus:outline-none"
+                        className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 bg-transparent border border-[#333] text-[#666] text-xs sm:text-sm font-mono tracking-widest uppercase hover:text-white hover:border-[#555] transition-all duration-300 focus:outline-none"
                     >
                         EXIT
                     </button>
@@ -380,7 +380,7 @@ export const ComprehensionGame = ({ onExit, onWin }: { onExit: () => void, onWin
                                             return <span key={wIdx} className={`${isSentenceActive ? 'text-white' : 'text-[#888]'} transition-colors duration-300 cursor-help hover:text-white`} title={sentence.en}>{word}</span>;
                                         })}
                                     </div>
-                                    <span className="block mt-1 text-[10px] sm:text-xs text-[#444] tracking-widest uppercase truncate w-full hover:text-white transition-colors duration-300 cursor-help" title={sentence.en}>
+                                    <span className="block mt-1 text-[10px] sm:text-xs text-[#444] tracking-wide sm:tracking-widest uppercase w-full leading-snug break-words hover:text-white transition-colors duration-300 cursor-help" title={sentence.en}>
                                         [ {sentence.en} ]
                                     </span>
                                 </div>

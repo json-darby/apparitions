@@ -49,6 +49,8 @@ export class GameEngine {
 
   // Input
   keys = { up: false, down: false, left: false, right: false };
+  /** Analog thumbstick vector, -1..1 per axis. Zeroed when the stick is released. */
+  axis = { x: 0, y: 0 };
   
   // Callbacks
   onUpdateHUD: (state: any) => void;
@@ -262,7 +264,7 @@ export class GameEngine {
       }
     }
 
-    this.ship.update(dt, this.keys, W, H);
+    this.ship.update(dt, this.keys, W, H, this.axis);
 
     // Level progression
     if (this.phase === 'normal' && this.wordsDefeatedInLevel >= 20) {

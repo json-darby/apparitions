@@ -22,18 +22,16 @@ import zipfile
 import asyncio
 from contextlib import asynccontextmanager
 import argostranslate.translate
-import wikipediaapi
-import difflib
 
-# Test for cloud run problem - ctrl + f
-wiki_en = wikipediaapi.Wikipedia(user_agent='Apparitions/1.0 (contact@apparitions.nl)', language='en')
-wiki_nl = wikipediaapi.Wikipedia(user_agent='Apparitions/1.0 (contact@apparitions.nl)', language='nl')
 
-load_dotenv(dotenv_path="../.env.local")
+# Resolve .env.local relative to this file, not the process working directory:
+# starting uvicorn from the repo root used to silently load nothing, which left
+# every WHISPER_* key unset and made the SHH panel look broken.
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".env.local"))
 from api.routers import pdok, p2000
 from apparition_engine import ApparitionEngine
-from whisper_system import get_whisper_suggestions
 from prompts import BASE_SYSTEM_INSTRUCTION, SCENARIOS
+import wiki_resolver
 
 # Initialise the engine once when the server boots
 apparition_engine = ApparitionEngine(update_storage=False)
@@ -177,23 +175,92 @@ class ReviewRequest(BaseModel):
 
 @app.post("/api/whisper/suggestions")
 async def fetch_whisper_suggestions(request: WhisperRequest):
+    """
+    Reply suggestions for the SHH panel. Mistral only — a failure is reported as
+    such rather than being returned as an empty list, which the UI cannot tell
+    apart from "the model had nothing to suggest".
+    """
+    from whisper_system import WhisperUnavailable, get_whisper_suggestions
+
     try:
-        from whisper_system import get_whisper_suggestions
-        suggestions = get_whisper_suggestions(request.bot_transcript, request.model, request.scenario, request.chat_history)
+        suggestions = await asyncio.to_thread(
+            get_whisper_suggestions,
+            request.bot_transcript,
+            request.model,
+            request.scenario,
+            request.chat_history,
+        )
         return {"suggestions": suggestions}
+    except WhisperUnavailable as e:
+        print(f"Whisper unavailable: {e}")
+        return {"suggestions": [], "error": str(e)}
     except Exception as e:
         print(f"Whisper Generation Error: {e}")
         raise HTTPException(status_code=500, detail="Failed to generate whisper suggestions.")
 
 @app.post("/api/review")
 async def generate_review(request: ReviewRequest):
+    from whisper_system import generate_conversation_review
+
     try:
-        from whisper_system import generate_conversation_review
-        review = generate_conversation_review(request.chat_history, request.scenario)
-        return review
+        return await asyncio.to_thread(
+            generate_conversation_review, request.chat_history, request.scenario
+        )
     except Exception as e:
         print(f"Review API Error: {e}")
-        raise HTTPException(status_code=500, detail="Failed to general review.")
+        raise HTTPException(status_code=500, detail="Failed to generate review.")
+
+class TranscribeRequest(BaseModel):
+    """Payload for /api/transcribe: base64-encoded audio plus its MIME type."""
+    audio: str
+    mime_type: str = "audio/wav"
+    language: str = "Dutch"
+
+
+@app.post("/api/transcribe")
+async def transcribe_audio(request: TranscribeRequest):
+    """
+    Transcribe a short recording of the user speaking.
+
+    The browser's own Web Speech API is not a dependable path here: Chrome routes it
+    through Google's servers (blocked on plenty of networks) and privacy-focused
+    browsers such as Brave ship without the key entirely, so it fails instantly with a
+    'network' error. Doing it server-side works in every browser and reuses the
+    microphone permission the live session already holds.
+    """
+    import base64
+
+    try:
+        audio_bytes = base64.b64decode(request.audio)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Audio payload is not valid base64.")
+
+    if not audio_bytes:
+        raise HTTPException(status_code=400, detail="Empty audio payload.")
+
+    if not api_key:
+        raise HTTPException(status_code=503, detail="Transcription is unavailable: GEMINI_API_KEY is not set.")
+
+    prompt = (
+        f"Transcribe the {request.language} speech in this audio exactly as spoken. "
+        "Return ONLY the transcript text, with no quotes, no translation, no commentary. "
+        "If there is no intelligible speech, return an empty string."
+    )
+
+    try:
+        response = await asyncio.to_thread(
+            client.models.generate_content,
+            model="gemini-2.5-flash",
+            contents=[
+                types.Part.from_bytes(data=audio_bytes, mime_type=request.mime_type),
+                prompt,
+            ],
+        )
+        return {"text": (response.text or "").strip()}
+    except Exception as e:
+        print(f"Transcription Error: {e}")
+        raise HTTPException(status_code=502, detail="Transcription failed.")
+
 
 @app.get("/api/index")
 async def get_lesson_index():
@@ -422,243 +489,52 @@ async def get_live_crowds(bbox: str):
 async def get_wikipedia_info(structure_name: str, city: str = None, lat: float = None, lon: float = None,
                              wikidata: str = None, wikipedia_title: str = None):
     """
-    Fetch Wikipedia summary and thumbnail for a given structure name.
-    Retrieves English text by default, resolving from Dutch if necessary.
-    Uses structural heuristics to avoid generic disambiguation pages.
+    Fetch the Wikipedia summary and thumbnail for a structure on the map.
+
+    The resolution strategies live in wiki_resolver; the OSM `wikidata` QID is the
+    most accurate signal and is tried first. Dutch-only articles are machine
+    translated so the panel always reads in English.
     """
-    try:
-        page = None
-        lang_fetched = 'en'
-        
-        # Helper to determine if an article is valid or just a disambiguation
-        def is_valid_article(p):
-            try:
-                if not p.exists(): return False
-                summary = p.summary.lower()
-                title = p.title.lower()
-                return not (
-                    "may refer to:" in summary or 
-                    "kan verwijzen naar:" in summary or
-                    "disambiguation" in title or
-                    "doorverwijspagina" in title or 
-                    "meerdere betekenissen" in summary
-                )
-            except KeyError:
-                return False
+    article = await wiki_resolver.resolve_article(
+        name=structure_name,
+        city=city,
+        lat=lat,
+        lon=lon,
+        wikidata=wikidata,
+        wikipedia_tag=wikipedia_title,
+    )
 
-        # Properly format the provided title, stripping language tags
-        if wikipedia_title and wikipedia_title.startswith(('nl:', 'en:')):
-            wikipedia_title = wikipedia_title[3:]
+    if not article:
+        raise HTTPException(status_code=404, detail="Wikipedia page not found")
 
-        # 1. Direct Tag Lock
-        if wikipedia_title:
-            p_en = wiki_en.page(wikipedia_title)
-            if is_valid_article(p_en):
-                page = p_en
-            else:
-                p_nl = wiki_nl.page(wikipedia_title)
-                if is_valid_article(p_nl):
-                    if 'en' in p_nl.langlinks:
-                        p_en_link = wiki_en.page(p_nl.langlinks['en'].title)
-                        if is_valid_article(p_en_link):
-                            page = p_en_link
-                        else:
-                            page = p_nl
-                            lang_fetched = 'nl'
-                    else:
-                        page = p_nl
-                        lang_fetched = 'nl'
-                        
-        if not page and wikidata:
-            try:
-                async with httpx.AsyncClient() as http_client:
-                    wd_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&ids={wikidata}&props=sitelinks&format=json"
-                    res = await http_client.get(wd_url, headers={"User-Agent": "Apparitions/1.0 (contact@apparitions.nl)"})
-                    data = res.json()
-                    sitelinks = data.get('entities', {}).get(wikidata, {}).get('sitelinks', {})
-                    if 'enwiki' in sitelinks:
-                        p_en = wiki_en.page(sitelinks['enwiki']['title'])
-                        if is_valid_article(p_en):
-                            page = p_en
-                    elif 'nlwiki' in sitelinks:
-                        p_nl = wiki_nl.page(sitelinks['nlwiki']['title'])
-                        if is_valid_article(p_nl):
-                            if 'en' in p_nl.langlinks:
-                                p_link = wiki_en.page(p_nl.langlinks['en'].title)
-                                if is_valid_article(p_link):
-                                    page = p_link
-                                else:
-                                    page = p_nl
-                                    lang_fetched = 'nl'
-                            else:
-                                page = p_nl
-                                lang_fetched = 'nl'
-            except Exception as e:
-                print(f"[WIKI] Wikidata wbgetentities error: {e}")
+    # The search only needed the lead; now that a winner is settled, pull the
+    # fuller text (lead plus following sections) in one extra request.
+    # Non-English articles get a tighter budget: every character of those has to
+    # go through Argos afterwards, and translation time scales with length.
+    budget = wiki_resolver.BODY_CHAR_BUDGET if article.lang == 'en' else 1500
+    extract = await wiki_resolver.fetch_body(article.lang, article.title, budget) or article.summary
+    description = article.description
 
-        # 2. Progressive GeoSearch
-        if not page and lat is not None and lon is not None:
-            name_lower = structure_name.lower()
-            try:
-                async with httpx.AsyncClient() as http_client:
-                    for radius in [100, 300, 1000]:
-                        if page: break
-                        
-                        # Added delay to respect Wikipedia rate limits when running in the cloud
-                        await asyncio.sleep(1.5)
-                        
-                        # 2a. Wikidata GeoSearch
-                        try:
-                            wd_geo = f"https://www.wikidata.org/w/api.php?action=query&list=geosearch&gscoord={lat}|{lon}&gsradius={radius}&gslimit=5&format=json"
-                            res = await http_client.get(wd_geo, headers={"User-Agent": "Apparitions/1.0 (contact@apparitions.nl)"})
-                            wd_data = res.json()
-                            wd_pages = wd_data.get("query", {}).get("geosearch", [])
-                            for gp in wd_pages:
-                                if page: break
-                                qid = gp['title']
-                                q_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&ids={qid}&props=sitelinks&format=json"
-                                q_res = await http_client.get(q_url, headers={"User-Agent": "Apparitions/1.0 (contact@apparitions.nl)"})
-                                q_data = q_res.json()
-                                sitelinks = q_data.get('entities', {}).get(qid, {}).get('sitelinks', {})
-                                
-                                potential_title = None
-                                if 'enwiki' in sitelinks:
-                                    potential_title = sitelinks['enwiki']['title']
-                                elif 'nlwiki' in sitelinks:
-                                    potential_title = sitelinks['nlwiki']['title']
-                                    
-                                if potential_title:
-                                    ratio = difflib.SequenceMatcher(None, name_lower, potential_title.lower()).ratio()
-                                    if ratio > 0.5 or potential_title.lower() in name_lower or name_lower in potential_title.lower():
-                                        wiki_obj = wiki_en if 'enwiki' in sitelinks else wiki_nl
-                                        p = wiki_obj.page(potential_title)
-                                        if is_valid_article(p):
-                                            if wiki_obj == wiki_nl and 'en' in p.langlinks:
-                                                p_link = wiki_en.page(p.langlinks['en'].title)
-                                                if is_valid_article(p_link):
-                                                    page = p_link
-                                                else:
-                                                    page = p
-                                                    lang_fetched = 'nl'
-                                            else:
-                                                page = p
-                                                lang_fetched = 'en' if wiki_obj == wiki_en else 'nl'
-                        except Exception as e:
-                            print(f"[WIKI] Wikidata geosearch error: {e}")
-
-                        # 2b. MediaWiki GeoSearch
-                        if not page:
-                            for g_lang in ['en', 'nl']:
-                                if page: break
-                                geo_url = f"https://{g_lang}.wikipedia.org/w/api.php?action=query&list=geosearch&gscoord={lat}|{lon}&gsradius={radius}&gslimit=5&format=json"
-                                res = await http_client.get(geo_url, headers={"User-Agent": "Apparitions/1.0 (contact@apparitions.nl)"})
-                                geo_data = res.json()
-                                geo_pages = geo_data.get("query", {}).get("geosearch", [])
-                                
-                                for gp in geo_pages:
-                                    title_lower = gp["title"].lower()
-                                    ratio = difflib.SequenceMatcher(None, name_lower, title_lower).ratio()
-                                    if ratio > 0.5 or title_lower in name_lower or name_lower in title_lower:
-                                        p = (wiki_en if g_lang == 'en' else wiki_nl).page(gp["title"])
-                                        if is_valid_article(p):
-                                            if g_lang == 'nl' and 'en' in p.langlinks:
-                                                p_link = wiki_en.page(p.langlinks['en'].title)
-                                                if is_valid_article(p_link):
-                                                    page = p_link
-                                                else:
-                                                    page = p
-                                                    lang_fetched = 'nl'
-                                            else:
-                                                page = p
-                                                lang_fetched = g_lang
-                                            break
-            except Exception as e:
-                print(f"[WIKI] Geosearch error: {e}")
-
-        # 3. Final Permutation Fallback
-        if not page:
-            candidates = []
-            c = city.title() if city else ""
-            if c:
-                candidates.extend([
-                    f"{structure_name} ({c})",
-                    f"{structure_name}, {c}",
-                    f"{structure_name} {c}"
-                ])
-            candidates.append(structure_name)
-            
-            for cand in candidates:
-                if page: break
-                
-                # Added delay to prevent rapid fire guesses from triggering a cloud IP block
-                await asyncio.sleep(1.5)
-                
-                p_en = wiki_en.page(cand)
-                if is_valid_article(p_en):
-                    if c and c.lower() not in p_en.text.lower() and c.lower() not in p_en.title.lower():
-                        continue
-                    page = p_en
-                    break
-                    
-            if not page:
-                for cand in candidates:
-                    # Delay before checking the Dutch variations
-                    await asyncio.sleep(1.5)
-                    
-                    p_nl = wiki_nl.page(cand)
-                    if is_valid_article(p_nl):
-                        if c and c.lower() not in p_nl.text.lower() and c.lower() not in p_nl.title.lower():
-                            continue
-                        if 'en' in p_nl.langlinks:
-                            p_link = wiki_en.page(p_nl.langlinks['en'].title)
-                            if is_valid_article(p_link):
-                                page = p_link
-                                lang_fetched = 'en'
-                                break
-                        page = p_nl
-                        lang_fetched = 'nl'
-                        break
-
-        if not page:
-            raise HTTPException(status_code=404, detail="Wikipedia page not found")
-            
-        # Fetch thumbnail via MediaWiki API since wikipediaapi focuses on text
-        thumbnail_source = None
+    if article.lang != 'en':
         try:
-            async with httpx.AsyncClient() as http_client:
-                res = await http_client.get(
-                    f"https://{lang_fetched}.wikipedia.org/w/api.php?action=query&titles={page.title}&prop=pageimages&format=json&pithumbsize=600",
-                    headers={"User-Agent": "Apparitions/1.0 (contact@apparitions.nl)"}
-                )
-                data = res.json()
-                pages = data.get("query", {}).get("pages", {})
-                for page_id, pdata in pages.items():
-                    if "thumbnail" in pdata:
-                        thumbnail_source = pdata["thumbnail"]["source"]
-                        break
+            # argos is CPU-bound, so keep it off the event loop.
+            extract = await asyncio.to_thread(
+                argostranslate.translate.translate, extract, article.lang, 'en')
+            if description:
+                description = await asyncio.to_thread(
+                    argostranslate.translate.translate, description, article.lang, 'en')
         except Exception as e:
-            print(f"[WIKI] Thumbnail fetch error: {e}")
+            print(f"[WIKI] Translate error: {e}")
 
-        extract = page.summary
-        
-        # Translate to English if we only found a Dutch article
-        if lang_fetched == 'nl':
-            try:
-                extract = argostranslate.translate.translate(extract, 'nl', 'en')
-            except Exception as e:
-                print(f"[WIKI] Translate error: {e}")
-
-        return {
-            "title": page.title,
-            "extract": extract,
-            "url": page.fullurl,
-            "thumbnail": {"source": thumbnail_source} if thumbnail_source else None
-        }
-    except HTTPException:
-        raise
-    except Exception as e:
-        print(f"Wikipedia API error: {e}")
-        raise HTTPException(status_code=500, detail="Failed to fetch Wikipedia data")
+    return {
+        "title": article.title,
+        "extract": extract,
+        # Wikidata's one-line gloss. Arrives free with the summary; available for
+        # the panel to use as a subtitle.
+        "description": description,
+        "url": article.url,
+        "thumbnail": {"source": article.thumbnail} if article.thumbnail else None,
+    }
 
 
 evaluate_speech_tool = types.Tool(

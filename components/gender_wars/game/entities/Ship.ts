@@ -14,11 +14,25 @@ export class Ship {
     this.y = canvasH / 2;
   }
 
-  update(dt: number, keys: { up: boolean; down: boolean; left: boolean; right: boolean }, canvasW: number, canvasH: number) {
-    if (keys.up) this.y -= this.speed * dt;
-    if (keys.down) this.y += this.speed * dt;
-    if (keys.left) this.x -= this.speed * dt;
-    if (keys.right) this.x += this.speed * dt;
+  /**
+   * @param keys  Digital input (keyboard / D-pad): each direction is on or off.
+   * @param axis  Optional analog input in the range -1..1 per axis, from the
+   *              on-screen thumbstick. Added to the digital input so keyboard
+   *              and stick can be used interchangeably.
+   */
+  update(
+    dt: number,
+    keys: { up: boolean; down: boolean; left: boolean; right: boolean },
+    canvasW: number,
+    canvasH: number,
+    axis?: { x: number; y: number }
+  ) {
+    const clampUnit = (v: number) => Math.max(-1, Math.min(1, v));
+    const dx = clampUnit((keys.right ? 1 : 0) - (keys.left ? 1 : 0) + (axis?.x ?? 0));
+    const dy = clampUnit((keys.down ? 1 : 0) - (keys.up ? 1 : 0) + (axis?.y ?? 0));
+
+    this.x += dx * this.speed * dt;
+    this.y += dy * this.speed * dt;
 
     // Constrain
     if (this.x < 20) this.x = 20;

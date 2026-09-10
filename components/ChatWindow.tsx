@@ -1,15 +1,24 @@
-import { Blob } from '@google/genai';
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { ai, getLiveConfig } from '../services/geminiService';
+import {
+  INPUT_SAMPLE_RATE,
+  OUTPUT_SAMPLE_RATE,
+  createPcmBlob,
+  decodeBase64,
+  decodePcmToAudioBuffer,
+  transcribeRecording,
+} from '../services/audio';
 import { Message, ResponseMode, ScenarioType } from '../types';
 import { shhh } from './models/shhh';
+import { useFitText } from './hooks/useFitText';
 
 type LiveServerMessage = any;
 
-const INPUT_SAMPLE_RATE = 16000;
-const OUTPUT_SAMPLE_RATE = 24000;
 const AUDIO_THRESHOLD = 5;
 const VISUALISER_BAR_COUNT = 24;
+
+/** Anything shorter than this is a mis-tap, not speech. */
+const MIN_RECORDING_SECONDS = 0.3;
 
 interface ChatWindowProps {
   scenario: ScenarioType;
@@ -19,55 +28,6 @@ interface ChatWindowProps {
 interface Suggestion {
   dutch: string;
   english: string;
-}
-
-function encode(bytes: Uint8Array) {
-  let binary = '';
-  const len = bytes.byteLength;
-  for (let i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return btoa(binary);
-}
-
-function decode(base64: string) {
-  const binaryString = atob(base64);
-  const len = binaryString.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-  return bytes;
-}
-
-async function decodeAudioData(
-  data: Uint8Array,
-  ctx: AudioContext,
-  sampleRate: number,
-  numChannels: number,
-): Promise<AudioBuffer> {
-  const dataInt16 = new Int16Array(data.buffer);
-  const frameCount = dataInt16.length / numChannels;
-  const buffer = ctx.createBuffer(numChannels, frameCount, sampleRate);
-  for (let channel = 0; channel < numChannels; channel++) {
-    const channelData = buffer.getChannelData(channel);
-    for (let i = 0; i < frameCount; i++) {
-      channelData[i] = dataInt16[i * numChannels + channel] / 32768.0;
-    }
-  }
-  return buffer;
-}
-
-function createBlob(data: Float32Array): Blob {
-  const l = data.length;
-  const int16 = new Int16Array(l);
-  for (let i = 0; i < l; i++) {
-    int16[i] = data[i] * 32768;
-  }
-  return {
-    data: encode(new Uint8Array(int16.buffer)),
-    mimeType: 'audio/pcm;rate=16000',
-  };
 }
 
 const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
@@ -83,7 +43,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
   const [draftTranscript, setDraftTranscript] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isFetchingWhispers, setIsFetchingWhispers] = useState(false);
-  const [speechAvailable, setSpeechAvailable] = useState(true);
+  /* Why the last turn produced no suggestions, so the panel can say so instead of
+     leaving the SHH button silently dead forever. Null means "all fine". */
+  const [whisperError, setWhisperError] = useState<string | null>(null);
   const [manualInput, setManualInput] = useState('');
   const [suggestionMemory, setSuggestionMemory] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -101,14 +63,26 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
   const nextStartTimeRef = useRef<number>(0);
   const sourcesRef = useRef<Set<AudioBufferSourceNode>>(new Set());
   const transcriptionRef = useRef({ user: '', bot: '', botSnapshot: '' });
-  const recognitionRef = useRef<any>(null);
   const responseModeRef = useRef<ResponseMode>(responseMode);
-  const speechRetryRef = useRef(0);
   const manualInputRef = useRef<HTMLInputElement>(null);
+  /* Non-null while the mic button is held down: the live session's audio tap
+     appends every frame here, and on release it becomes a WAV to transcribe. */
+  const recordingChunksRef = useRef<Float32Array[] | null>(null);
+  const [isTranscribing, setIsTranscribing] = useState(false);
 
   useEffect(() => {
     responseModeRef.current = responseMode;
   }, [responseMode]);
+
+  /* Voice input is available whenever the live session (and therefore the mic) is up. */
+  const speechAvailable = isLive;
+
+  /* 'CONVERSATION' is far wider than 'OFFLINE', so the status cell has to give
+     ground rather than push the mode toggle out of the header when it swaps. */
+  const statusLabel = isLive
+    ? (scenario === ScenarioType.COMPREHENSION ? 'STORY' : 'CONVERSATION')
+    : 'OFFLINE';
+  const { boxRef: statusBoxRef, textRef: statusTextRef } = useFitText<HTMLDivElement, HTMLSpanElement>(statusLabel);
 
 
 
@@ -153,85 +127,66 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
   }, [isFetchingWhispers]);
 
   useEffect(() => {
-    if (!isFetchingWhispers && allSuggestions.length > 0) {
-      setMobileSuggestions(allSuggestions);
-      const t = window.setTimeout(() => setMobileSuggestionsVisible(true), 30);
-      return () => clearTimeout(t);
-    }
+    if (isFetchingWhispers) return;
+    setMobileSuggestions(allSuggestions);
+    if (allSuggestions.length === 0) return;
+    const t = window.setTimeout(() => setMobileSuggestionsVisible(true), 30);
+    return () => clearTimeout(t);
   }, [allSuggestions, isFetchingWhispers]);
 
-  useEffect(() => {
-    const MAX_SPEECH_RETRIES = 3;
+  /**
+   * Reflection mode voice input.
+   *
+   * This used to run on the browser's SpeechRecognition API, which never worked
+   * reliably: Chrome relays the audio to Google's servers (blocked on many
+   * networks) and Brave ships without the key at all, so recognition failed
+   * instantly and silently. Instead the live session's existing microphone tap is
+   * recorded straight into memory and transcribed by the backend, which works in
+   * every browser and needs no second microphone permission.
+   */
+  const startRecording = useCallback(() => {
+    if (!isLive) {
+      setError('No microphone connection yet. Wait for the channel to open.');
+      return;
+    }
+    recordingChunksRef.current = [];
+    setDraftTranscript('');
+    setIsRecording(true);
+  }, [isLive]);
+
+  const stopRecording = useCallback(async () => {
+    const chunks = recordingChunksRef.current;
+    recordingChunksRef.current = null;
+    setIsRecording(false);
+
+    if (!chunks || chunks.length === 0) return;
+
+    const samples = chunks.reduce((total, chunk) => total + chunk.length, 0);
+    if (samples < INPUT_SAMPLE_RATE * MIN_RECORDING_SECONDS) return;
+
+    setIsTranscribing(true);
     try {
-      if (typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-        const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
-        const isMobile = typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        recognitionRef.current = new SpeechRecognition();
-        recognitionRef.current.continuous = !isMobile;
-        recognitionRef.current.interimResults = true;
-        recognitionRef.current.lang = 'nl-NL';
-        recognitionRef.current.onresult = (event: any) => {
-          /* Successful result resets the retry counter */
-          speechRetryRef.current = 0;
-          let finalTranscript = '';
-          for (let i = event.resultIndex; i < event.results.length; ++i) {
-            if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript;
-          }
-          if (finalTranscript) {
-            setDraftTranscript(prev => (prev + ' ' + finalTranscript).trim());
-            setManualInput(prev => (prev ? prev + ' ' + finalTranscript : finalTranscript).trim());
-          }
-        };
-        recognitionRef.current.onstart = () => setIsRecording(true);
-        recognitionRef.current.onend = () => setIsRecording(false);
-        recognitionRef.current.onerror = (e: any) => {
-          const errCode = e.error;
-          if (errCode === 'network' || errCode === 'service-not-allowed') {
-            /* Auto-retry on transient network errors.
-             * Chrome's Web Speech API sends audio to Google's cloud
-             * servers; local dev environments (VPN, firewall, DNS)
-             * often block this. Retry a few times before falling
-             * back to the manual text input. */
-            speechRetryRef.current += 1;
-            if (speechRetryRef.current <= MAX_SPEECH_RETRIES) {
-              console.warn(`[Speech] Network error — retry ${speechRetryRef.current}/${MAX_SPEECH_RETRIES}`);
-              setTimeout(() => {
-                try { recognitionRef.current?.start(); } catch (_) { /* already started */ }
-              }, speechRetryRef.current * 800);
-              return;
-            }
-            /* Exhausted retries — fall back to text input */
-            console.warn('[Speech] Retries exhausted — switching to manual text input');
-            setSpeechAvailable(false);
-            setIsRecording(false);
-            setError(null); /* Clear any stale banner */
-          } else if (errCode !== 'aborted' && errCode !== 'no-speech') {
-            setError(`Spraakherkenning fout: ${errCode}`);
-          }
-        };
+      const text = await transcribeRecording(chunks, INPUT_SAMPLE_RATE);
+      if (text) {
+        setManualInput(prev => (prev ? `${prev} ${text}` : text).trim());
       } else {
-        setSpeechAvailable(false);
+        setError('Nothing was heard. Try speaking again.');
       }
     } catch (err) {
-      console.error("Speech Recognition setup error:", err);
-      setSpeechAvailable(false);
+      console.error('[Speech] Transcription failed:', err);
+      setError('Transcription failed. Type your reply or try again.');
+    } finally {
+      setIsTranscribing(false);
     }
   }, []);
 
-  const toggleRecording = () => {
-    try {
-      if (!recognitionRef.current || !speechAvailable) return;
-      if (isRecording) {
-        recognitionRef.current.stop();
-      } else {
-        speechRetryRef.current = 0;
-        setDraftTranscript('');
-        recognitionRef.current.start();
-      }
-    } catch (err) {
-      setError("Fout bij starten opname.");
+  const toggleRecording = useCallback(() => {
+    if (isRecording) {
+      void stopRecording();
+    } else if (!isTranscribing) {
+      startRecording();
     }
-  };
+  }, [isRecording, isTranscribing, startRecording, stopRecording]);
 
   const confirmSend = () => {
     try {
@@ -257,9 +212,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
       setManualInput('');
       setVisibleCount(0);
       setIsFetchingWhispers(true);
-      if (isRecording) recognitionRef.current.stop();
+      if (isRecording) void stopRecording();
     } catch (err) {
-      setError("Versturen mislukt.");
+      setError('Could not send your message.');
     }
   };
 
@@ -298,7 +253,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [responseMode, isRecording, draftTranscript, manualInput, whisperUnlocked, allSuggestions, speechAvailable]);
+  }, [responseMode, isRecording, draftTranscript, manualInput, whisperUnlocked, allSuggestions, speechAvailable, toggleRecording]);
 
   useEffect(() => {
     let checkInterval: number;
@@ -317,7 +272,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
             }
           });
         } catch (mediaErr) {
-          setError("Microfoontoegang geweigerd. Activeer de microfoon om de nacht te betreden.");
+          setError('Microphone access denied. Enable the microphone to enter the night.');
           return;
         }
         if (!inputAudioCtxRef.current) {
@@ -329,7 +284,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
 
         const liveConfig = getLiveConfig(scenario);
         activeSession = await (ai.live.connect({
-          model: liveConfig.model,
           callbacks: {
             onopen: () => {
               if (!isMounted) { activeSession?.close(); return; }
@@ -343,6 +297,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
                   const level = (sum / inputData.length) * 1000;
                   setAudioLevel(Math.min(level, 100));
 
+                  /* Reflection mode: capture the frame for transcription while the
+                     mic button is held. The buffer is copied because the browser
+                     reuses the underlying array between callbacks. */
+                  if (recordingChunksRef.current) {
+                    recordingChunksRef.current.push(new Float32Array(inputData));
+                  }
+
                   /* Only send mic audio when the bot is NOT speaking.
                    * This prevents echo feedback where the bot hears its
                    * own speaker output via the mic and talks to itself. */
@@ -351,7 +312,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
                     : false;
 
                   if (responseModeRef.current === 'instant' && activeSession && !botPlaying) {
-                    activeSession.sendRealtimeInput({ audio: createBlob(inputData) });
+                    activeSession.sendRealtimeInput({ audio: createPcmBlob(inputData) });
                   }
                 } catch (err) {
                   console.error("Audio processor error:", err);
@@ -425,7 +386,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
                   try {
                     const ctx = outputAudioCtxRef.current;
                     nextStartTimeRef.current = Math.max(nextStartTimeRef.current, ctx.currentTime);
-                    const buffer = await decodeAudioData(decode(audioBase64), ctx, OUTPUT_SAMPLE_RATE, 1);
+                    const buffer = await decodePcmToAudioBuffer(decodeBase64(audioBase64), ctx, OUTPUT_SAMPLE_RATE, 1);
                     const source = ctx.createBufferSource();
                     source.buffer = buffer; source.connect(ctx.destination);
                     source.addEventListener('ended', () => sourcesRef.current.delete(source));
@@ -480,12 +441,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
                       }).catch(err => console.error(err));
                     
                     shhh.getWhispers(botText, scenario, suggestionMemory ? messages : undefined).then(suggestions => {
-                      if (suggestions && suggestions.length > 0) {
-                        setAllSuggestions(suggestions);
-                      }
+                      const next = suggestions || [];
+                      setAllSuggestions(next);
+                      setWhisperError(next.length === 0 ? 'The whisper model returned nothing.' : null);
                       setIsFetchingWhispers(false);
                     }).catch(e => {
                       console.error("Whisper error:", e);
+                      setAllSuggestions([]);
+                      setWhisperError(e?.message || 'The whisper service did not answer.');
                       setIsFetchingWhispers(false);
                     });
                   } else {
@@ -511,7 +474,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
             },
             onerror: (e) => {
               console.error("Live API Error:", e);
-              setError("API Connectie mislukt. (Is je API key correct en lokaal ingesteld?)");
+              setError('Connection to the apparition failed. Check the API key configuration.');
             },
             onclose: () => setIsLive(false),
           },
@@ -529,7 +492,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
         }
       } catch (err: any) {
         if (isMounted) {
-          setError(`Connectie mislukt: ${err.message || 'Onbekende fout'}`);
+          setError(`Connection failed: ${err.message || 'unknown error'}`);
           setIsLive(false);
         }
       }
@@ -552,6 +515,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
     setWhisperUnlocked(false);
     setMobileSuggestions([]);
     setMobileSuggestionsVisible(false);
+    setWhisperError(null);
     transcriptionRef.current = { user: '', bot: '', botSnapshot: '' };
     
     // Close existing connection
@@ -653,8 +617,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
               </div>
             ))
           ) : (
-            <div className="text-[10px] uppercase tracking-[0.4em] text-[#333] py-20 text-center leading-relaxed font-display font-bold">
-              SILENCE.
+            <div className="text-[10px] uppercase tracking-[0.4em] text-[#333] py-20 text-center leading-relaxed font-display font-bold px-2">
+              {isFetchingWhispers
+                ? 'LISTENING...'
+                : whisperError
+                  ? <>NO SIGNAL.<span className="block mt-4 tracking-[0.2em] text-[#2a2a2a] normal-case font-body break-words">{whisperError}</span></>
+                  : 'SILENCE.'}
             </div>
           )
         ) : (
@@ -717,11 +685,16 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
 
       {/* Error Overlay */}
       {error && (
-        <div className="absolute top-8 left-1/2 -translate-x-1/2 z-[100] bg-black/80 backdrop-blur-xl border border-red-900/30 px-8 py-4 shadow-2xl animate-in fade-in slide-in-from-top-8 duration-700 min-w-[300px]">
-          <div className="flex items-center gap-6">
-            <div className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" />
-            <span className="text-gray-300 text-[10px] uppercase tracking-[0.3em] font-light flex-1">{error}</span>
-            <button onClick={() => setError(null)} className="text-gray-400 hover:text-white transition-colors text-[9px] uppercase tracking-widest pl-4 border-l border-white/10">CLOSE</button>
+        <div className="absolute top-4 md:top-8 left-1/2 -translate-x-1/2 z-[100] w-[calc(100%-2rem)] max-w-md bg-black/85 backdrop-blur-xl border border-red-900/40 px-4 py-3 md:px-6 md:py-4 shadow-2xl animate-in fade-in slide-in-from-top-8 duration-700">
+          <div className="flex items-start gap-3 md:gap-4">
+            <div className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse mt-1.5 shrink-0" />
+            <span className="flex-1 min-w-0 font-mono text-[10px] md:text-[11px] leading-relaxed tracking-[0.12em] uppercase text-gray-300 break-words">{error}</span>
+            <button
+              onClick={() => setError(null)}
+              className="shrink-0 font-mono text-[9px] uppercase tracking-[0.2em] text-gray-400 hover:text-white transition-colors pl-3 md:pl-4 border-l border-white/10 self-stretch"
+            >
+              CLOSE
+            </button>
           </div>
         </div>
       )}
@@ -785,18 +758,20 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
 
         {/* Sticky Header — mobile: 3 evenly-spaced cells (status | mode toggle | review+return) so
             the toggle sits centred and RETURN isn't crowded. Desktop: original clustered layout. */}
-        <div className="grid grid-cols-[1fr_auto_1fr] md:hidden items-center gap-3 px-4 py-6 bg-gradient-to-b from-[#050505] via-[#050505]/80 to-transparent">
-          <div className="flex items-center gap-2 min-w-0 justify-self-start">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:hidden items-center gap-3 px-4 py-6 bg-gradient-to-b from-[#050505] via-[#050505]/80 to-transparent">
+          <div className="flex items-center gap-2 min-w-0">
             <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${isLive ? 'bg-white animate-pulse' : 'bg-red-900'}`} />
-            <span className="text-[9px] uppercase tracking-[0.2em] font-light text-[#888888] truncate">
-              {isLive ? `${scenario === ScenarioType.COMPREHENSION ? 'STORY' : 'CONVERSATION'}` : 'OFFLINE'}
-            </span>
+            <div ref={statusBoxRef} className="min-w-0 flex-1 overflow-hidden">
+              <span ref={statusTextRef} className="text-[9px] uppercase tracking-[0.2em] font-light text-[#888888] whitespace-nowrap inline-block">
+                {statusLabel}
+              </span>
+            </div>
           </div>
           <div className="flex bg-white/5 p-0.5 rounded-sm overflow-hidden border border-white/10 justify-self-center shrink-0">
             <button onClick={() => { setResponseMode('instant'); setDraftTranscript(''); }} className={`px-2 sm:px-3 py-1.5 text-[8px] sm:text-[9px] uppercase tracking-widest transition-all ${responseMode === 'instant' ? 'bg-white text-black font-medium' : 'text-gray-500 hover:text-gray-300'}`}>Instant</button>
             <button onClick={() => setResponseMode('review')} className={`px-2 sm:px-3 py-1.5 text-[8px] sm:text-[9px] uppercase tracking-widest transition-all ${responseMode === 'review' ? 'bg-white text-black font-medium' : 'text-gray-500 hover:text-gray-300'}`}>Reflection</button>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0 justify-self-end">
+          <div className="flex items-center gap-2 sm:gap-3 justify-end min-w-0">
             {responseMode === 'review' && scenario !== ScenarioType.COMPREHENSION && (
               <button
                 onClick={endAndReview}
@@ -815,7 +790,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
           <div className="flex items-center gap-4 min-w-0">
             <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${isLive ? 'bg-white animate-pulse' : 'bg-red-900'}`} />
             <span className="text-[10px] uppercase tracking-[0.3em] font-light text-[#888888] truncate">
-              {isLive ? `${scenario === ScenarioType.COMPREHENSION ? 'STORY' : 'CONVERSATION'}` : 'OFFLINE'}
+              {statusLabel}
             </span>
           </div>
           <div className="flex items-center gap-8 shrink-0">
@@ -882,12 +857,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
             <div className="w-full flex items-center border-t border-b border-[#111] divide-x divide-[#111]">
               <button
                 onClick={toggleWhispers}
-                disabled={allSuggestions.length === 0 && !whisperUnlocked}
                 className={`flex-1 py-2.5 text-[9px] uppercase tracking-[0.2em] font-bold transition-colors ${whisperUnlocked
                   ? 'text-white'
                   : allSuggestions.length > 0
                     ? 'text-white/80 hover:text-white'
-                    : 'text-[#444] cursor-not-allowed'
+                    : 'text-[#555] hover:text-white'
                   }`}
               >
                 {whisperUnlocked ? 'SIGNAL FOUND' : 'SHH'}
@@ -907,6 +881,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
               style={{ gridTemplateRows: whisperUnlocked ? '1fr' : '0fr' }}
             >
               <div className="overflow-hidden">
+                {mobileSuggestions.length === 0 && (
+                  <div className="py-2 text-[8px] uppercase tracking-[0.3em] text-[#444] font-bold">
+                    {isFetchingWhispers ? 'LISTENING...' : whisperError ? 'NO SIGNAL' : 'SILENCE'}
+                  </div>
+                )}
                 {mobileSuggestions.length > 0 && (
                   <div
                     className="flex gap-2 overflow-x-auto py-2 scrollbar-hide"
@@ -936,21 +915,31 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
               {/* Unified Brutalist Input Console */}
               <div className="flex items-center gap-2 w-full max-w-3xl bg-[#080808] border border-[#222] focus-within:border-white/50 transition-all p-1.5 md:p-2 shadow-2xl">
                 {/* Voice Record / Mic Button */}
-                {speechAvailable && (
-                  <button
-                    type="button"
-                    onClick={toggleRecording}
-                    className={`px-3 md:px-4 py-2.5 transition-all duration-300 flex items-center gap-2 shrink-0 border ${
-                      isRecording
-                        ? 'bg-white text-black border-white shadow-[0_0_15px_rgba(255,255,255,0.4)]'
-                        : 'bg-transparent border-[#222] text-gray-400 hover:text-white hover:border-[#444]'
-                    }`}
-                    title={isRecording ? 'Klik om te stoppen' : 'Klik om in te spreken'}
-                  >
-                    <div className={`w-1.5 h-1.5 rounded-full ${isRecording ? 'bg-black animate-ping' : 'bg-white'}`} />
-                    <span className="text-[9px] uppercase tracking-[0.25em] font-bold">{isRecording ? 'REC' : 'MIC'}</span>
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={toggleRecording}
+                  disabled={!speechAvailable || isTranscribing}
+                  className={`px-3 md:px-4 py-2.5 transition-all duration-300 flex items-center gap-2 shrink-0 border ${
+                    isRecording
+                      ? 'bg-white text-black border-white shadow-[0_0_15px_rgba(255,255,255,0.4)]'
+                      : isTranscribing
+                        ? 'bg-transparent border-[#333] text-gray-500 cursor-wait'
+                        : !speechAvailable
+                          ? 'bg-transparent border-[#1a1a1a] text-[#333] cursor-not-allowed'
+                          : 'bg-transparent border-[#222] text-gray-400 hover:text-white hover:border-[#444]'
+                  }`}
+                  title={
+                    isRecording ? 'Klik om te stoppen'
+                      : isTranscribing ? 'Bezig met transcriberen...'
+                      : speechAvailable ? 'Klik om in te spreken'
+                      : 'Wachten op verbinding...'
+                  }
+                >
+                  <div className={`w-1.5 h-1.5 rounded-full ${isRecording ? 'bg-black animate-ping' : isTranscribing ? 'bg-white animate-pulse' : 'bg-white'}`} />
+                  <span className="text-[9px] uppercase tracking-[0.25em] font-bold">
+                    {isRecording ? 'REC' : isTranscribing ? '...' : 'MIC'}
+                  </span>
+                </button>
 
                 {/* Text input - spaces allowed, speech drafts auto-populate here */}
                 <input
@@ -964,7 +953,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
                       confirmSend();
                     }
                   }}
-                  placeholder={isRecording ? "Aan het luisteren... (spreek in het Nederlands)" : "Spreek of typ in het Nederlands..."}
+                  placeholder={
+                    isRecording ? "Aan het luisteren... (spreek in het Nederlands)"
+                      : isTranscribing ? "Bezig met transcriberen..."
+                      : "Spreek of typ in het Nederlands..."
+                  }
                   className="bg-transparent text-white text-xs md:text-sm font-light tracking-wide outline-none flex-1 px-3 py-1 placeholder:text-[#444] placeholder:tracking-wider min-w-0"
                 />
 
@@ -985,7 +978,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
 
               {/* Mobile / Desktop Status Indicator */}
               <div className="flex items-center justify-between text-[8.5px] uppercase tracking-[0.3em] text-[#555] font-bold px-1">
-                <span>{isRecording ? 'MICROFOON ACTIEF' : 'SPREEK OF TYP JE ANTWOORD'}</span>
+                <span>{isRecording ? 'MICROFOON ACTIEF' : isTranscribing ? 'TRANSCRIBEREN...' : 'SPREEK OF TYP JE ANTWOORD'}</span>
                 <span className="hidden md:inline">ENTER OM TE VERSTUREN</span>
               </div>
             </div>
@@ -1009,8 +1002,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
             <div className="flex items-center gap-4 border-r border-[#333] pr-6">
               <div className={`w-1.5 h-1.5 ${isRecording || audioLevel > AUDIO_THRESHOLD ? 'bg-white' : 'bg-[#333]'}`} />
               {responseMode === 'review'
-                ? (speechAvailable
-                    ? (isRecording ? 'LISTENING...' : 'WAITING...')
+                ? (isRecording ? 'LISTENING...'
+                    : isTranscribing ? 'DECODING...'
+                    : speechAvailable ? 'WAITING...'
                     : (manualInput.trim() ? 'READY TO SEND' : 'TYPE TO RESPOND'))
                 : (audioLevel > AUDIO_THRESHOLD ? 'INPUT ACTIVE' : 'AWAITING INPUT')}
             </div>

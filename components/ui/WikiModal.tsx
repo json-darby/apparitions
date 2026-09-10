@@ -1,3 +1,4 @@
+import { useFitBlock } from '../hooks/useFitText';
 import React, { useEffect, useState } from 'react';
 import { BuildingFeature } from '../layers/OSMBuildingLayer';
 
@@ -22,7 +23,7 @@ export const WikiModal: React.FC<WikiModalProps> = ({ building, city, coords, on
     const [visibleParagraphs, setVisibleParagraphs] = useState(1);
 
     useEffect(() => {
-        if (!building || !building.name) return;
+        if (!building || !(building.name || building.wikidata || building.wikipedia)) return;
 
         let isActive = true;
         setLoading(true);
@@ -32,7 +33,9 @@ export const WikiModal: React.FC<WikiModalProps> = ({ building, city, coords, on
 
         const fetchWikiData = async () => {
             try {
-                const url = new URL(`/api/wikipedia/${encodeURIComponent(building.name!)}`, window.location.origin);
+                /* '-' tells the backend there is no usable name, so it resolves from
+                   the Wikidata QID instead of guessing article titles. */
+                const url = new URL(`/api/wikipedia/${encodeURIComponent(building.name || '-')}`, window.location.origin);
                 if (city) {
                     url.searchParams.append('city', city);
                 }
@@ -68,6 +71,12 @@ export const WikiModal: React.FC<WikiModalProps> = ({ building, city, coords, on
 
         return () => { isActive = false; };
     }, [building]);
+
+    const displayTitle = wikiData?.title || building?.name || 'UNKNOWN STRUCTURE';
+    const { boxRef: titleBoxRef, textRef: titleTextRef } = useFitBlock<HTMLDivElement, HTMLHeadingElement>(
+        displayTitle,
+        { maxPx: 48, minPx: 16, maxLines: 3 }
+    );
 
     if (!building) return null;
 
@@ -116,17 +125,15 @@ export const WikiModal: React.FC<WikiModalProps> = ({ building, city, coords, on
                             </div>
                         ) : null}
 
-                        {/* Overlapping Title (Brutalist style) */}
-                        <div className="absolute bottom-6 left-8 right-8 z-10 drop-shadow-lg overflow-hidden">
+                        {/* Overlapping Title (Brutalist style) — measured to fit the
+                            panel rather than guessed from character count, so long
+                            names stay inside the card on a phone. */}
+                        <div ref={titleBoxRef} className="absolute bottom-4 sm:bottom-6 left-4 sm:left-8 right-4 sm:right-8 z-10 drop-shadow-lg overflow-hidden">
                             <h2
-                                className="font-bold font-display uppercase tracking-[-0.04em] leading-[0.95] whitespace-normal break-words"
-                                style={{
-                                    fontSize: (wikiData?.title || building.name || "").length > 18
-                                        ? `min(${Math.max(1.5, 48 * (16 / (wikiData?.title || building.name || "").length))}px, 11vw)`
-                                        : 'min(48px, 11vw)'
-                                }}
+                                ref={titleTextRef}
+                                className="font-bold font-display uppercase tracking-[-0.04em] leading-[0.95] break-words hyphens-auto"
                             >
-                                {wikiData?.title || building.name}
+                                {displayTitle}
                             </h2>
                         </div>
                     </div>

@@ -20,12 +20,9 @@ class ShhhSystem {
    * Generates whisper suggestions using the currently configured provider.
    */
   async getWhispers(botTranscript: string, scenario?: string, chatHistory?: Message[]): Promise<Suggestion[]> {
-    try {
-      return await this.provider.generateSuggestions(botTranscript, scenario, chatHistory);
-    } catch (err) {
-      console.error("Shhh system error:", err);
-      return [];
-    }
+    /* Errors propagate deliberately: the chat view needs to know the difference
+       between "the model had nothing" and "the model never answered". */
+    return this.provider.generateSuggestions(botTranscript, scenario, chatHistory);
   }
 }
 

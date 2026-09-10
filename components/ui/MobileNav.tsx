@@ -47,9 +47,9 @@ const MobileNav: React.FC<MobileNavProps> = ({ current, title = 'APPARITIONS', o
       {open && createPortal(
         <div className="md:hidden fixed inset-0 z-[200] bg-black flex flex-col animate-in fade-in duration-200">
           {/* Header row — exact geometry/typography of the real nav, with RETURN sitting where MENU was */}
-          <div className="w-full h-[65px] px-4 flex items-center justify-between shrink-0">
-            <h3 className="font-display font-bold text-xl tracking-tighter text-white">{title}</h3>
-            <button onClick={() => setOpen(false)} className={TOGGLE_BUTTON_CLASSES}>
+          <div className="w-full h-[65px] px-4 flex items-center justify-between gap-3 shrink-0">
+            <h3 className="font-display font-bold text-xl tracking-tighter text-white min-w-0 truncate">{title}</h3>
+            <button onClick={() => setOpen(false)} className={`${TOGGLE_BUTTON_CLASSES} shrink-0`}>
               RETURN
             </button>
           </div>

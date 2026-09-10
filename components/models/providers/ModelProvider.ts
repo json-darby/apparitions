@@ -37,11 +37,16 @@ export class ModelProvider implements IModelProvider {
       }
 
       const data = await response.json();
+      /* The backend reports an unavailable model as an explicit `error` alongside an
+         empty list, so the UI can distinguish "nothing to suggest" from "it broke". */
+      if (data.error) {
+        throw new Error(data.error);
+      }
       return data.suggestions || [];
 
     } catch (err: any) {
       console.error("ModelProvider failed to fetch suggestions from backend:", err);
-      return [];
+      throw err;
     }
   }
 }
