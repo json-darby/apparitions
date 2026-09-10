@@ -119,11 +119,11 @@ export const WikiModal: React.FC<WikiModalProps> = ({ building, city, coords, on
                         {/* Overlapping Title (Brutalist style) */}
                         <div className="absolute bottom-6 left-8 right-8 z-10 drop-shadow-lg overflow-hidden">
                             <h2
-                                className="font-bold font-display uppercase tracking-[-0.04em] leading-none whitespace-nowrap"
+                                className="font-bold font-display uppercase tracking-[-0.04em] leading-[0.95] whitespace-normal break-words"
                                 style={{
                                     fontSize: (wikiData?.title || building.name || "").length > 18
-                                        ? `${Math.max(1.5, 48 * (16 / (wikiData?.title || building.name || "").length))}px`
-                                        : '48px'
+                                        ? `min(${Math.max(1.5, 48 * (16 / (wikiData?.title || building.name || "").length))}px, 11vw)`
+                                        : 'min(48px, 11vw)'
                                 }}
                             >
                                 {wikiData?.title || building.name}

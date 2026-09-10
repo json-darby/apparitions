@@ -9,6 +9,7 @@ import Core from './components/Core';
 import GenderWarsGame from './components/gender_wars/GenderWarsGame';
 import ContactPage from './components/ContactPage';
 import HelpPage from './components/HelpPage';
+import MobileNav from './components/ui/MobileNav';
 
 const DigitalAberrationStyles = () => (
   <style>{`
@@ -47,13 +48,12 @@ const App: React.FC = () => {
   const [isMemoryGameWon, setIsMemoryGameWon] = useState(false);
   const [isComprehensionGameWon, setIsComprehensionGameWon] = useState(false);
   const [menuText, setMenuText] = useState('LATEN WE SPELEN');
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const COMING_SOON_DELAY_MS = 2000;
 
   if (currentScenario) {
     return (
-      <div className="w-full h-screen bg-editorial-bg text-white overflow-hidden animate-in fade-in duration-1000">
+      <div className="w-full h-screen h-[100dvh] bg-editorial-bg text-white overflow-hidden animate-in fade-in duration-1000">
         <ChatWindow scenario={currentScenario} onExit={() => setCurrentScenario(null)} />
       </div>
     );
@@ -61,7 +61,7 @@ const App: React.FC = () => {
 
   if (gameScene === 'menu') {
     return (
-      <div className="w-full h-screen bg-black text-white relative flex flex-col items-center justify-center overflow-hidden animate-in fade-in duration-1000">
+      <div className="w-full h-screen h-[100dvh] bg-black text-white relative flex flex-col items-center justify-center overflow-hidden animate-in fade-in duration-1000">
         <DigitalAberrationStyles />
 
         {/* Top Header - mirrored from landing page */}
@@ -80,70 +80,13 @@ const App: React.FC = () => {
           </div>
 
           {/* Right - Contact / Mobile Menu */}
-          <div className="pointer-events-auto flex items-center gap-3">
-            <button 
-              onClick={() => setMobileNavOpen(!mobileNavOpen)}
-              className="md:hidden px-3 py-1.5 border border-white/30 text-white text-[10px] font-mono tracking-widest uppercase hover:bg-white hover:text-black transition-colors"
-            >
-              {mobileNavOpen ? '✕ CLOSE' : '☰ MENU'}
-            </button>
+          <div className="pointer-events-auto flex items-center gap-4">
+            <MobileNav current="menu" title="APPARITIONS: SPELEN" onNavigate={(scene) => setGameScene(scene as any)} />
             <button onClick={() => setGameScene('contact')} className="hidden sm:inline-block px-6 py-2 border border-white/20 rounded-full text-xs font-bold uppercase tracking-wider text-white hover:bg-white hover:text-black transition-colors duration-500">
               Contact
             </button>
           </div>
         </nav>
-
-        {/* Mobile Nav Overlay */}
-        {mobileNavOpen && (
-          <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-6 animate-in fade-in duration-300">
-            <div className="w-full max-w-sm flex flex-col items-start gap-8">
-              <div className="border-b border-white/20 pb-4 w-full flex justify-between items-baseline">
-                <div>
-                  <span className="text-[9px] font-mono text-red-500 tracking-[0.3em] uppercase block">SYSTEM TERMINAL</span>
-                  <h3 className="text-xl font-display font-bold tracking-tighter text-white">APPARITIONS</h3>
-                </div>
-                <span className="text-[10px] font-mono text-gray-500">v2.6 // SECURE</span>
-              </div>
-
-              <div className="flex flex-col gap-5 w-full font-mono text-sm tracking-[0.2em]">
-                <button onClick={() => { setGameScene(null); setMobileNavOpen(false); }} className="text-left text-gray-400 hover:text-white flex items-center gap-3 transition-colors group">
-                  <span className="text-red-600 text-xs font-bold">01</span>
-                  <span className="group-hover:translate-x-1 transition-transform">HOME ARCHIVE</span>
-                </button>
-                <button onClick={() => { setGameScene('menu'); setMobileNavOpen(false); }} className="text-left text-white font-bold flex items-center gap-3 transition-colors group">
-                  <span className="text-red-500 text-xs font-bold">02</span>
-                  <span className="text-red-500 group-hover:translate-x-1 transition-transform">GAMES COMPENDIUM ▶</span>
-                </button>
-                <button onClick={() => { setGameScene('core'); setMobileNavOpen(false); }} className="text-left text-gray-400 hover:text-white flex items-center gap-3 transition-colors group">
-                  <span className="text-red-600 text-xs font-bold">03</span>
-                  <span className="group-hover:translate-x-1 transition-transform">CORE LESSONS</span>
-                </button>
-                <button onClick={() => { setGameScene('nexus'); setMobileNavOpen(false); }} className="text-left text-gray-400 hover:text-white flex items-center gap-3 transition-colors group">
-                  <span className="text-red-600 text-xs font-bold">04</span>
-                  <span className="group-hover:translate-x-1 transition-transform">3D NEXUS DIORAMA</span>
-                </button>
-                <button onClick={() => { setGameScene('help'); setMobileNavOpen(false); }} className="text-left text-gray-400 hover:text-white flex items-center gap-3 transition-colors group">
-                  <span className="text-red-600 text-xs font-bold">05</span>
-                  <span className="group-hover:translate-x-1 transition-transform">INTELLIGENCE HELP</span>
-                </button>
-                <button onClick={() => { setGameScene('contact'); setMobileNavOpen(false); }} className="text-left text-gray-400 hover:text-white flex items-center gap-3 transition-colors group">
-                  <span className="text-red-600 text-xs font-bold">06</span>
-                  <span className="group-hover:translate-x-1 transition-transform">DISPATCH CONTACT</span>
-                </button>
-              </div>
-
-              <div className="w-full pt-6 border-t border-white/10 flex justify-between items-center">
-                <button
-                  onClick={() => setMobileNavOpen(false)}
-                  className="px-6 py-2.5 border border-white/30 text-xs font-mono tracking-[0.2em] text-white hover:bg-white hover:text-black transition-all active:scale-95 uppercase"
-                >
-                  [✕] ESCAPE
-                </button>
-                <span className="text-[9px] font-mono text-gray-600 tracking-widest">EN-NL IMMERSION</span>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Backing large text matched to the landing page style */}
         <div className="absolute bottom-[2vh] md:bottom-10 left-3 md:left-12 z-0 pointer-events-none transition-all duration-300 opacity-30 md:opacity-100">
@@ -202,7 +145,7 @@ const App: React.FC = () => {
 
   if (gameScene === 'comprehension') {
     return (
-      <div className="relative w-full h-screen bg-[#0a0a0c] text-white overflow-hidden animate-in fade-in duration-[3000ms]">
+      <div className="relative w-full h-screen h-[100dvh] bg-[#0a0a0c] text-white overflow-hidden animate-in fade-in duration-[3000ms]">
         <DigitalAberrationStyles />
 
         {/* CRT Scanline Overlay */}
@@ -231,7 +174,7 @@ const App: React.FC = () => {
 
   if (gameScene === 'memory') {
     return (
-      <div className="w-full h-screen bg-black text-white overflow-hidden relative animate-in fade-in duration-[3000ms]">
+      <div className="w-full h-screen h-[100dvh] bg-black text-white overflow-hidden relative animate-in fade-in duration-[3000ms]">
         <DigitalAberrationStyles />
 
         {/* Full-screen Film Grain Noise Overlay */}
@@ -275,7 +218,7 @@ const App: React.FC = () => {
 
   if (gameScene === 'gender_wars') {
     return (
-      <div className="w-full h-screen bg-black text-white relative flex flex-col items-center justify-center overflow-hidden animate-in fade-in duration-[3000ms]">
+      <div className="w-full h-screen h-[100dvh] bg-black text-white relative flex flex-col items-center justify-center overflow-hidden animate-in fade-in duration-[3000ms]">
         <DigitalAberrationStyles />
 
         {/* Minimal navigation bar for desktop viewports (>= 1024px) */}
@@ -327,73 +270,16 @@ const App: React.FC = () => {
         </div>
 
         {/* Right - Contact / Mobile Menu */}
-        <div className="pointer-events-auto flex items-center gap-3">
-          <button 
-            onClick={() => setMobileNavOpen(!mobileNavOpen)}
-            className="md:hidden px-3 py-1.5 border border-white/30 text-white text-[10px] font-mono tracking-widest uppercase hover:bg-white hover:text-black transition-colors"
-          >
-            {mobileNavOpen ? '✕ CLOSE' : '☰ MENU'}
-          </button>
+        <div className="pointer-events-auto flex items-center gap-4">
+          <MobileNav current="home" onNavigate={(scene) => setGameScene(scene as any)} />
           <button onClick={() => setGameScene('contact')} className="hidden sm:inline-block px-6 py-2 border border-white/20 rounded-full text-xs font-bold uppercase tracking-wider text-white hover:bg-white hover:text-black transition-colors duration-500">
             Contact
           </button>
         </div>
       </nav>
 
-      {/* Mobile Nav Overlay */}
-      {mobileNavOpen && (
-        <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-6 animate-in fade-in duration-300">
-          <div className="w-full max-w-sm flex flex-col items-start gap-8">
-            <div className="border-b border-white/20 pb-4 w-full flex justify-between items-baseline">
-              <div>
-                <span className="text-[9px] font-mono text-red-500 tracking-[0.3em] uppercase block">SYSTEM TERMINAL</span>
-                <h3 className="text-xl font-display font-bold tracking-tighter text-white">APPARITIONS</h3>
-              </div>
-              <span className="text-[10px] font-mono text-gray-500">v2.6 // SECURE</span>
-            </div>
-
-            <div className="flex flex-col gap-5 w-full font-mono text-sm tracking-[0.2em]">
-              <button onClick={() => { setGameScene(null); setMobileNavOpen(false); }} className="text-left text-white font-bold flex items-center gap-3 transition-colors group">
-                <span className="text-red-500 text-xs font-bold">01</span>
-                <span className="text-red-500 group-hover:translate-x-1 transition-transform">HOME ARCHIVE ▶</span>
-              </button>
-              <button onClick={() => { setGameScene('menu'); setMobileNavOpen(false); }} className="text-left text-gray-400 hover:text-white flex items-center gap-3 transition-colors group">
-                <span className="text-red-600 text-xs font-bold">02</span>
-                <span className="group-hover:translate-x-1 transition-transform">GAMES COMPENDIUM</span>
-              </button>
-              <button onClick={() => { setGameScene('core'); setMobileNavOpen(false); }} className="text-left text-gray-400 hover:text-white flex items-center gap-3 transition-colors group">
-                <span className="text-red-600 text-xs font-bold">03</span>
-                <span className="group-hover:translate-x-1 transition-transform">CORE LESSONS</span>
-              </button>
-              <button onClick={() => { setGameScene('nexus'); setMobileNavOpen(false); }} className="text-left text-gray-400 hover:text-white flex items-center gap-3 transition-colors group">
-                <span className="text-red-600 text-xs font-bold">04</span>
-                <span className="group-hover:translate-x-1 transition-transform">3D NEXUS DIORAMA</span>
-              </button>
-              <button onClick={() => { setGameScene('help'); setMobileNavOpen(false); }} className="text-left text-gray-400 hover:text-white flex items-center gap-3 transition-colors group">
-                <span className="text-red-600 text-xs font-bold">05</span>
-                <span className="group-hover:translate-x-1 transition-transform">INTELLIGENCE HELP</span>
-              </button>
-              <button onClick={() => { setGameScene('contact'); setMobileNavOpen(false); }} className="text-left text-gray-400 hover:text-white flex items-center gap-3 transition-colors group">
-                <span className="text-red-600 text-xs font-bold">06</span>
-                <span className="group-hover:translate-x-1 transition-transform">DISPATCH CONTACT</span>
-              </button>
-            </div>
-
-            <div className="w-full pt-6 border-t border-white/10 flex justify-between items-center">
-              <button
-                onClick={() => setMobileNavOpen(false)}
-                className="px-6 py-2.5 border border-white/30 text-xs font-mono tracking-[0.2em] text-white hover:bg-white hover:text-black transition-all active:scale-95 uppercase"
-              >
-                [✕] ESCAPE
-              </button>
-              <span className="text-[9px] font-mono text-gray-600 tracking-widest">EN-NL IMMERSION</span>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Hero Section */}
-      <section className="relative w-full h-screen flex flex-col items-center justify-center p-8 overflow-hidden">
+      <section className="relative w-full h-screen h-[100dvh] flex flex-col items-center justify-center p-8 overflow-hidden">
 
         {/* Base Title (Behind the Image) */}
         <div className="absolute bottom-[5vh] md:bottom-10 left-4 md:left-12 z-0 pointer-events-none">

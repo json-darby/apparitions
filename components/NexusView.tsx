@@ -14,6 +14,8 @@ import { usePollingEffect } from './hooks/usePollingEffect';
 import { useEmergencyRadar } from './hooks/useEmergencyRadar';
 import { BrutalistSlider } from './ui/BrutalistSlider';
 import { WikiModal } from './ui/WikiModal';
+import MobileNav from './ui/MobileNav';
+import MobileAlertBar from './ui/MobileAlertBar';
 
 
 
@@ -751,8 +753,8 @@ const NexusView: React.FC<NexusViewProps> = ({ onExit, onNavigate }) => {
             }} />
 
             {/* ── Global Nav ── */}
-            <nav className="relative top-0 left-0 w-full h-[100px] z-[100] px-8 md:px-12 flex items-center justify-between pointer-events-none mix-blend-difference">
-                <div className="font-display font-bold text-2xl tracking-tighter text-white pointer-events-auto">
+            <nav className="relative top-0 left-0 w-full h-[65px] md:h-[100px] z-[100] px-4 md:px-12 flex items-center justify-between pointer-events-none mix-blend-difference">
+                <div className="font-display font-bold text-xl md:text-2xl tracking-tighter text-white pointer-events-auto">
                     APPARITIONS: NEXUS
                 </div>
 
@@ -764,18 +766,19 @@ const NexusView: React.FC<NexusViewProps> = ({ onExit, onNavigate }) => {
                     <button onClick={() => onNavigate && onNavigate('help')} className="text-[#555] hover:text-white transition-colors duration-300 tracking-[0.2em] focus:outline-none">HELP</button>
                 </div>
 
-                <div className="pointer-events-auto font-sans relative">
-                    <button onClick={() => onNavigate && onNavigate('contact')} className="px-6 py-2 border border-white/20 rounded-full text-xs font-bold uppercase tracking-wider text-white hover:bg-white hover:text-black transition-colors duration-500">
+                <div className="pointer-events-auto font-sans relative flex items-center gap-4">
+                    <MobileNav current="nexus" title="APPARITIONS: NEXUS" onNavigate={(scene) => scene === null ? onExit() : (onNavigate && onNavigate(scene))} />
+                    <button onClick={() => onNavigate && onNavigate('contact')} className="hidden sm:inline-block px-6 py-2 border border-white/20 rounded-full text-xs font-bold uppercase tracking-wider text-white hover:bg-white hover:text-black transition-colors duration-500">
                         Contact
                     </button>
                 </div>
             </nav>
 
-            {/* Emergency Notification UI (Below Contact) */}
+            {/* Emergency Notification UI (Below Contact) — full card on desktop */}
             {radarActive && activeAlert && (
-                <div 
+                <div
                     key={activeAlert.id}
-                    className="absolute top-[90px] right-8 md:right-12 w-[320px] bg-[#050505]/95 border border-[#333] p-5 shadow-2xl z-[150] pointer-events-auto backdrop-blur-md"
+                    className="hidden md:block md:absolute md:top-[110px] md:right-12 md:w-[320px] bg-[#050505]/95 border border-[#333] p-5 shadow-2xl z-[150] pointer-events-auto backdrop-blur-md"
                     style={{
                         borderLeftWidth: '4px',
                         borderLeftColor: activeAlert.color && activeAlert.color.length >= 3
@@ -795,6 +798,16 @@ const NexusView: React.FC<NexusViewProps> = ({ onExit, onNavigate }) => {
                         {activeAlert.text}
                     </div>
                 </div>
+            )}
+
+            {/* Emergency Notification UI — bottom-attached bar on mobile */}
+            {radarActive && activeAlert && (
+                <MobileAlertBar
+                    key={activeAlert.id}
+                    agency={activeAlert.agency}
+                    text={activeAlert.text}
+                    color={activeAlert.color}
+                />
             )}
 
             {/* Map Canvas */}
@@ -870,8 +883,8 @@ const NexusView: React.FC<NexusViewProps> = ({ onExit, onNavigate }) => {
                 setRadarActive={setRadarActive}
             />
 
-            {/* Minimal Compass */}
-            <div className="absolute bottom-8 right-8 z-40 pointer-events-auto">
+            {/* Minimal Compass — lifted clear of the mobile notification bar */}
+            <div className="absolute bottom-24 md:bottom-8 right-8 z-40 pointer-events-auto">
                 <button
                     onClick={() => {
                         setViewState(prev => ({

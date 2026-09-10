@@ -84,13 +84,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
   const [error, setError] = useState<string | null>(null);
   const [isFetchingWhispers, setIsFetchingWhispers] = useState(false);
   const [speechAvailable, setSpeechAvailable] = useState(true);
-  const [inputPreference, setInputPreference] = useState<'voice' | 'text'>('voice');
   const [manualInput, setManualInput] = useState('');
   const [suggestionMemory, setSuggestionMemory] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [reviewReport, setReviewReport] = useState<any>(null);
   const [isReviewing, setIsReviewing] = useState(false);
   const [sessionCounter, setSessionCounter] = useState(0);
+  const [mobileSuggestions, setMobileSuggestions] = useState<Suggestion[]>([]);
+  const [mobileSuggestionsVisible, setMobileSuggestionsVisible] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -141,6 +142,23 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
       return () => clearTimeout(timer);
     }
   }, [whisperUnlocked, visibleCount, allSuggestions, isFetchingWhispers, isBotSpeaking]);
+
+  /* Mobile suggestions strip: shows every current suggestion at once, no unlock
+     gating. As soon as a new turn starts fetching fresh whispers, the old set
+     fades out; once the new set lands, it swaps in and fades back in. */
+  useEffect(() => {
+    if (isFetchingWhispers) {
+      setMobileSuggestionsVisible(false);
+    }
+  }, [isFetchingWhispers]);
+
+  useEffect(() => {
+    if (!isFetchingWhispers && allSuggestions.length > 0) {
+      setMobileSuggestions(allSuggestions);
+      const t = window.setTimeout(() => setMobileSuggestionsVisible(true), 30);
+      return () => clearTimeout(t);
+    }
+  }, [allSuggestions, isFetchingWhispers]);
 
   useEffect(() => {
     const MAX_SPEECH_RETRIES = 3;
@@ -532,6 +550,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
     setAllSuggestions([]);
     setVisibleCount(0);
     setWhisperUnlocked(false);
+    setMobileSuggestions([]);
+    setMobileSuggestionsVisible(false);
     transcriptionRef.current = { user: '', bot: '', botSnapshot: '' };
     
     // Close existing connection
@@ -583,8 +603,101 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
     return '/persona_freespeech.png';
   };
 
+  /* Shared between the desktop sidebar drawer and the mobile bottom sheet */
+  const whispersPanelContent = (
+    <>
+      {/* Toggle Button */}
+      <div className="px-8 py-10 border-b border-[#111]">
+        <button
+          onClick={toggleWhispers}
+          className={`group w-full py-5 border transition-all duration-700 flex items-center justify-center relative ${whisperUnlocked
+            ? 'border-white bg-white text-black'
+            : allSuggestions.length > 0
+              ? 'border-[#555] text-white hover:border-white hover:bg-white/5'
+              : 'border-[#222] text-[#444] cursor-not-allowed'
+            }`}
+        >
+          <span className={`text-[11px] uppercase tracking-[0.3em] font-bold pl-3 transition-colors ${whisperUnlocked ? 'text-black' : 'text-white'}`}>
+            {whisperUnlocked ? 'SIGNAL FOUND' : 'SHH'}
+          </span>
+          {!whisperUnlocked && allSuggestions.length > 0 && (
+            <div className="absolute top-3 right-3">
+              <div className="w-1.5 h-1.5 bg-white rounded-full animate-ping" />
+            </div>
+          )}
+          <div className={`absolute bottom-[-20px] left-1/2 -translate-x-1/2 transition-opacity duration-1000 ${allSuggestions.length > 0 && !whisperUnlocked ? 'opacity-100' : 'opacity-0'}`}>
+            <span className="text-[8px] uppercase tracking-widest text-[#555] whitespace-nowrap">{allSuggestions.length} UNREAD</span>
+          </div>
+        </button>
+      </div>
+
+      {/* Suggestions List */}
+      <div className="flex-1 overflow-y-auto px-8 py-6 space-y-5 scrollbar-hide bg-gradient-to-b from-transparent to-[#050505]/80">
+        <div className="text-[9px] font-bold uppercase tracking-[0.5em] text-[#444] mb-6 flex justify-between">
+          <span>WHISPERS</span>
+          <span>[W]</span>
+        </div>
+
+        {whisperUnlocked ? (
+          allSuggestions.length > 0 ? (
+            allSuggestions.map((s, idx) => (
+              <div key={idx} className={`transition-all duration-700 transform ${idx < visibleCount ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
+                <div className="bg-[#050505] px-5 py-4 group hover:bg-[#111] transition-colors cursor-crosshair border-l border-transparent hover:border-white">
+                  <div className="font-body font-bold text-lg md:text-xl text-gray-300 tracking-tight mb-3 leading-[1.2] group-hover:text-white transition-colors">
+                    "{s.dutch}"
+                  </div>
+                  <div className="font-display text-[9px] text-[#555] uppercase tracking-[0.2em] font-bold pt-2 group-hover:text-gray-400 transition-colors border-t border-[#111] group-hover:border-[#333]">
+                    EN: {s.english}
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-[10px] uppercase tracking-[0.4em] text-[#333] py-20 text-center leading-relaxed font-display font-bold">
+              SILENCE.
+            </div>
+          )
+        ) : (
+          <div className="h-full flex flex-col items-center justify-center pb-32 opacity-20 hover:opacity-100 transition-opacity duration-1000 cursor-pointer" onClick={toggleWhispers}>
+            <span className="text-[5vw] font-display font-bold mix-blend-overlay">?</span>
+          </div>
+        )}
+      </div>
+
+      {/* Lower Control Bar */}
+      <div className="border-t border-[#111] bg-[#050505] flex items-center h-16 shrink-0">
+        <button onClick={restartSession} className="flex-1 h-full text-[9px] uppercase tracking-[0.2em] font-bold text-[#666] hover:text-white hover:bg-white/5 transition-all outline-none flex items-center justify-center">
+          RESTART
+        </button>
+
+        {scenario !== ScenarioType.COMPREHENSION && (
+          <>
+            <div className="w-[1px] h-8 bg-[#111]" />
+
+            <button
+              onClick={endAndReview}
+              disabled={isReviewing}
+              className="flex-1 h-full text-[9px] uppercase tracking-[0.2em] font-bold text-[#666] hover:text-white hover:bg-white/5 transition-all outline-none flex items-center justify-center gap-2"
+            >
+              {isReviewing ? 'REVIEWING...' : 'REVIEW'}
+            </button>
+
+            <div className="w-[1px] h-8 bg-[#111]" />
+
+            <button
+              onClick={() => setSuggestionMemory(!suggestionMemory)}
+              className="flex-1 h-full text-[9px] uppercase tracking-[0.2em] font-bold text-[#666] hover:text-white hover:bg-white/5 transition-all outline-none flex items-center justify-center"
+            >
+              MEMORY: {suggestionMemory ? 'ON' : 'OFF'}
+            </button>
+          </>
+        )}
+      </div>
+    </>
+  );
+
   return (
-    <div className="flex h-screen w-full relative selection:bg-white/20 selection:text-white bg-[#050505] text-white font-body overflow-hidden">
+    <div className="flex h-screen h-[100dvh] w-full relative selection:bg-white/20 selection:text-white bg-[#050505] text-white font-body overflow-hidden">
 
       {/* Dynamic Persona Background Layer */}
       <div className="absolute inset-0 pointer-events-none z-0">
@@ -596,6 +709,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
         {/* Gradients to fade out the image into the editorial background */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/50 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-60" />
+        {/* Mobile-only wash: the photo runs full-width behind the whole message column here
+            (unlike desktop's 80%-wide, left-gradiented version), so guarantee text contrast
+            everywhere rather than only on the left. */}
+        <div className="absolute inset-0 md:hidden bg-[#050505]/55" />
       </div>
 
       {/* Error Overlay */}
@@ -666,63 +783,80 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
       {/* Main Chat Layout Area (Matching Landing Aesthetic) */}
       <div className="flex flex-col flex-1 relative z-10 w-full md:w-3/4 mx-auto md:mx-0 md:mr-[25%] h-full">
 
-        {/* Sticky Header */}
-        <div className="flex items-center justify-between px-8 md:px-12 py-8 bg-gradient-to-b from-[#050505] via-[#050505]/80 to-transparent">
-          <div className="flex items-center gap-4">
-            <div className={`w-1.5 h-1.5 rounded-full ${isLive ? 'bg-white animate-pulse' : 'bg-red-900'}`} />
-            <span className="text-[10px] uppercase tracking-[0.3em] font-light text-[#888888]">
+        {/* Sticky Header — mobile: 3 evenly-spaced cells (status | mode toggle | review+return) so
+            the toggle sits centred and RETURN isn't crowded. Desktop: original clustered layout. */}
+        <div className="grid grid-cols-[1fr_auto_1fr] md:hidden items-center gap-3 px-4 py-6 bg-gradient-to-b from-[#050505] via-[#050505]/80 to-transparent">
+          <div className="flex items-center gap-2 min-w-0 justify-self-start">
+            <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${isLive ? 'bg-white animate-pulse' : 'bg-red-900'}`} />
+            <span className="text-[9px] uppercase tracking-[0.2em] font-light text-[#888888] truncate">
               {isLive ? `${scenario === ScenarioType.COMPREHENSION ? 'STORY' : 'CONVERSATION'}` : 'OFFLINE'}
             </span>
           </div>
-          <div className="flex items-center gap-4 md:gap-8">
-            <div className="flex bg-white/5 p-0.5 rounded-sm overflow-hidden border border-white/10">
-              <button onClick={() => { setResponseMode('instant'); setDraftTranscript(''); }} className={`px-3 md:px-4 py-1.5 text-[9px] uppercase tracking-widest transition-all ${responseMode === 'instant' ? 'bg-white text-black font-medium' : 'text-gray-500 hover:text-gray-300'}`}>Instant</button>
-              <button onClick={() => setResponseMode('review')} className={`px-3 md:px-4 py-1.5 text-[9px] uppercase tracking-widest transition-all ${responseMode === 'review' ? 'bg-white text-black font-medium' : 'text-gray-500 hover:text-gray-300'}`}>Reflection</button>
-            </div>
+          <div className="flex bg-white/5 p-0.5 rounded-sm overflow-hidden border border-white/10 justify-self-center shrink-0">
+            <button onClick={() => { setResponseMode('instant'); setDraftTranscript(''); }} className={`px-2 sm:px-3 py-1.5 text-[8px] sm:text-[9px] uppercase tracking-widest transition-all ${responseMode === 'instant' ? 'bg-white text-black font-medium' : 'text-gray-500 hover:text-gray-300'}`}>Instant</button>
+            <button onClick={() => setResponseMode('review')} className={`px-2 sm:px-3 py-1.5 text-[8px] sm:text-[9px] uppercase tracking-widest transition-all ${responseMode === 'review' ? 'bg-white text-black font-medium' : 'text-gray-500 hover:text-gray-300'}`}>Reflection</button>
+          </div>
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0 justify-self-end">
             {responseMode === 'review' && scenario !== ScenarioType.COMPREHENSION && (
               <button
                 onClick={endAndReview}
                 disabled={isReviewing}
-                className="md:hidden px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 text-[9px] uppercase tracking-widest text-white font-bold transition-all disabled:opacity-50"
+                className="px-2 sm:px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 text-[8px] sm:text-[9px] uppercase tracking-widest text-white font-bold transition-all disabled:opacity-50"
                 aria-label="Review Session"
               >
                 {isReviewing ? '...' : 'REVIEW'}
               </button>
             )}
-            <button onClick={onExit} className="text-[10px] uppercase tracking-[0.2em] font-bold border-b border-transparent hover:border-[#888888] text-[#888888] hover:text-white transition-all">EXIT</button>
+            <button onClick={onExit} className="text-[9px] uppercase tracking-[0.15em] font-bold border-b border-transparent hover:border-[#888888] text-[#888888] hover:text-white transition-all">RETURN</button>
+          </div>
+        </div>
+
+        <div className="hidden md:flex items-center justify-between gap-3 px-12 py-8 bg-gradient-to-b from-[#050505] via-[#050505]/80 to-transparent">
+          <div className="flex items-center gap-4 min-w-0">
+            <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${isLive ? 'bg-white animate-pulse' : 'bg-red-900'}`} />
+            <span className="text-[10px] uppercase tracking-[0.3em] font-light text-[#888888] truncate">
+              {isLive ? `${scenario === ScenarioType.COMPREHENSION ? 'STORY' : 'CONVERSATION'}` : 'OFFLINE'}
+            </span>
+          </div>
+          <div className="flex items-center gap-8 shrink-0">
+            <div className="flex bg-white/5 p-0.5 rounded-sm overflow-hidden border border-white/10">
+              <button onClick={() => { setResponseMode('instant'); setDraftTranscript(''); }} className={`px-4 py-1.5 text-[9px] uppercase tracking-widest transition-all ${responseMode === 'instant' ? 'bg-white text-black font-medium' : 'text-gray-500 hover:text-gray-300'}`}>Instant</button>
+              <button onClick={() => setResponseMode('review')} className={`px-4 py-1.5 text-[9px] uppercase tracking-widest transition-all ${responseMode === 'review' ? 'bg-white text-black font-medium' : 'text-gray-500 hover:text-gray-300'}`}>Reflection</button>
+            </div>
+            <button onClick={onExit} className="text-[10px] uppercase tracking-[0.2em] font-bold border-b border-transparent hover:border-[#888888] text-[#888888] hover:text-white transition-all">RETURN</button>
           </div>
         </div>
 
         {/* Scrollable Chat Area */}
         <div
           ref={scrollContainerRef}
-          className="flex-1 overflow-y-auto px-8 md:px-12 pb-10 space-y-24 scroll-smooth scrollbar-hide pt-12"
+          className="flex-1 overflow-y-auto px-5 md:px-12 pb-6 md:pb-10 space-y-8 md:space-y-24 scroll-smooth scrollbar-hide pt-8 md:pt-12"
         >
           {messages.length === 0 && isLive && !error && (
-            <div className="text-left py-40 animate-pulse">
-              <p className="font-display font-bold text-4xl md:text-6xl text-white/30 tracking-tighter mix-blend-overlay">CONNECTING...</p>
+            <div className="text-left py-24 md:py-40 animate-pulse">
+              <p className="font-display font-bold text-3xl md:text-6xl text-white/30 tracking-tighter mix-blend-overlay">CONNECTING...</p>
             </div>
           )}
           {messages.map((msg) => (
             <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-8 duration-1000 group`}>
               <div className={`max-w-[85%] md:max-w-[70%] ${msg.sender === 'user' ? 'text-right' : 'text-left'} relative`}>
-                <div className={`font-medium text-2xl md:text-4xl leading-[1.2] tracking-tighter ${msg.sender === 'user' ? 'text-gray-300' : msg.sender === 'narrator' ? 'italic text-[#888888]' : 'text-white'}`}>
+                <div className={`font-medium text-lg md:text-4xl leading-[1.25] md:leading-[1.2] tracking-tighter break-words ${msg.sender === 'user' ? 'text-gray-300' : msg.sender === 'narrator' ? 'italic text-[#888888]' : 'text-white'}`}>
                   {msg.text}
                 </div>
                 {msg.translation && (
-                  <div className={`mt-3 text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-bold opacity-70 ${msg.sender === 'user' ? 'text-gray-500' : 'text-[#888888]'} bg-[#111] px-4 py-2 rounded border-l-2 ${msg.sender === 'user' ? 'border-[#333]' : 'border-white/20'}`}>
+                  <div className={`mt-2 md:mt-3 text-[8px] md:text-[10px] uppercase tracking-[0.15em] md:tracking-[0.2em] font-bold opacity-70 break-words ${msg.sender === 'user' ? 'text-gray-500' : 'text-[#888888]'} bg-[#111] px-3 py-1.5 md:px-4 md:py-2 rounded border-l-2 ${msg.sender === 'user' ? 'border-[#333]' : 'border-white/20'}`}>
                     EN: {msg.translation}
                   </div>
                 )}
                 {msg.sender === 'user' && msg.isCorrect !== undefined && (
-                  <div className="mt-4 flex justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                  <div className="mt-2 md:mt-4 flex justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-700">
                     <div className="flex items-center gap-2">
                       <div className={`w-1 h-1 rounded-full ${msg.isCorrect ? 'bg-white/70' : 'bg-orange-500/70'}`} />
                       <span className={`text-[8px] uppercase tracking-[0.3em] font-medium ${msg.isCorrect ? 'text-white/80' : 'text-orange-500/80'}`}>{msg.isCorrect ? 'Accurate' : 'No Match'}</span>
                     </div>
                   </div>
                 )}
-                <span className="text-[9px] w-full uppercase tracking-[0.4em] text-[#555555] mt-6 block font-bold border-t border-[#222222] pt-4">
+                <span className="text-[8px] md:text-[9px] w-full uppercase tracking-[0.3em] md:tracking-[0.4em] text-[#555555] mt-3 md:mt-6 block font-bold border-t border-[#222222] pt-2 md:pt-4">
                   <span className={msg.sender === 'user' ? 'float-right' : 'float-left'}>{msg.sender === 'user' ? 'GUEST' : getPersonaName().toUpperCase()}</span>
                 </span>
                 <div className="clear-both" />
@@ -732,15 +866,64 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
           {draftTranscript && (
             <div className="flex justify-end animate-in slide-in-from-right-8 duration-500">
               <div className="max-w-[85%] md:max-w-[70%] text-right">
-                <div className={`text-white italic text-2xl md:text-3xl font-light pr-6 py-2 border-r border-[#444] ${isRecording ? 'opacity-80 animate-pulse' : 'opacity-40'}`}>"{draftTranscript}"</div>
+                <div className={`text-white italic text-lg md:text-3xl font-light pr-4 md:pr-6 py-1.5 md:py-2 border-r border-[#444] break-words ${isRecording ? 'opacity-80 animate-pulse' : 'opacity-40'}`}>"{draftTranscript}"</div>
               </div>
             </div>
           )}
-          <div ref={messagesEndRef} className="h-40" />
+          <div ref={messagesEndRef} className="h-20 md:h-40" />
         </div>
 
         {/* CONTROLS & VISUALISER (Brutalist Footer) */}
         <div className="px-8 md:px-12 pb-12 pt-10 flex flex-col items-start gap-6 relative z-10 border-t border-[#111111]/30 bg-gradient-to-t from-[#050505] via-[#050505]/80 to-transparent">
+          {/* Mobile Controls — SHH / RESTART / MEMORY share one compact line, same language as
+              desktop's lower control bar (divided, equal-width, plain text). Toggling SHH opens
+              a gap below for suggestions instead of costing its own row. */}
+          <div className="md:hidden w-full flex flex-col">
+            <div className="w-full flex items-center border-t border-b border-[#111] divide-x divide-[#111]">
+              <button
+                onClick={toggleWhispers}
+                disabled={allSuggestions.length === 0 && !whisperUnlocked}
+                className={`flex-1 py-2.5 text-[9px] uppercase tracking-[0.2em] font-bold transition-colors ${whisperUnlocked
+                  ? 'text-white'
+                  : allSuggestions.length > 0
+                    ? 'text-white/80 hover:text-white'
+                    : 'text-[#444] cursor-not-allowed'
+                  }`}
+              >
+                {whisperUnlocked ? 'SIGNAL FOUND' : 'SHH'}
+              </button>
+              <button onClick={restartSession} className="flex-1 py-2.5 text-[9px] uppercase tracking-[0.2em] font-bold text-[#666] hover:text-white transition-colors">
+                RESTART
+              </button>
+              <button onClick={() => setSuggestionMemory(!suggestionMemory)} className="flex-1 py-2.5 text-[9px] uppercase tracking-[0.2em] font-bold text-[#666] hover:text-white transition-colors">
+                MEMORY: {suggestionMemory ? 'ON' : 'OFF'}
+              </button>
+            </div>
+
+            {/* The gap itself opens/closes only with the SHH toggle; suggestion content fades
+                independently as new turns arrive, so a refresh never re-triggers the gap animation. */}
+            <div
+              className="w-full grid transition-[grid-template-rows] duration-300 ease-in-out"
+              style={{ gridTemplateRows: whisperUnlocked ? '1fr' : '0fr' }}
+            >
+              <div className="overflow-hidden">
+                {mobileSuggestions.length > 0 && (
+                  <div
+                    className="flex gap-2 overflow-x-auto py-2 scrollbar-hide"
+                    style={{ opacity: mobileSuggestionsVisible ? 1 : 0, transition: 'opacity 300ms ease' }}
+                  >
+                    {mobileSuggestions.map((s, idx) => (
+                      <div key={idx} className="shrink-0 whitespace-nowrap bg-[#0a0a0a] border border-white/10 px-2.5 py-1.5">
+                        <div className="text-white text-[10px] font-bold leading-tight">{s.dutch}</div>
+                        <div className="text-[#666] text-[8px] uppercase tracking-wide leading-tight mt-0.5">{s.english}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
           {responseMode === 'review' ? (
             <div className="w-full flex flex-col gap-3">
               {/* Draft speech indication if speaking */}
@@ -836,97 +1019,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
         </div>
       </div>
 
-      {/* WHISPERS SIDEBAR (Right Absolute Drawer) */}
+      {/* WHISPERS SIDEBAR (Right Absolute Drawer) — desktop only */}
       <div className="absolute top-0 right-0 h-full w-full md:w-1/4 bg-[#0a0a0a]/40 backdrop-blur-md border-l border-[#111111]/50 hidden md:flex flex-col z-50">
-
-        {/* Toggle Button */}
-        <div className="px-8 py-10 border-b border-[#111]">
-          <button
-            onClick={toggleWhispers}
-            className={`group w-full py-5 border transition-all duration-700 flex items-center justify-center relative ${whisperUnlocked
-              ? 'border-white bg-white text-black'
-              : allSuggestions.length > 0
-                ? 'border-[#555] text-white hover:border-white hover:bg-white/5'
-                : 'border-[#222] text-[#444] cursor-not-allowed'
-              }`}
-          >
-            <span className={`text-[11px] uppercase tracking-[0.3em] font-bold pl-3 transition-colors ${whisperUnlocked ? 'text-black' : 'text-white'}`}>
-              {whisperUnlocked ? 'SIGNAL FOUND' : 'SHH'}
-            </span>
-            {!whisperUnlocked && allSuggestions.length > 0 && (
-              <div className="absolute top-3 right-3">
-                <div className="w-1.5 h-1.5 bg-white rounded-full animate-ping" />
-              </div>
-            )}
-            <div className={`absolute bottom-[-20px] left-1/2 -translate-x-1/2 transition-opacity duration-1000 ${allSuggestions.length > 0 && !whisperUnlocked ? 'opacity-100' : 'opacity-0'}`}>
-              <span className="text-[8px] uppercase tracking-widest text-[#555] whitespace-nowrap">{allSuggestions.length} UNREAD</span>
-            </div>
-          </button>
-        </div>
-
-        {/* Suggestions List */}
-        <div className="flex-1 overflow-y-auto px-8 py-6 space-y-5 scrollbar-hide bg-gradient-to-b from-transparent to-[#050505]/80">
-          <div className="text-[9px] font-bold uppercase tracking-[0.5em] text-[#444] mb-6 flex justify-between">
-            <span>WHISPERS</span>
-            <span>[W]</span>
-          </div>
-
-          {whisperUnlocked ? (
-            allSuggestions.length > 0 ? (
-              allSuggestions.map((s, idx) => (
-                <div key={idx} className={`transition-all duration-700 transform ${idx < visibleCount ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
-                  <div className="bg-[#050505] px-5 py-4 group hover:bg-[#111] transition-colors cursor-crosshair border-l border-transparent hover:border-white">
-                    <div className="font-body font-bold text-lg md:text-xl text-gray-300 tracking-tight mb-3 leading-[1.2] group-hover:text-white transition-colors">
-                      "{s.dutch}"
-                    </div>
-                    <div className="font-display text-[9px] text-[#555] uppercase tracking-[0.2em] font-bold pt-2 group-hover:text-gray-400 transition-colors border-t border-[#111] group-hover:border-[#333]">
-                      EN: {s.english}
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="text-[10px] uppercase tracking-[0.4em] text-[#333] py-20 text-center leading-relaxed font-display font-bold">
-                SILENCE.
-              </div>
-            )
-          ) : (
-            <div className="h-full flex flex-col items-center justify-center pb-32 opacity-20 hover:opacity-100 transition-opacity duration-1000 cursor-pointer" onClick={toggleWhispers}>
-              <span className="text-[5vw] font-display font-bold mix-blend-overlay">?</span>
-            </div>
-          )}
-        </div>
-
-        {/* Lower Control Bar */}
-        <div className="border-t border-[#111] bg-[#050505] flex items-center h-16">
-          <button onClick={restartSession} className="flex-1 h-full text-[9px] uppercase tracking-[0.2em] font-bold text-[#666] hover:text-white hover:bg-white/5 transition-all outline-none flex items-center justify-center">
-            RESTART
-          </button>
-
-          {scenario !== ScenarioType.COMPREHENSION && (
-            <>
-              <div className="w-[1px] h-8 bg-[#111]" />
-              
-              <button 
-                onClick={endAndReview} 
-                disabled={isReviewing} 
-                className="flex-1 h-full text-[9px] uppercase tracking-[0.2em] font-bold text-[#666] hover:text-white hover:bg-white/5 transition-all outline-none flex items-center justify-center gap-2"
-              >
-                {isReviewing ? 'REVIEWING...' : 'REVIEW'}
-              </button>
-
-              <div className="w-[1px] h-8 bg-[#111]" />
-              
-              <button 
-                onClick={() => setSuggestionMemory(!suggestionMemory)}
-                className="flex-1 h-full text-[9px] uppercase tracking-[0.2em] font-bold text-[#666] hover:text-white hover:bg-white/5 transition-all outline-none flex items-center justify-center"
-              >
-                MEMORY: {suggestionMemory ? 'ON' : 'OFF'}
-              </button>
-            </>
-          )}
-        </div>
+        {whispersPanelContent}
       </div>
+
     </div>
   );
 };

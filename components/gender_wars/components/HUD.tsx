@@ -40,10 +40,10 @@ export default function HUD({ state, onPauseToggle, onSpecialWeapon, onToggleMod
         {onQuit && (
           <button 
             onClick={onQuit}
-            className="text-[8px] md:text-[9px] font-mono font-bold tracking-widest text-gray-400 hover:text-white border border-white/25 px-1.5 py-0.5 uppercase active:bg-white active:text-black transition-colors"
-            title="Exit Mission"
+            className="font-display font-bold text-xs md:text-sm tracking-tighter text-white hover:opacity-70 transition-opacity"
+            title="Return"
           >
-            EXIT
+            RETURN
           </button>
         )}
         <div>

@@ -7,9 +7,9 @@ export default function StartScreen({ onStart, onQuit }: { onStart: () => void, 
         <div className="absolute top-3 left-3 z-50">
           <button
             onClick={onQuit}
-            className="px-2.5 py-1 bg-black/60 hover:bg-white/20 border border-white/25 text-white text-[10px] md:text-xs font-mono uppercase tracking-widest active:bg-white active:text-black transition-colors"
+            className="font-display font-bold text-xs md:text-sm tracking-tighter text-white hover:opacity-70 transition-opacity"
           >
-            ← RETURN
+            RETURN
           </button>
         </div>
       )}

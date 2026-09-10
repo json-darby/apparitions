@@ -109,10 +109,12 @@ async def load_route_map():
 
 
 class TTSRequest(BaseModel):
+    """Payload for the /api/tts endpoint: the Dutch text to synthesise."""
     text: str
 
 @app.post("/api/tts")
 async def generate_tts(request: TTSRequest):
+    """Synthesise the given text as Dutch speech via edge-tts and stream back the MP3 bytes."""
     try:
         voice = "nl-NL-FennaNeural"
         communicate = edge_tts.Communicate(request.text, voice, rate="-10%")
@@ -128,10 +130,12 @@ async def generate_tts(request: TTSRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 class TranslateRequest(BaseModel):
+    """Payload for the /api/translate endpoint: Dutch text to render into English."""
     text: str
 
 @app.post("/api/translate")
 async def translate_text(request: TranslateRequest):
+    """Translate Dutch text to English using the offline Argos Translate model."""
     try:
         translatedText = argostranslate.translate.translate(request.text, 'nl', 'en')
         return {"translatedText": translatedText}
@@ -140,6 +144,7 @@ async def translate_text(request: TranslateRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 class LessonRequest(BaseModel):
+    """Payload for the /api/lesson endpoint: the requested topic and any real-world context."""
     user_request: str
     context: str = "None"
 
@@ -160,6 +165,7 @@ async def get_lesson(request: LessonRequest):
         raise HTTPException(status_code=500, detail="The Apparitions failed to conjure a lesson.")
 
 class WhisperRequest(BaseModel):
+    """Payload for the /api/whisper/suggestions endpoint."""
     bot_transcript: str
     model: int = 2
     scenario: str = "START_INTRO"
@@ -338,9 +344,17 @@ async def get_live_transit(bbox: str = None):
 
 @app.get("/api/crowds")
 async def get_live_crowds(bbox: str):
+    """
+    Proxy pedestrian-path geometry from Overpass for the given bounding box,
+    used to seed the crowd-density bokeh layer on the Nexus map.
+
+    Results are cached in-memory for 60 seconds per bbox. Tries each mirror
+    in `endpoints` in turn before giving up, since Overpass's public
+    instance can reject or rate-limit a bare request.
+    """
     import time as _time
     import urllib.parse
-    
+
     cache_key = f"crowd_cache_{bbox}"
     
     # Check in-memory cache first (60s TTL)
@@ -361,32 +375,47 @@ async def get_live_crowds(bbox: str):
         );
         out geom;
     """
-    
-    try:
-        async with httpx.AsyncClient(verify=False) as http_client:
-            response = await http_client.get(
-                f'https://overpass-api.de/api/interpreter?data={urllib.parse.quote(query)}',
-                timeout=30.0
-            )
-            response.raise_for_status()
-            
-            # Cache the raw JSON content
-            app.state.crowd_cache[cache_key] = {
-                'data': response.content,
-                'timestamp': _time.time()
-            }
-            
-            return Response(content=response.content, media_type="application/json")
 
-    except httpx.HTTPStatusError as e:
-        print(f"Crowd proxy upstream error {e.response.status_code}: {e.response.text}")
-        raise HTTPException(status_code=502, detail="Upstream Overpass server returned an error.")
-    except httpx.RequestError as e:
-        print(f"Crowd proxy fetch error: {e}")
-        raise HTTPException(status_code=502, detail="Upstream Overpass server is unresponsive.")
-    except Exception as e:
-        print(f"Crowd proxy internal error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+    # Overpass's Apache front-end will 406 requests that don't look like a
+    # browser, and its public instance is rate-limit-happy — mirror the
+    # frontend's dual-endpoint fallback (see fetchOverpassData in
+    # NexusView.tsx) instead of giving up after a single attempt.
+    endpoints = [
+        'https://overpass-api.de/api/interpreter',
+        'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
+    ]
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (compatible; Apparitions/1.0)',
+        'Accept': 'application/json, text/plain, */*',
+    }
+
+    last_error = None
+    async with httpx.AsyncClient(verify=False) as http_client:
+        for endpoint in endpoints:
+            try:
+                response = await http_client.get(
+                    f'{endpoint}?data={urllib.parse.quote(query)}',
+                    headers=headers,
+                    timeout=30.0
+                )
+                response.raise_for_status()
+
+                # Cache the raw JSON content
+                app.state.crowd_cache[cache_key] = {
+                    'data': response.content,
+                    'timestamp': _time.time()
+                }
+
+                return Response(content=response.content, media_type="application/json")
+
+            except httpx.HTTPStatusError as e:
+                print(f"Crowd proxy upstream error from {endpoint}: {e.response.status_code} {e.response.text[:200]}")
+                last_error = e
+            except httpx.RequestError as e:
+                print(f"Crowd proxy request to {endpoint} failed: {e}")
+                last_error = e
+
+    raise HTTPException(status_code=502, detail=f"Upstream Overpass server returned an error: {last_error}")
 
 
 @app.get("/api/wikipedia/{structure_name}")

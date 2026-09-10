@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import MobileNav from './ui/MobileNav';
 
 const Core = ({ onExit, onNavigate }) => {
   const [commsMode, setCommsMode] = useState('INDEX');
@@ -8,6 +9,7 @@ const Core = ({ onExit, onNavigate }) => {
   const [openChapter, setOpenChapter] = useState(null);
   const currentAudioRef = useRef(null);
   const currentPlaybackIdRef = useRef(0);
+  const stageRef = useRef(null);
 
   const [topicInput, setTopicInput] = useState('');
   const [contextInput, setContextInput] = useState('');
@@ -24,6 +26,14 @@ const Core = ({ onExit, onNavigate }) => {
     };
     fetchIndex();
   }, []);
+
+  useEffect(() => {
+    // Jump the lesson stage back to its top whenever a new lesson loads,
+    // rather than leaving it wherever the previous lesson had been scrolled to.
+    if (lessonData && !isLoading && stageRef.current) {
+      stageRef.current.scrollTop = 0;
+    }
+  }, [lessonData, isLoading]);
 
   const fetchLesson = async (requestStr, contextStr = "None") => {
     setIsLoading(true);
@@ -152,8 +162,8 @@ const Core = ({ onExit, onNavigate }) => {
       <div className="w-full h-screen bg-[#050505] text-white font-body flex flex-col overflow-hidden selection:bg-white/20 selection:text-white noise">
 
       {/* ── Global Nav (matching NexusView / App landing) ── */}
-      <nav className="relative top-0 left-0 w-full h-[100px] z-[100] px-8 md:px-12 flex items-center justify-between pointer-events-none mix-blend-difference flex-shrink-0">
-        <div className="font-display font-bold text-2xl tracking-tighter text-white pointer-events-auto">
+      <nav className="relative top-0 left-0 w-full h-[65px] md:h-[100px] z-[100] px-4 md:px-12 flex items-center justify-between pointer-events-none mix-blend-difference flex-shrink-0">
+        <div className="font-display font-bold text-xl md:text-2xl tracking-tighter text-white pointer-events-auto">
           APPARITIONS: CORE
         </div>
 
@@ -165,40 +175,41 @@ const Core = ({ onExit, onNavigate }) => {
           <button onClick={() => onNavigate && onNavigate('help')} className="text-[#555] hover:text-white transition-colors duration-300 tracking-[0.2em] focus:outline-none">HELP</button>
         </div>
 
-        <div className="pointer-events-auto">
-          <button onClick={() => onNavigate && onNavigate('contact')} className="px-6 py-2 border border-white/20 rounded-full text-xs font-bold uppercase tracking-wider text-white hover:bg-white hover:text-black transition-colors duration-500">
+        <div className="pointer-events-auto flex items-center gap-4">
+          <MobileNav current="core" title="APPARITIONS: CORE" onNavigate={(scene) => scene === null ? (onExit && onExit()) : (onNavigate && onNavigate(scene))} />
+          <button onClick={() => onNavigate && onNavigate('contact')} className="hidden sm:inline-block px-6 py-2 border border-white/20 rounded-full text-xs font-bold uppercase tracking-wider text-white hover:bg-white hover:text-black transition-colors duration-500">
             Contact
           </button>
         </div>
       </nav>
 
       {/* ── Content Area ── */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-col md:flex-row flex-1 overflow-hidden relative">
 
-        {/* LEFT PANEL — Index / Open Channel */}
-        <div className="absolute top-32 left-8 w-[320px] bg-black/50 border border-white/20 backdrop-blur-md shadow-2xl z-40 flex flex-col font-mono transition-all duration-300">
+        {/* LEFT PANEL — Index / Open Channel. Pinned as a bottom drawer on mobile, floating panel on desktop. */}
+        <div className="order-2 md:order-1 relative w-full shrink-0 max-h-[36vh] md:max-h-none md:w-[320px] md:absolute md:top-32 md:left-8 bg-black/50 border border-white/20 backdrop-blur-md shadow-2xl z-40 flex flex-col font-mono transition-all duration-300">
 
           {/* Toggle Header */}
           <div className="flex border-b border-white/10">
             <button
               onClick={() => setCommsMode('INDEX')}
-              className={`flex-1 py-5 text-[10px] font-bold tracking-[0.2em] uppercase transition-all duration-500 ${commsMode === 'INDEX' ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'text-white/40 hover:text-white/70'}`}
+              className={`flex-1 py-3 md:py-5 text-[9px] md:text-[10px] font-bold tracking-[0.2em] uppercase transition-all duration-500 ${commsMode === 'INDEX' ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'text-white/40 hover:text-white/70'}`}
             >
               Index
             </button>
             <button
               onClick={() => setCommsMode('OPEN_CHANNEL')}
-              className={`flex-1 py-5 text-[10px] font-bold tracking-[0.2em] uppercase transition-all duration-500 border-l border-white/10 ${commsMode === 'OPEN_CHANNEL' ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'text-white/40 hover:text-white/70'}`}
+              className={`flex-1 py-3 md:py-5 text-[9px] md:text-[10px] font-bold tracking-[0.2em] uppercase transition-all duration-500 border-l border-white/10 ${commsMode === 'OPEN_CHANNEL' ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'text-white/40 hover:text-white/70'}`}
             >
               Open Channel
             </button>
           </div>
 
           {/* Panel Content */}
-          <div className="max-h-[calc(100vh-16rem)] overflow-y-auto px-6 py-6 scrollbar-hide w-full flex-1">
+          <div className="max-h-[28vh] md:max-h-[calc(100vh-16rem)] overflow-y-auto px-4 py-4 md:px-6 md:py-6 scrollbar-hide w-full flex-1">
             {commsMode === 'INDEX' ? (
               <div className="flex flex-col gap-2">
-                <div className="text-[#555] text-[9px] mb-6 uppercase tracking-[0.3em] font-bold">Available Archives</div>
+                <div className="text-[#555] text-[8px] md:text-[9px] mb-4 md:mb-6 uppercase tracking-[0.3em] font-bold">Available Archives</div>
                 {indexData.length === 0 && (
                   <div className="text-[#333] text-[10px] tracking-[0.2em] uppercase animate-pulse">Loading index...</div>
                 )}
@@ -213,9 +224,9 @@ const Core = ({ onExit, onNavigate }) => {
                     <div key={chapterTitle} className="mb-1">
                       <button
                         onClick={() => setOpenChapter(isOpen ? null : chapterTitle)}
-                        className={`w-full text-left py-4 px-5 border transition-all duration-300 text-[10px] font-bold tracking-[0.15em] uppercase flex justify-between items-center group ${isOpen ? 'border-white/20 bg-white/5 text-white' : 'border-[#111] hover:border-[#333] text-[#666] hover:text-white'}`}
+                        className={`w-full text-left py-2.5 px-3 md:py-4 md:px-5 border transition-all duration-300 text-[9px] md:text-[10px] font-bold tracking-[0.15em] uppercase flex justify-between items-center group ${isOpen ? 'border-white/20 bg-white/5 text-white' : 'border-[#111] hover:border-[#333] text-[#666] hover:text-white'}`}
                       >
-                        <span className="truncate pr-2 font-display tracking-tight text-xs normal-case">{chapterTitle}</span>
+                        <span className="truncate pr-2 font-display tracking-tight text-[11px] md:text-xs normal-case">{chapterTitle}</span>
                         <span className={`text-[#444] transition-transform duration-300 ${isOpen ? 'rotate-90' : ''}`}>›</span>
                       </button>
 
@@ -225,7 +236,7 @@ const Core = ({ onExit, onNavigate }) => {
                             <button
                               key={lesson.id}
                               onClick={() => handleStaticClick(lesson.id)}
-                              className="w-full text-left py-3 px-6 hover:bg-white/5 transition-all duration-300 text-[10px] tracking-[0.1em] text-[#555] hover:text-white border-b border-[#0a0a0a] last:border-b-0 group flex items-start gap-3"
+                              className="w-full text-left py-2 px-4 md:py-3 md:px-6 hover:bg-white/5 transition-all duration-300 text-[9px] md:text-[10px] tracking-[0.1em] text-[#555] hover:text-white border-b border-[#0a0a0a] last:border-b-0 group flex items-start gap-3"
                             >
                               <span className="text-[#333] group-hover:text-white mt-[1px] transition-colors">›</span>
                               <span className="leading-relaxed font-body">{lesson.subtitle || lesson.id}</span>
@@ -284,7 +295,7 @@ const Core = ({ onExit, onNavigate }) => {
         </div>
 
         {/* MAIN STAGE — Lesson Display */}
-        <div className="flex-1 bg-[#050505] relative flex flex-col overflow-y-auto pl-[352px]">
+        <div ref={stageRef} className="order-1 md:order-2 flex-1 bg-[#050505] relative flex flex-col overflow-y-auto md:pl-[352px]">
 
           {isLoading ? (
             <div className="flex-1 flex items-center justify-center">
@@ -329,7 +340,7 @@ const Core = ({ onExit, onNavigate }) => {
 
               {/* Header Section */}
               <div className="mb-12">
-                <h1 className="font-display font-bold text-[clamp(2.5rem,5vw,5rem)] text-white tracking-tighter mb-4 leading-[1.1]">
+                <h1 className="font-display font-bold text-4xl sm:text-5xl md:text-[clamp(2.5rem,5vw,5rem)] text-white tracking-tighter mb-4 leading-[1.1] break-words">
                   {lessonData.metadata?.title || 'UNKNOWN ARCHIVE'}
                 </h1>
                 <div className="text-[#555] text-[10px] tracking-[0.25em] font-bold uppercase mb-10 border-l-2 border-[#333] pl-4">
@@ -364,9 +375,9 @@ const Core = ({ onExit, onNavigate }) => {
                   switch(template) {
                     case "Grid_Interactive":
                       return (
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-8">
+                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2.5 sm:gap-4 mt-8">
                           {assets.map((asset, idx) => (
-                            <div key={idx} style={{ containerType: 'inline-size' }} className="relative flex flex-col items-center justify-center w-full p-4 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl hover:bg-[#111] hover:border-[#333] transition-all duration-300 min-h-[130px] group overflow-hidden">
+                            <div key={idx} style={{ containerType: 'inline-size' }} className="relative flex flex-col items-center justify-center w-full p-2.5 sm:p-4 bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl hover:bg-[#111] hover:border-[#333] transition-all duration-300 min-h-[100px] sm:min-h-[130px] group overflow-hidden">
                               <div className="absolute top-2 right-2 opacity-50 group-hover:opacity-100 transition-opacity z-10">
                                  <PlayButton asset={asset} />
                               </div>

@@ -231,7 +231,7 @@ export const MemoryGame = ({ onWin, onRestart }: { onWin?: () => void, onRestart
                 </div>
                 <button
                     onClick={handleRestart}
-                    className="px-8 py-4 bg-[#1a1a1a] border border-[#333] text-[#aaa] font-mono tracking-widest uppercase hover:text-white hover:bg-[#222] hover:border-[#555] transition-all duration-300 shadow-[0_0_15px_rgba(0,0,0,0.8)] focus:outline-none"
+                    className="font-display font-bold text-xl md:text-2xl tracking-tighter text-white hover:opacity-70 transition-opacity focus:outline-none"
                 >
                     RESTART
                 </button>
@@ -244,8 +244,8 @@ export const MemoryGame = ({ onWin, onRestart }: { onWin?: () => void, onRestart
             {/* Subtle Top Info Bar */}
             <div className="flex justify-between items-center px-1 mb-2 text-[10px] sm:text-xs font-mono text-gray-500 tracking-widest uppercase">
                 <span>MOVES: <strong className="text-white font-bold">{moves}</strong></span>
-                <button onClick={handleRestart} className="hover:text-white transition-colors cursor-pointer">
-                    [RESTART]
+                <button onClick={handleRestart} className="font-display font-bold tracking-tighter normal-case text-white/70 hover:text-white hover:opacity-70 transition-all cursor-pointer">
+                    RESTART
                 </button>
             </div>
 

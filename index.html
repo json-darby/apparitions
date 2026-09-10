@@ -66,6 +66,13 @@
         ::-webkit-scrollbar-thumb {
             background: #222;
         }
+        .scrollbar-hide {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
         @keyframes fadeOut {
             from { opacity: 1; filter: blur(0); }
             to { opacity: 0; filter: blur(4px); }

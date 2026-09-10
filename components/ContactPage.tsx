@@ -1,6 +1,7 @@
 import React from 'react';
 import { CardSwap, Card } from './ui/CardSwap';
 import { Mail, Terminal, Briefcase, User } from 'lucide-react';
+import MobileNav from './ui/MobileNav';
 
 interface ContactPageProps {
   onNavigate: (scene: string | null) => void;
@@ -22,11 +23,11 @@ const ContactPage: React.FC<ContactPageProps> = ({ onNavigate }) => {
       <div className="absolute inset-0 noise mix-blend-difference pointer-events-none" />
       
       {/* Top Header */}
-      <nav className="fixed top-0 left-0 w-full h-[100px] z-[100] px-8 md:px-12 flex items-center justify-between pointer-events-none mix-blend-difference flex-shrink-0">
-        <div className="font-display font-bold text-2xl tracking-tighter text-white pointer-events-auto">
+      <nav className="fixed top-0 left-0 w-full h-[65px] md:h-[100px] z-[100] px-4 md:px-12 flex items-center justify-between pointer-events-none mix-blend-difference flex-shrink-0">
+        <div className="font-display font-bold text-xl md:text-2xl tracking-tighter text-white pointer-events-auto">
           APPARITIONS: CONTACT
         </div>
-        
+
         <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-[40px] text-xs font-bold tracking-[0.2em] pointer-events-auto">
           <button onClick={() => onNavigate(null)} className="text-[#555] hover:text-white transition-colors duration-300 tracking-[0.2em] focus:outline-none">HOME</button>
           <button onClick={() => onNavigate('menu')} className="text-[#555] hover:text-white transition-colors duration-300 tracking-[0.2em] focus:outline-none">GAMES</button>
@@ -34,9 +35,10 @@ const ContactPage: React.FC<ContactPageProps> = ({ onNavigate }) => {
           <button onClick={() => onNavigate('nexus')} className="text-[#555] hover:text-white transition-colors duration-300 tracking-[0.2em] focus:outline-none">NEXUS</button>
           <button onClick={() => onNavigate('help')} className="text-[#555] hover:text-white transition-colors duration-300 tracking-[0.2em] focus:outline-none">HELP</button>
         </div>
-        
-        <div className="pointer-events-auto">
-          <button className="px-6 py-2 border border-white rounded-full text-xs font-bold uppercase tracking-wider text-black bg-white transition-colors duration-500 cursor-default">
+
+        <div className="pointer-events-auto flex items-center gap-4">
+          <MobileNav current="contact" title="APPARITIONS: CONTACT" onNavigate={(scene) => onNavigate(scene)} />
+          <button className="hidden sm:inline-block px-6 py-2 border border-white rounded-full text-xs font-bold uppercase tracking-wider text-black bg-white transition-colors duration-500 cursor-default">
             Contact
           </button>
         </div>

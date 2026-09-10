@@ -39,9 +39,9 @@ class ApparitionEngine:
         
         """Configures Mistral, explicitly setting max_tokens to prevent JSON truncation."""
         Settings.llm = MistralAI(
-            model="ministral-8b-latest", 
-            temperature=0.7, 
-            max_tokens=2048, 
+            model="mistral-medium-latest",
+            temperature=0.7,
+            max_tokens=2048,
             api_key=api_key
         )
         Settings.embed_model = MistralAIEmbedding(model_name="mistral-embed", api_key=api_key)

@@ -153,7 +153,7 @@ def _mistral_whisper(bot_transcript: str, scenario: str, chat_history: list = No
     
     try:
         response = client.chat.complete(
-            model="mistral-large-latest",
+            model="mistral-medium-latest",
             messages=[
                 {"role": "user", "content": prompt}
             ],
@@ -223,7 +223,7 @@ def generate_conversation_review(chat_history: list, scenario: str) -> dict:
 
     try:
         response = client.chat.complete(
-            model="mistral-large-latest",
+            model="mistral-medium-latest",
             messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object"},
             temperature=0.7
