@@ -78,7 +78,7 @@ const App: React.FC = () => {
           {/* Left Side: Memory Game */}
           <div
             onClick={() => setGameScene('memory')}
-            className="w-full md:w-1/3 h-24 sm:h-28 md:h-full relative cursor-pointer group border border-white/20 md:border-y-0 md:border-l-0 md:border-r overflow-hidden flex items-center justify-center bg-[#0a0a0a] md:bg-transparent transition-colors hover:bg-white/5 active:scale-98"
+            className="w-full md:w-1/3 h-24 sm:h-28 md:h-full relative cursor-pointer group border border-white/20 md:border-y-0 md:border-l-0 md:border-r overflow-hidden flex items-center justify-center bg-transparent active:scale-98"
           >
             <div className="absolute inset-0 flex items-center justify-center px-4">
               <span className="font-display font-bold text-lg sm:text-xl md:text-3xl text-center tracking-widest uppercase transition-transform duration-500 group-hover:scale-110">Pair Match</span>
@@ -88,7 +88,7 @@ const App: React.FC = () => {
           {/* Middle Side: Gender Wars */}
           <div
             onClick={() => setGameScene('gender_wars')}
-            className="w-full md:w-1/3 h-24 sm:h-28 md:h-full relative cursor-pointer group border border-white/20 md:border-y-0 md:border-l-0 md:border-r overflow-hidden flex items-center justify-center bg-[#0a0a0a] md:bg-transparent transition-colors hover:bg-white/5 active:scale-98"
+            className="w-full md:w-1/3 h-24 sm:h-28 md:h-full relative cursor-pointer group border border-white/20 md:border-y-0 md:border-l-0 md:border-r overflow-hidden flex items-center justify-center bg-transparent active:scale-98"
           >
             {/* Animated Target SVG Background */}
             <svg viewBox="0 0 100 100" className="absolute w-[80%] h-[80%] opacity-20 group-hover:opacity-40 transition-all duration-1000 text-white/50 group-hover:text-white animate-[pulse_4s_ease-in-out_infinite]">
@@ -110,7 +110,7 @@ const App: React.FC = () => {
           {/* Right Side: Comprehension Game */}
           <div
             onClick={() => setGameScene('comprehension')}
-            className="w-full md:w-1/3 h-24 sm:h-28 md:h-full relative cursor-pointer group border border-white/20 md:border-none overflow-hidden flex items-center justify-center bg-[#0a0a0a] md:bg-transparent transition-colors hover:bg-white/5 active:scale-98"
+            className="w-full md:w-1/3 h-24 sm:h-28 md:h-full relative cursor-pointer group border border-white/20 md:border-none overflow-hidden flex items-center justify-center bg-transparent active:scale-98"
           >
             <div className="absolute inset-0 flex items-center justify-center px-4">
               <span className="font-display font-bold text-lg sm:text-xl md:text-3xl text-center tracking-widest uppercase transition-transform duration-500 group-hover:scale-110 leading-tight">Redacted</span>
@@ -275,7 +275,8 @@ const App: React.FC = () => {
                       backgroundSize: 'cover'
                     }}
                   />
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-700 flex items-center justify-center backdrop-blur-sm">
+                  {/* Titles reveal on hover; touch screens have no hover, so there they always show. */}
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity duration-700 flex items-center justify-center backdrop-blur-sm">
                     <span className="text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] text-editorial-muted text-center px-4">{detail.title}</span>
                   </div>
                 </div>
@@ -311,8 +312,8 @@ const App: React.FC = () => {
 
       {/* Content Block (Editorial Layout) */}
       <section className="w-full border-t border-editorial-border relative z-10 bg-editorial-bg px-8 md:px-12 pt-32 pb-16">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-20">
-          <div className="md:col-span-4">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-20">
+          <div className="xl:col-span-4">
             <div className="sticky top-32 flex flex-col gap-12 items-start">
               <h2 className="font-display font-bold text-6xl tracking-tighter">
                 COGNITIVE SPACE
@@ -322,7 +323,7 @@ const App: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="md:col-span-8 flex flex-col gap-12 max-w-3xl">
+          <div className="xl:col-span-8 flex flex-col gap-12 max-w-3xl">
             <p className="text-2xl md:text-3xl font-light leading-[1.6] text-gray-200">
               Language acquisition is rarely a matter of textbook logic. It lives in the unspoken pauses of a dark café, the hushed whispers at a bus stop, the fragments of an overheard story.
             </p>
@@ -331,10 +332,14 @@ const App: React.FC = () => {
             </p>
 
             <div className="mt-8">
-              <a href="#" className="group relative inline-flex items-center gap-4 text-sm font-bold uppercase tracking-[0.2em] pb-2 border-b border-editorial-border hover:border-white transition-colors">
+              {/* The scenarios live in the hero image, so starting means going back up to it. */}
+              <button
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="group relative inline-flex items-center gap-4 text-sm font-bold uppercase tracking-[0.2em] pb-2 border-b border-editorial-border hover:border-white transition-colors"
+              >
                 <span>Get Started</span>
                 <span className="transform group-hover:translate-x-2 transition-transform duration-500">→</span>
-              </a>
+              </button>
             </div>
           </div>
         </div>

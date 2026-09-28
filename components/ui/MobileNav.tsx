@@ -26,7 +26,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ current, title = 'APPARITIONS', o
     <>
       <button
         onClick={() => setOpen(prev => !prev)}
-        className={`md:hidden ${TOGGLE_BUTTON_CLASSES}`}
+        className={`lg:hidden ${TOGGLE_BUTTON_CLASSES}`}
       >
         ☰ MENU
       </button>
@@ -35,7 +35,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ current, title = 'APPARITIONS', o
         <button
           onClick={() => onNavigate(null)}
           aria-label="Home"
-          className={`md:hidden ${TOGGLE_BUTTON_CLASSES} !px-2.5 flex items-center justify-center`}
+          className={`lg:hidden ${TOGGLE_BUTTON_CLASSES} !px-2.5 flex items-center justify-center`}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M3 11.5 12 4l9 7.5" />
@@ -45,7 +45,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ current, title = 'APPARITIONS', o
       )}
 
       {open && createPortal(
-        <div className="md:hidden fixed inset-0 z-[200] bg-black flex flex-col animate-in fade-in duration-200">
+        <div className="lg:hidden fixed inset-0 z-[200] bg-black flex flex-col animate-in fade-in duration-200">
           {/* Header row — exact geometry/typography of the real nav, with RETURN sitting where MENU was */}
           <div className="w-full h-[65px] px-4 flex items-center justify-between gap-3 shrink-0">
             <h3 className="font-display font-bold text-xl tracking-tighter text-white min-w-0 truncate">{title}</h3>

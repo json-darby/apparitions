@@ -17,7 +17,7 @@ from typing import List, Optional
 
 from prompts import SCENARIOS
 
-MISTRAL_MODEL = "mistral-medium-latest"
+MISTRAL_MODEL = "ministral-14b-latest"
 SUGGESTION_COUNT = 3
 
 

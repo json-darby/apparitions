@@ -1,4 +1,5 @@
 import React from 'react';
+import { NOTICE_TEXT_CLASS } from './Notice';
 import { BrutalistSlider } from './BrutalistSlider';
 import { FlyToInterpolator } from '@deck.gl/core';
 
@@ -141,7 +142,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 <div className="space-y-4">
                     <div className="flex justify-between items-center border-b border-white/10 pb-2">
                         <span className="text-[10px] uppercase tracking-tighter">DATA LINK</span>
-                        <span className={`text-[10px] font-bold ${status === 'ONLINE' ? 'text-green-500' : 'text-yellow-500 animate-pulse'}`}>
+                        <span className={`text-[10px] font-bold ${status === 'ONLINE' ? 'text-green-500' : status.includes('ERROR') ? NOTICE_TEXT_CLASS : 'text-yellow-500 animate-pulse'}`}>
                             {status}
                         </span>
                     </div>
@@ -237,7 +238,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                         <>
                             <div className="flex justify-between items-center border-b border-white/10 pb-2">
                                 <span className="text-[10px] uppercase tracking-tighter">TRANSIT LINK</span>
-                                <span className={`text-[10px] font-bold ${transitStatus.includes('API') ? 'text-red-500' : 'text-blue-400'}`}>
+                                <span className={`text-[10px] font-bold ${transitStatus.includes('ERROR') ? NOTICE_TEXT_CLASS : 'text-blue-400'}`}>
                                     {transitStatus}
                                 </span>
                             </div>

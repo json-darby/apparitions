@@ -1,5 +1,14 @@
 import React from 'react';
 
+/* Keyboard bindings must match GameEngine.handleKeyDown. */
+const CONTROLS: { label: string; action: string; keys: string; special?: boolean }[] = [
+  { label: 'MOVE', action: 'Move Ship', keys: 'WASD / ARROWS' },
+  { label: 'DE / HET', action: 'Switch Article', keys: 'SHIFT' },
+  { label: 'FIRE', action: 'Blast Words', keys: 'SPACE' },
+  { label: 'FLIP', action: 'Face Forwards / Backwards', keys: 'Z' },
+  { label: 'BEAM', action: 'Super Weapon', keys: 'R', special: true },
+];
+
 export default function StartScreen({ onStart, onQuit }: { onStart: () => void, onQuit?: () => void }) {
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center bg-black text-white p-2 md:p-4 overflow-y-auto landscape:py-1">
@@ -28,22 +37,23 @@ export default function StartScreen({ onStart, onQuit }: { onStart: () => void, 
         </div>
 
         <div className="space-y-1.5 md:space-y-3 text-[8px] sm:text-[9px] md:text-xs text-gray-300 font-mono">
-          <div className="flex items-center gap-2 md:gap-4 border-b border-gray-800 pb-1.5">
-            <span className="bg-white text-black px-1.5 md:px-2 py-0.5 md:py-1 min-w-[70px] md:min-w-[80px] text-center font-bold text-[8px] md:text-[10px]">DRAG / KEYS</span>
-            <span>Move Ship</span>
-          </div>
-          <div className="flex items-center gap-2 md:gap-4 border-b border-gray-800 pb-1.5">
-            <span className="bg-white text-black px-1.5 md:px-2 py-0.5 md:py-1 min-w-[70px] md:min-w-[80px] text-center font-bold text-[8px] md:text-[10px]">DE / HET</span>
-            <span>Toggle Mode</span>
-          </div>
-          <div className="flex items-center gap-2 md:gap-4 border-b border-gray-800 pb-1.5">
-            <span className="bg-white text-black px-1.5 md:px-2 py-0.5 md:py-1 min-w-[70px] md:min-w-[80px] text-center font-bold text-[8px] md:text-[10px]">FIRE / TAP</span>
-            <span>Blast Words</span>
-          </div>
-          <div className="flex items-center gap-2 md:gap-4 pt-0.5">
-            <span className="text-red-600 min-w-[70px] md:min-w-[80px] text-center text-[9px] md:text-base font-bold">BEAM / S / H</span>
-            <span>Super Weapon</span>
-          </div>
+          {CONTROLS.map(({ label, keys, action, special }, i) => (
+            <div
+              key={label}
+              className={`flex items-center gap-2 md:gap-4 ${i < CONTROLS.length - 1 ? 'border-b border-gray-800 pb-1.5' : 'pt-0.5'}`}
+            >
+              <span
+                className={special
+                  ? 'text-red-600 min-w-[70px] md:min-w-[80px] text-center text-[9px] md:text-base font-bold'
+                  : 'bg-white text-black px-1.5 md:px-2 py-0.5 md:py-1 min-w-[70px] md:min-w-[80px] text-center font-bold text-[8px] md:text-[10px]'}
+              >
+                {label}
+              </span>
+              <span className="flex-1">{action}</span>
+              {/* Keyboard keys mean nothing on a touch screen, which has its own on-screen buttons. */}
+              <span className="text-gray-500 text-right [@media(hover:none)]:hidden">{keys}</span>
+            </div>
+          ))}
         </div>
       </div>
 

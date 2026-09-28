@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import SiteHeader from './ui/SiteHeader';
+import Notice from './ui/Notice';
 
 const Core = ({ onExit, onNavigate }) => {
   const [commsMode, setCommsMode] = useState('INDEX');
@@ -43,10 +44,13 @@ const Core = ({ onExit, onNavigate }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_request: requestStr, context: contextStr })
       });
-      const data = await res.json();
-      setLessonData(data);
+      const data = await res.json().catch(() => ({}));
+      /* A failed request comes back as FastAPI's {detail}, not a lesson; without this
+         it rendered as an empty "UNKNOWN ARCHIVE" lesson instead of an error. */
+      setLessonData(res.ok ? data : { error: data.detail || 'The lesson could not be conjured.' });
     } catch (err) {
       console.error(err);
+      setLessonData({ error: 'The lesson server could not be reached. Check your connection and try again.' });
     }
     setIsLoading(false);
   };
@@ -317,8 +321,8 @@ const Core = ({ onExit, onNavigate }) => {
               </svg>
             </div>
           ) : lessonData.error ? (
-            <div className="flex-1 flex flex-col items-center justify-center">
-              <span className="tracking-[0.3em] text-red-900 border border-red-900/30 bg-red-900/10 px-6 py-3 text-sm uppercase font-display">ERROR: {lessonData.error}</span>
+            <div className="flex-1 flex flex-col items-center justify-center px-6">
+              <Notice title="Lesson unavailable" message={lessonData.error} />
             </div>
           ) : (
             <div className="lesson-fade-in max-w-[1100px] mx-auto w-full flex flex-col pt-[28px] pb-24 px-8 md:px-12">

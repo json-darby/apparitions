@@ -1,6 +1,7 @@
 import React from 'react';
 import { Zap } from 'lucide-react';
 import { ArticleMode } from '../game/types';
+import { LEVEL_LABELS } from '../game/constants';
 
 interface HUDProps {
   state: {
@@ -31,7 +32,6 @@ const TulipIcon = ({ active }: { active: boolean; key?: number | string }) => (
 );
 
 export default function HUD({ state, onPauseToggle, onSpecialWeapon, onToggleMode, onQuit }: HUDProps) {
-  const levels = ['A0', 'A1', 'A2', 'B1'];
 
   return (
     <div className="w-full bg-black border-b border-gray-800 p-2 flex justify-between items-center z-10 shrink-0 select-none">
@@ -52,7 +52,7 @@ export default function HUD({ state, onPauseToggle, onSpecialWeapon, onToggleMod
         </div>
         <div>
           <div className="text-[7px] md:text-[8px] text-gray-500 mb-0.5 font-mono">LEVEL</div>
-          <div className="text-xs md:text-sm text-red-600 font-mono font-bold">{levels[state.level]}</div>
+          <div className="text-xs md:text-sm text-red-600 font-mono font-bold">{LEVEL_LABELS[state.level]}</div>
         </div>
         <button 
           onClick={onPauseToggle}

@@ -5,8 +5,18 @@ import { Particle } from './entities/Particle';
 import { Powerup, PowerupType } from './entities/Powerup';
 import { EnemyProjectile } from './entities/EnemyProjectile';
 import { FloatingText } from './entities/FloatingText';
-import { WORDS, COLORS } from './constants';
+import { WORDS, COLORS, LEVEL_LABELS } from './constants';
 import { GameStats } from './types';
+import { WordDeck } from './WordDeck';
+import { BossBrain, BossContext } from './boss/BossBrain';
+import { BOSS_PROFILES } from './boss/profiles';
+
+/** Slow-motion power-up: the whole boss fight (movement, timers, orbs) runs at this speed. */
+const SLOW_TIME_SCALE = 0.4;
+/** The special beam takes this share of a boss's health instead of killing it outright. */
+const BEAM_BOSS_DAMAGE_SHARE = 0.3;
+/** Correct hits needed before a stage's boss appears. */
+const WORDS_PER_STAGE = 20;
 
 export class GameEngine {
   canvas: HTMLCanvasElement;
@@ -28,7 +38,6 @@ export class GameEngine {
   totalHit: number = 0;
   missedWords: { word: string; article: string }[] = [];
   screenShake: number = 0;
-  bossProjectileTimer: number = 0;
   wordsDefeatedInLevel: number = 0;
   phase: 'normal' | 'boss_warning' | 'boss_battle' = 'normal';
   bossWarningTimer: number = 0;
@@ -37,6 +46,10 @@ export class GameEngine {
   bossWave: number = 1;
   specialWeaponState: 'ready' | 'charging' | 'firing' = 'ready';
   specialWeaponTimer: number = 0;
+  /** Deals this stage's words with a guaranteed de/het balance. */
+  deck: WordDeck = WordDeck.forLevel(0);
+  /** The one boss currently allowed to attack; the others wait their turn. */
+  attackingBoss: BossBrain | null = null;
 
   // Entities
   ship: Ship;
@@ -179,7 +192,7 @@ export class GameEngine {
         this.spawnParticles(w.x, w.y, COLORS.white);
         this.words.splice(i, 1);
       } else {
-        w.bossHits += 50;
+        w.bossHits += Math.max(2, Math.ceil(w.bossMaxHits * BEAM_BOSS_DAMAGE_SHARE));
         this.spawnParticles(w.x, w.y, COLORS.red);
         if (w.bossHits >= w.bossMaxHits) {
           this.handleBossDeath(w, i, W, H);
@@ -201,6 +214,7 @@ export class GameEngine {
     }
     
     this.words.splice(index, 1);
+    if (w.brain && this.attackingBoss === w.brain) this.attackingBoss = null;
 
     const bossesLeft = this.words.filter(word => word.isBoss).length;
     if (bossesLeft === 0) {
@@ -224,8 +238,9 @@ export class GameEngine {
         }
       } else {
         this.level++;
-        const levels = ['A0', 'A1', 'A2', 'B1'];
-        this.onFeedback(`${levels[this.level]} UNLOCKED!`, COLORS.white);
+        this.onFeedback(`${LEVEL_LABELS[this.level]} UNLOCKED!`, COLORS.white);
+        this.deck = WordDeck.forLevel(this.level);
+        this.enemyProjectiles = [];
         this.wordsDefeatedInLevel = 0;
         this.phase = 'normal';
         this.wordSpeed = 40 + this.level * 20;
@@ -267,7 +282,7 @@ export class GameEngine {
     this.ship.update(dt, this.keys, W, H, this.axis);
 
     // Level progression
-    if (this.phase === 'normal' && this.wordsDefeatedInLevel >= 20) {
+    if (this.phase === 'normal' && this.wordsDefeatedInLevel >= WORDS_PER_STAGE) {
       this.phase = 'boss_warning';
       this.bossWarningTimer = 3;
       this.onBossWarning('BOSS DETECTED');
@@ -324,18 +339,18 @@ export class GameEngine {
     }
 
     // Update words
+    const timeScale = this.slowActive ? SLOW_TIME_SCALE : 1;
+    const bossContext = this.bossContext(dt * timeScale, W, H);
     for (let i = this.words.length - 1; i >= 0; i--) {
       const w = this.words[i];
-      w.update(dt, this.slowActive, this.onBossWarning, this.ship.y);
+      w.update(dt, this.slowActive, this.onBossWarning, w.brain ? bossContext : undefined);
 
-      if (w.isBoss) {
-        this.bossProjectileTimer += dt;
-        const fireRate = w.bossState === 'swooping' ? 0.4 : 1.2;
-        if (this.bossProjectileTimer > fireRate) {
-          this.bossProjectileTimer = 0;
-          const projWord = Math.random() > 0.5 ? 'de' : 'het';
-          this.enemyProjectiles.push(new EnemyProjectile(w.x, w.y, projWord));
-        }
+      /* A boss changing form clears the air, Returnal-style: every orb on screen
+         vanishes, so the new phase starts from a fair, readable slate. */
+      if (w.phaseChanged) {
+        this.enemyProjectiles.forEach(ep => this.spawnParticles(ep.x, ep.y, COLORS.redDim, 3));
+        this.enemyProjectiles = [];
+        this.screenShake = 1;
       }
 
       if (w.x < -100) {
@@ -346,8 +361,7 @@ export class GameEngine {
       }
 
       // Check collision with ship
-      const textWidth = w.currentText.length * 16;
-      const dist = Math.abs(this.ship.x - w.x) < textWidth / 2 + 15 && Math.abs(this.ship.y - w.y) < 30;
+      const dist = Math.abs(this.ship.x - w.x) < w.hitHalfWidth + 9 && Math.abs(this.ship.y - w.y) < w.hitHalfHeight;
       
       if (dist) {
         if (w.damageTimer <= 0) {
@@ -412,9 +426,7 @@ export class GameEngine {
 
       for (let j = this.words.length - 1; j >= 0; j--) {
         const w = this.words[j];
-        // Collision detection (approximate text width)
-        const textWidth = w.currentText.length * 16;
-        const dist = Math.abs(b.x - w.x) < textWidth / 2 + 15 && Math.abs(b.y - w.y) < 30;
+        const dist = Math.abs(b.x - w.x) < w.hitHalfWidth && Math.abs(b.y - w.y) < w.hitHalfHeight;
         
         if (dist) {
           b.dead = true;
@@ -459,7 +471,7 @@ export class GameEngine {
     // Update enemy projectiles
     for (let i = this.enemyProjectiles.length - 1; i >= 0; i--) {
       const ep = this.enemyProjectiles[i];
-      ep.update(dt);
+      ep.update(dt * timeScale, W, H);
       if (ep.dead) { this.enemyProjectiles.splice(i, 1); continue; }
       if (ep.hitsShip(this.ship.x, this.ship.y)) {
         ep.dead = true;
@@ -515,6 +527,7 @@ export class GameEngine {
     }
 
     this.powerups.forEach(p => p.draw(this.ctx));
+    this.words.forEach(w => w.brain?.drawTell(this.ctx, W, H, this.ship.x, this.ship.y, w.hitHalfHeight));
     this.words.forEach(w => w.draw(this.ctx, this.hintActive));
     this.enemyProjectiles.forEach(ep => ep.draw(this.ctx));
     this.bullets.forEach(b => b.draw(this.ctx));
@@ -564,32 +577,47 @@ export class GameEngine {
   }
 
   spawnWord(W: number, H: number) {
-    const pool = WORDS.filter(w => w.level === this.level && !w.boss);
-    if (pool.length === 0) return;
-    const w = pool[Math.floor(Math.random() * pool.length)];
-    this.words.push(new WordEnemy(w, W, H, this.wordSpeed));
+    const w = this.deck.next();
+    if (w) this.words.push(new WordEnemy(w, W, H, this.wordSpeed));
   }
 
+  /** Bosses of one wave are different words, spread evenly down the screen. */
   spawnBoss(W: number, H: number, count: number = 1, wave: number = 1) {
-    const pool = WORDS.filter(w => w.level === this.level && w.boss);
+    const pool = WORDS.filter(w => w.level === this.level && w.boss).sort(() => Math.random() - 0.5);
     if (pool.length === 0) return;
-    
-    const types: ('zigzag' | 'teleport' | 'swooper' | 'default')[] = ['zigzag', 'teleport', 'swooper'];
-    
+    const profile = BOSS_PROFILES[Math.min(this.level, BOSS_PROFILES.length - 1)];
+
     for (let i = 0; i < count; i++) {
-      const w = pool[Math.floor(Math.random() * pool.length)];
-      const boss = new WordEnemy(w, W, H, this.wordSpeed, wave);
+      const boss = new WordEnemy(pool[i % pool.length], W, H, this.wordSpeed);
       boss.y = (H / (count + 1)) * (i + 1);
-      boss.startY = boss.y;
-      if (this.level === 3) {
-        boss.bossType = types[i % types.length];
-      }
+      boss.x = W + 80 + i * 60;
+      boss.makeBoss(profile, wave);
       this.words.push(boss);
     }
   }
 
-  spawnParticles(x: number, y: number, color: string) {
-    for (let i = 0; i < 15; i++) {
+  /** Everything a boss brain needs this frame, including the one-at-a-time attack slot. */
+  bossContext(dt: number, W: number, H: number): BossContext {
+    return {
+      dt,
+      canvasW: W,
+      canvasH: H,
+      playerX: this.ship.x,
+      playerY: this.ship.y,
+      emit: (orb) => this.enemyProjectiles.push(orb),
+      requestAttackSlot: (brain) => {
+        if (this.attackingBoss && this.attackingBoss !== brain) return false;
+        this.attackingBoss = brain;
+        return true;
+      },
+      releaseAttackSlot: (brain) => {
+        if (this.attackingBoss === brain) this.attackingBoss = null;
+      },
+    };
+  }
+
+  spawnParticles(x: number, y: number, color: string, count = 15) {
+    for (let i = 0; i < count; i++) {
       this.particles.push(new Particle(x, y, color));
     }
   }

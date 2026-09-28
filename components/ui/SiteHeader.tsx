@@ -51,8 +51,8 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({ title, current, onNavigate, pos
         </span>
       </div>
 
-      {/* Centre links (desktop only) */}
-      <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-[40px] text-xs font-bold tracking-[0.2em] pointer-events-auto">
+      {/* Centre links (desktop only: below 1024px they collide with the wordmark, so tablets use the menu) */}
+      <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-[40px] text-xs font-bold tracking-[0.2em] pointer-events-auto">
         {CENTRE_LINKS.map(link => (
           <button
             key={link.key}

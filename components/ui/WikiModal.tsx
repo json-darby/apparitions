@@ -1,4 +1,5 @@
 import { useFitBlock } from '../hooks/useFitText';
+import Notice from './Notice';
 import React, { useEffect, useState } from 'react';
 import { BuildingFeature } from '../layers/OSMBuildingLayer';
 
@@ -153,8 +154,8 @@ export const WikiModal: React.FC<WikiModalProps> = ({ building, city, coords, on
                                 <div className="h-2 bg-[#222] w-5/6 animate-pulse"></div>
                             </div>
                         ) : error || !wikiData ? (
-                            <div className="py-12 text-[#555] font-mono text-xs uppercase tracking-widest border border-[#222] p-4 text-center bg-[#0a0a0a]">
-                                No archival data available for this structure in the current sector.
+                            <div className="py-6 flex justify-center">
+                                <Notice title="No archive entry" message="There is no archival record for this structure yet." />
                             </div>
                         ) : (
                             <div className="space-y-6">

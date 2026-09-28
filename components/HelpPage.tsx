@@ -14,7 +14,7 @@ const HelpPage: React.FC<HelpPageProps> = ({ onNavigate }) => {
           position: absolute;
           top: 0; left: 0; width: 100%; height: 100%;
           pointer-events: none; opacity: 0.05;
-          background: url('https://grainy-gradients.vercel.app/noise.svg');
+          background: url('/noise.svg');
           z-index: 50;
         }
       `}</style>

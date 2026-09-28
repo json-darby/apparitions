@@ -51,7 +51,7 @@ class ApparitionEngine:
         
         """Configures Mistral, explicitly setting max_tokens to prevent JSON truncation."""
         Settings.llm = MistralAI(
-            model="mistral-medium-latest",
+            model="ministral-8b-latest",
             temperature=0.7,
             max_tokens=2048,
             api_key=api_key
@@ -208,7 +208,7 @@ class ApparitionEngine:
             return {"error": "The Apparitions returned a malformed lesson. Try again."}
         except Exception as e:
             print(f"[ApparitionEngine] Mistral query failed: {e}")
-            return {"error": f"Failed to conjure lesson: {e}"}
+            return {"error": "The lesson model did not answer. Try again in a moment."}
 
 
 if __name__ == "__main__":

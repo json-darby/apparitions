@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react';
 import { ai, getLiveConfig } from '../services/geminiService';
 import {
   INPUT_SAMPLE_RATE,
@@ -11,6 +11,9 @@ import {
 import { Message, ResponseMode, ScenarioType } from '../types';
 import { shhh } from './models/shhh';
 import { useFitText } from './hooks/useFitText';
+import Notice from './ui/Notice';
+import VotivePanel from './votive/VotivePanel';
+import CandleIcon from './votive/CandleIcon';
 
 type LiveServerMessage = any;
 
@@ -19,6 +22,9 @@ const VISUALISER_BAR_COUNT = 24;
 
 /** Anything shorter than this is a mis-tap, not speech. */
 const MIN_RECORDING_SECONDS = 0.3;
+
+/** Tallest the Reflection reply box grows before it scrolls instead. */
+const REPLY_BOX_MAX_PX = 128;
 
 interface ChatWindowProps {
   scenario: ScenarioType;
@@ -64,11 +70,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
   const sourcesRef = useRef<Set<AudioBufferSourceNode>>(new Set());
   const transcriptionRef = useRef({ user: '', bot: '', botSnapshot: '' });
   const responseModeRef = useRef<ResponseMode>(responseMode);
-  const manualInputRef = useRef<HTMLInputElement>(null);
+  const manualInputRef = useRef<HTMLTextAreaElement>(null);
   /* Non-null while the mic button is held down: the live session's audio tap
      appends every frame here, and on release it becomes a WAV to transcribe. */
   const recordingChunksRef = useRef<Float32Array[] | null>(null);
   const [isTranscribing, setIsTranscribing] = useState(false);
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const [votiveOpen, setVotiveOpen] = useState(false);
 
   useEffect(() => {
     responseModeRef.current = responseMode;
@@ -76,6 +84,26 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
 
   /* Voice input is available whenever the live session (and therefore the mic) is up. */
   const speechAvailable = isLive;
+
+  /* Elapsed-time readout on the mic button, so it is obvious the recording is running. */
+  useEffect(() => {
+    if (!isRecording) return;
+    setRecordingSeconds(0);
+    const startedAt = Date.now();
+    const timer = window.setInterval(() => setRecordingSeconds(Math.floor((Date.now() - startedAt) / 1000)), 250);
+    return () => window.clearInterval(timer);
+  }, [isRecording]);
+
+  /* The reply box grows with its text so a whole spoken sentence can be read back
+     (and corrected) before it is sent, instead of scrolling out of a one-line field. */
+  useLayoutEffect(() => {
+    const box = manualInputRef.current;
+    if (!box) return;
+    box.style.height = 'auto';
+    box.style.height = `${Math.min(box.scrollHeight, REPLY_BOX_MAX_PX)}px`;
+    /* Only show a scrollbar once the text genuinely outgrows the box. */
+    box.style.overflowY = box.scrollHeight > REPLY_BOX_MAX_PX ? 'auto' : 'hidden';
+  }, [manualInput, responseMode]);
 
   /* 'CONVERSATION' is far wider than 'OFFLINE', so the status cell has to give
      ground rather than push the mode toggle out of the header when it swaps. */
@@ -149,6 +177,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
       setError('No microphone connection yet. Wait for the channel to open.');
       return;
     }
+    /* Browsers can leave an AudioContext suspended until a user gesture; this
+       click is one, so make sure frames are actually flowing. */
+    void inputAudioCtxRef.current?.resume();
     recordingChunksRef.current = [];
     setDraftTranscript('');
     setIsRecording(true);
@@ -159,16 +190,29 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
     recordingChunksRef.current = null;
     setIsRecording(false);
 
-    if (!chunks || chunks.length === 0) return;
+    if (!chunks || chunks.length === 0) {
+      setError('The microphone sent no audio. Check it is not muted, then try again.');
+      return;
+    }
 
     const samples = chunks.reduce((total, chunk) => total + chunk.length, 0);
-    if (samples < INPUT_SAMPLE_RATE * MIN_RECORDING_SECONDS) return;
+    if (samples < INPUT_SAMPLE_RATE * MIN_RECORDING_SECONDS) {
+      setError('That was too short to hear. Press MIC, speak, then press STOP.');
+      return;
+    }
 
     setIsTranscribing(true);
     try {
       const text = await transcribeRecording(chunks, INPUT_SAMPLE_RATE);
       if (text) {
         setManualInput(prev => (prev ? `${prev} ${text}` : text).trim());
+        /* Hand the text straight back to the user to check, edit, then send. */
+        requestAnimationFrame(() => {
+          const box = manualInputRef.current;
+          if (!box) return;
+          box.focus();
+          box.setSelectionRange(box.value.length, box.value.length);
+        });
       } else {
         setError('Nothing was heard. Try speaking again.');
       }
@@ -232,8 +276,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
         target?.tagName === 'TEXTAREA' || 
         document.activeElement === manualInputRef.current;
 
-      if (isTypingInInput) {
-        return; // Allow native typing including spacebar and backspace
+      if (isTypingInInput || votiveOpen) {
+        return; // Allow native typing; and leave shortcuts alone while Votive is open
       }
 
       if ((e.code === 'KeyW' || e.key === 'w' || e.key === 'W') && !isRecording) {
@@ -253,7 +297,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [responseMode, isRecording, draftTranscript, manualInput, whisperUnlocked, allSuggestions, speechAvailable, toggleRecording]);
+  }, [responseMode, isRecording, draftTranscript, manualInput, whisperUnlocked, allSuggestions, speechAvailable, toggleRecording, votiveOpen]);
 
   useEffect(() => {
     let checkInterval: number;
@@ -443,12 +487,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
                     shhh.getWhispers(botText, scenario, suggestionMemory ? messages : undefined).then(suggestions => {
                       const next = suggestions || [];
                       setAllSuggestions(next);
-                      setWhisperError(next.length === 0 ? 'The whisper model returned nothing.' : null);
+                      setWhisperError(next.length === 0 ? 'No suggestions came back for that line.' : null);
                       setIsFetchingWhispers(false);
                     }).catch(e => {
                       console.error("Whisper error:", e);
                       setAllSuggestions([]);
-                      setWhisperError(e?.message || 'The whisper service did not answer.');
+                      /* The raw provider message is logged above; the user gets plain English. */
+                      setWhisperError('The whisper model did not answer. It will try again on the next line.');
                       setIsFetchingWhispers(false);
                     });
                   } else {
@@ -474,7 +519,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
             },
             onerror: (e) => {
               console.error("Live API Error:", e);
-              setError('Connection to the apparition failed. Check the API key configuration.');
+              setError('The connection to the apparition dropped. Press restart to try again.');
             },
             onclose: () => setIsLive(false),
           },
@@ -492,7 +537,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
         }
       } catch (err: any) {
         if (isMounted) {
-          setError(`Connection failed: ${err.message || 'unknown error'}`);
+          console.error('[Live] Connection failed:', err);
+          setError('Could not reach the apparition. Press restart to try again.');
           setIsLive(false);
         }
       }
@@ -552,6 +598,32 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
       setIsReviewing(false);
     }
   };
+
+  /* A phrase picked in Votive lands in the Reflection reply box, ready to edit and send. */
+  const insertVotivePhrase = useCallback((text: string) => {
+    setResponseMode('review');
+    setManualInput(prev => (prev.trim() ? `${prev.trim()} ${text}` : text));
+    setVotiveOpen(false);
+    window.setTimeout(() => {
+      const box = manualInputRef.current;
+      if (!box) return;
+      box.focus();
+      box.setSelectionRange(box.value.length, box.value.length);
+    }, 350);
+  }, []);
+  const closeVotive = useCallback(() => setVotiveOpen(false), []);
+
+  /* The candle doubles as the connection light: its flame is lit while the channel is open. */
+  const votiveButton = (
+    <button
+      onClick={() => setVotiveOpen(open => !open)}
+      aria-label="Open Votive phrases"
+      title="Votive: phrases for this scene"
+      className={`w-[30px] h-7 shrink-0 border grid place-items-center transition-colors ${votiveOpen ? 'bg-white text-black border-white' : 'border-white/30 text-white hover:bg-white hover:text-black'}`}
+    >
+      <CandleIcon lit={isLive} />
+    </button>
+  );
 
   const getPersonaName = () => {
     if (scenario === ScenarioType.INTRO) return 'Lotte';
@@ -634,7 +706,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
 
       {/* Lower Control Bar */}
       <div className="border-t border-[#111] bg-[#050505] flex items-center h-16 shrink-0">
-        <button onClick={restartSession} className="flex-1 h-full text-[9px] uppercase tracking-[0.2em] font-bold text-[#666] hover:text-white hover:bg-white/5 transition-all outline-none flex items-center justify-center">
+        <button onClick={restartSession} className="flex-1 h-full text-[9px] uppercase tracking-[0.15em] xl:tracking-[0.2em] whitespace-nowrap font-bold text-[#666] hover:text-white hover:bg-white/5 transition-all outline-none flex items-center justify-center">
           RESTART
         </button>
 
@@ -645,7 +717,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
             <button
               onClick={endAndReview}
               disabled={isReviewing}
-              className="flex-1 h-full text-[9px] uppercase tracking-[0.2em] font-bold text-[#666] hover:text-white hover:bg-white/5 transition-all outline-none flex items-center justify-center gap-2"
+              className="flex-1 h-full text-[9px] uppercase tracking-[0.15em] xl:tracking-[0.2em] whitespace-nowrap font-bold text-[#666] hover:text-white hover:bg-white/5 transition-all outline-none flex items-center justify-center gap-2"
             >
               {isReviewing ? 'REVIEWING...' : 'REVIEW'}
             </button>
@@ -654,7 +726,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
 
             <button
               onClick={() => setSuggestionMemory(!suggestionMemory)}
-              className="flex-1 h-full text-[9px] uppercase tracking-[0.2em] font-bold text-[#666] hover:text-white hover:bg-white/5 transition-all outline-none flex items-center justify-center"
+              className="flex-1 h-full text-[9px] uppercase tracking-[0.15em] xl:tracking-[0.2em] whitespace-nowrap font-bold text-[#666] hover:text-white hover:bg-white/5 transition-all outline-none flex items-center justify-center"
             >
               MEMORY: {suggestionMemory ? 'ON' : 'OFF'}
             </button>
@@ -683,21 +755,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
         <div className="absolute inset-0 md:hidden bg-[#050505]/55" />
       </div>
 
-      {/* Error Overlay */}
       {error && (
-        <div className="absolute top-4 md:top-8 left-1/2 -translate-x-1/2 z-[100] w-[calc(100%-2rem)] max-w-md bg-black/85 backdrop-blur-xl border border-red-900/40 px-4 py-3 md:px-6 md:py-4 shadow-2xl animate-in fade-in slide-in-from-top-8 duration-700">
-          <div className="flex items-start gap-3 md:gap-4">
-            <div className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse mt-1.5 shrink-0" />
-            <span className="flex-1 min-w-0 font-mono text-[10px] md:text-[11px] leading-relaxed tracking-[0.12em] uppercase text-gray-300 break-words">{error}</span>
-            <button
-              onClick={() => setError(null)}
-              className="shrink-0 font-mono text-[9px] uppercase tracking-[0.2em] text-gray-400 hover:text-white transition-colors pl-3 md:pl-4 border-l border-white/10 self-stretch"
-            >
-              CLOSE
-            </button>
-          </div>
-        </div>
+        <Notice floating title="Signal lost" message={error} onDismiss={() => setError(null)} />
       )}
+
+      <VotivePanel scenario={scenario} open={votiveOpen} onClose={closeVotive} onUse={insertVotivePhrase} />
 
       {/* Review Modal Overlap */}
       {showReviewModal && (
@@ -724,7 +786,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
                 <span className="text-[10px] uppercase tracking-[0.4em] font-bold text-[#666]">Analysing...</span>
               </div>
             ) : reviewReport?.error ? (
-              <div className="py-10 text-center text-red-500 font-medium">The review could not be completed: {reviewReport.error}</div>
+              <div className="py-10 flex justify-center">
+                <Notice title="Review unavailable" message="The review could not be completed. Close this and try again in a moment." />
+              </div>
             ) : reviewReport?.summary ? (
               <div className="space-y-6 pb-4">
                 <div className="mb-10 text-gray-300 font-body text-xl md:text-2xl tracking-tight leading-relaxed whitespace-pre-wrap border-l-2 border-[#555] pl-6 md:pl-8 italic">
@@ -746,7 +810,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
                 )}
               </div>
             ) : (
-              <div className="py-10 text-center text-[#555]">No data available. Try again.</div>
+              <div className="py-10 flex justify-center">
+                <Notice title="Review unavailable" message="No review came back. Close this and try again in a moment." />
+              </div>
             )}
             </div>
           </div>
@@ -754,13 +820,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
       )}
 
       {/* Main Chat Layout Area (Matching Landing Aesthetic) */}
-      <div className="flex flex-col flex-1 relative z-10 w-full md:w-3/4 mx-auto md:mx-0 md:mr-[25%] h-full">
+      <div className="flex flex-col flex-1 relative z-10 w-full md:w-2/3 lg:w-3/4 mx-auto md:mx-0 md:mr-[33.333%] lg:mr-[25%] h-full">
 
         {/* Sticky Header — mobile: 3 evenly-spaced cells (status | mode toggle | review+return) so
             the toggle sits centred and RETURN isn't crowded. Desktop: original clustered layout. */}
         <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:hidden items-center gap-3 px-4 py-6 bg-gradient-to-b from-[#050505] via-[#050505]/80 to-transparent">
           <div className="flex items-center gap-2 min-w-0">
-            <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${isLive ? 'bg-white animate-pulse' : 'bg-red-900'}`} />
+            {votiveButton}
             <div ref={statusBoxRef} className="min-w-0 flex-1 overflow-hidden">
               <span ref={statusTextRef} className="text-[9px] uppercase tracking-[0.2em] font-light text-[#888888] whitespace-nowrap inline-block">
                 {statusLabel}
@@ -771,24 +837,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
             <button onClick={() => { setResponseMode('instant'); setDraftTranscript(''); }} className={`px-2 sm:px-3 py-1.5 text-[8px] sm:text-[9px] uppercase tracking-widest transition-all ${responseMode === 'instant' ? 'bg-white text-black font-medium' : 'text-gray-500 hover:text-gray-300'}`}>Instant</button>
             <button onClick={() => setResponseMode('review')} className={`px-2 sm:px-3 py-1.5 text-[8px] sm:text-[9px] uppercase tracking-widest transition-all ${responseMode === 'review' ? 'bg-white text-black font-medium' : 'text-gray-500 hover:text-gray-300'}`}>Reflection</button>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3 justify-end min-w-0">
-            {responseMode === 'review' && scenario !== ScenarioType.COMPREHENSION && (
-              <button
-                onClick={endAndReview}
-                disabled={isReviewing}
-                className="px-2 sm:px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 text-[8px] sm:text-[9px] uppercase tracking-widest text-white font-bold transition-all disabled:opacity-50"
-                aria-label="Review Session"
-              >
-                {isReviewing ? '...' : 'REVIEW'}
-              </button>
-            )}
+          <div className="flex items-center justify-end min-w-0">
             <button onClick={onExit} className="text-[9px] uppercase tracking-[0.15em] font-bold border-b border-transparent hover:border-[#888888] text-[#888888] hover:text-white transition-all">RETURN</button>
           </div>
         </div>
 
         <div className="hidden md:flex items-center justify-between gap-3 px-12 py-8 bg-gradient-to-b from-[#050505] via-[#050505]/80 to-transparent">
           <div className="flex items-center gap-4 min-w-0">
-            <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${isLive ? 'bg-white animate-pulse' : 'bg-red-900'}`} />
+            {votiveButton}
             <span className="text-[10px] uppercase tracking-[0.3em] font-light text-[#888888] truncate">
               {statusLabel}
             </span>
@@ -857,7 +913,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
             <div className="w-full flex items-center border-t border-b border-[#111] divide-x divide-[#111]">
               <button
                 onClick={toggleWhispers}
-                className={`flex-1 py-2.5 text-[9px] uppercase tracking-[0.2em] font-bold transition-colors ${whisperUnlocked
+                className={`flex-1 py-2.5 text-[9px] uppercase tracking-[0.15em] font-bold transition-colors whitespace-nowrap ${whisperUnlocked
                   ? 'text-white'
                   : allSuggestions.length > 0
                     ? 'text-white/80 hover:text-white'
@@ -866,10 +922,22 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
               >
                 {whisperUnlocked ? 'SIGNAL FOUND' : 'SHH'}
               </button>
-              <button onClick={restartSession} className="flex-1 py-2.5 text-[9px] uppercase tracking-[0.2em] font-bold text-[#666] hover:text-white transition-colors">
+              {/* REVIEW sits here rather than in the header: a phone header has no room
+                  for it beside the mode toggle, and this matches desktop's control bar. */}
+              {scenario !== ScenarioType.COMPREHENSION && (
+                <button
+                  onClick={endAndReview}
+                  disabled={isReviewing}
+                  className="flex-1 py-2.5 text-[9px] uppercase tracking-[0.15em] font-bold text-[#666] hover:text-white transition-colors disabled:opacity-50"
+                  aria-label="Review Session"
+                >
+                  {isReviewing ? '...' : 'REVIEW'}
+                </button>
+              )}
+              <button onClick={restartSession} className="flex-1 py-2.5 text-[9px] uppercase tracking-[0.15em] font-bold text-[#666] hover:text-white transition-colors">
                 RESTART
               </button>
-              <button onClick={() => setSuggestionMemory(!suggestionMemory)} className="flex-1 py-2.5 text-[9px] uppercase tracking-[0.2em] font-bold text-[#666] hover:text-white transition-colors">
+              <button onClick={() => setSuggestionMemory(!suggestionMemory)} className="flex-1 py-2.5 text-[9px] uppercase tracking-[0.15em] font-bold text-[#666] hover:text-white transition-colors whitespace-nowrap">
                 MEMORY: {suggestionMemory ? 'ON' : 'OFF'}
               </button>
             </div>
@@ -913,7 +981,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
               )}
 
               {/* Unified Brutalist Input Console */}
-              <div className="flex items-center gap-2 w-full max-w-3xl bg-[#080808] border border-[#222] focus-within:border-white/50 transition-all p-1.5 md:p-2 shadow-2xl">
+              <div className="flex items-end gap-2 w-full max-w-3xl bg-[#080808] border border-[#222] focus-within:border-white/50 transition-all p-1.5 md:p-2 shadow-2xl">
                 {/* Voice Record / Mic Button */}
                 <button
                   type="button"
@@ -937,20 +1005,21 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
                 >
                   <div className={`w-1.5 h-1.5 rounded-full ${isRecording ? 'bg-black animate-ping' : isTranscribing ? 'bg-white animate-pulse' : 'bg-white'}`} />
                   <span className="text-[9px] uppercase tracking-[0.25em] font-bold">
-                    {isRecording ? 'REC' : isTranscribing ? '...' : 'MIC'}
+                    {isRecording ? `STOP ${Math.floor(recordingSeconds / 60)}:${String(recordingSeconds % 60).padStart(2, '0')}` : isTranscribing ? '...' : 'MIC'}
                   </span>
                 </button>
 
                 {/* Text input - spaces allowed, speech drafts auto-populate here */}
-                <input
+                <textarea
                   ref={manualInputRef}
-                  type="text"
+                  rows={1}
                   value={manualInput}
                   onChange={(e) => setManualInput(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' && (manualInput.trim() || draftTranscript.trim())) {
+                    /* Enter sends; Shift+Enter is left alone for a line break. */
+                    if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
-                      confirmSend();
+                      if (manualInput.trim() || draftTranscript.trim()) confirmSend();
                     }
                   }}
                   placeholder={
@@ -958,7 +1027,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
                       : isTranscribing ? "Bezig met transcriberen..."
                       : "Spreek of typ in het Nederlands..."
                   }
-                  className="bg-transparent text-white text-xs md:text-sm font-light tracking-wide outline-none flex-1 px-3 py-1 placeholder:text-[#444] placeholder:tracking-wider min-w-0"
+                  className={`bg-transparent text-white text-xs md:text-sm font-light tracking-wide outline-none flex-1 px-3 py-1.5 placeholder:text-[#444] placeholder:tracking-wider min-w-0 resize-none overflow-hidden leading-snug ${manualInput ? '' : 'whitespace-nowrap'}`}
                 />
 
                 {/* Send button */}
@@ -998,8 +1067,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
             </div>
           )}
 
-          <div className="text-[9px] uppercase tracking-[0.5em] text-[#666] flex items-center gap-4 mt-2 font-bold w-full justify-between md:w-auto md:justify-start">
-            <div className="flex items-center gap-4 border-r border-[#333] pr-6">
+          <div className="text-[9px] uppercase tracking-[0.3em] md:tracking-[0.5em] whitespace-nowrap text-[#666] flex items-center gap-4 mt-2 font-bold w-full justify-between md:w-auto md:justify-start">
+            <div className="flex items-center gap-3 md:gap-4 border-r border-[#333] pr-4 md:pr-6">
               <div className={`w-1.5 h-1.5 ${isRecording || audioLevel > AUDIO_THRESHOLD ? 'bg-white' : 'bg-[#333]'}`} />
               {responseMode === 'review'
                 ? (isRecording ? 'LISTENING...'
@@ -1014,7 +1083,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ scenario, onExit }) => {
       </div>
 
       {/* WHISPERS SIDEBAR (Right Absolute Drawer) — desktop only */}
-      <div className="absolute top-0 right-0 h-full w-full md:w-1/4 bg-[#0a0a0a]/40 backdrop-blur-md border-l border-[#111111]/50 hidden md:flex flex-col z-50">
+      <div className="absolute top-0 right-0 h-full w-full md:w-1/3 lg:w-1/4 bg-[#0a0a0a]/40 backdrop-blur-md border-l border-[#111111]/50 hidden md:flex flex-col z-50">
         {whispersPanelContent}
       </div>
 

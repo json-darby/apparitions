@@ -210,23 +210,29 @@ async def generate_review(request: ReviewRequest):
         print(f"Review API Error: {e}")
         raise HTTPException(status_code=500, detail="Failed to generate review.")
 
+VOXTRAL_URL = "https://api.mistral.ai/v1/audio/transcriptions"
+VOXTRAL_MODEL = "voxtral-mini-latest"
+
+
 class TranscribeRequest(BaseModel):
     """Payload for /api/transcribe: base64-encoded audio plus its MIME type."""
     audio: str
     mime_type: str = "audio/wav"
-    language: str = "Dutch"
+    language: str = "nl"
 
 
 @app.post("/api/transcribe")
 async def transcribe_audio(request: TranscribeRequest):
     """
-    Transcribe a short recording of the user speaking.
+    Transcribe a short recording of the user speaking (Reflection mode).
 
-    The browser's own Web Speech API is not a dependable path here: Chrome routes it
-    through Google's servers (blocked on plenty of networks) and privacy-focused
-    browsers such as Brave ship without the key entirely, so it fails instantly with a
-    'network' error. Doing it server-side works in every browser and reuses the
-    microphone permission the live session already holds.
+    Uses Mistral's Voxtral speech-to-text model on the same key as the Whisper
+    system. It is a dedicated transcription model, so it is fast (~1s), returns
+    the words verbatim, and has its own free-tier budget separate from chat.
+
+    The browser's Web Speech API is not an option: Chrome routes it through
+    Google's servers (blocked on plenty of networks) and Brave ships without the
+    key entirely, so it fails instantly with a 'network' error.
     """
     import base64
 
@@ -238,25 +244,21 @@ async def transcribe_audio(request: TranscribeRequest):
     if not audio_bytes:
         raise HTTPException(status_code=400, detail="Empty audio payload.")
 
-    if not api_key:
-        raise HTTPException(status_code=503, detail="Transcription is unavailable: GEMINI_API_KEY is not set.")
+    mistral_key = os.getenv("WHISPER_SYSTEM_MISTRAL")
+    if not mistral_key:
+        raise HTTPException(status_code=503, detail="Transcription is unavailable: WHISPER_SYSTEM_MISTRAL is not set.")
 
-    prompt = (
-        f"Transcribe the {request.language} speech in this audio exactly as spoken. "
-        "Return ONLY the transcript text, with no quotes, no translation, no commentary. "
-        "If there is no intelligible speech, return an empty string."
-    )
-
+    extension = request.mime_type.split("/")[-1].split(";")[0] or "wav"
     try:
-        response = await asyncio.to_thread(
-            client.models.generate_content,
-            model="gemini-2.5-flash",
-            contents=[
-                types.Part.from_bytes(data=audio_bytes, mime_type=request.mime_type),
-                prompt,
-            ],
-        )
-        return {"text": (response.text or "").strip()}
+        async with httpx.AsyncClient(timeout=30) as http:
+            response = await http.post(
+                VOXTRAL_URL,
+                headers={"Authorization": f"Bearer {mistral_key}"},
+                files={"file": (f"speech.{extension}", audio_bytes, request.mime_type)},
+                data={"model": VOXTRAL_MODEL, "language": request.language},
+            )
+        response.raise_for_status()
+        return {"text": (response.json().get("text") or "").strip()}
     except Exception as e:
         print(f"Transcription Error: {e}")
         raise HTTPException(status_code=502, detail="Transcription failed.")
